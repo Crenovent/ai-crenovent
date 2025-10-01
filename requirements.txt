@@ -10,14 +10,14 @@ requests==2.31.0
 sqlalchemy==2.0.20
 # Fixed: Use asyncpg instead of psycopg2-binary for better Windows compatibility
 asyncpg==0.29.0
-typing_extensions==4.7.1
+typing_extensions>=4.8.0
 
 # LangChain and LangGraph for advanced AI workflows
-langchain==0.1.17
-langchain-community==0.0.38
-langchain-openai==0.1.7
-langgraph==0.0.53
-langsmith==0.1.56
+langchain>=0.2.0
+langchain-community>=0.2.0
+langchain-openai>=0.1.0
+langgraph>=0.2.0
+langsmith>=0.1.0
 
 # Memory and conversation management (optional)
 # redis==4.6.0
@@ -25,13 +25,13 @@ langsmith==0.1.56
 
 # Real-time communication
 websockets==11.0.3
-socketio==5.9.0
+python-socketio==5.9.0
 flask-socketio==5.3.6
 
 # Agent tools and utilities
 pydantic==2.4.2
 tenacity==8.2.3
-tiktoken==0.5.1
+tiktoken>=0.7,<1
 
 # RPA and automation dependencies
 selenium==4.15.0
@@ -46,7 +46,7 @@ numpy==1.24.3
 pyodbc==4.0.39
 
 # Enterprise LangChain Tools for Revolutionary AI
-langchain-experimental==0.0.58
+langchain-experimental>=0.0.60
 tavily-python==0.3.3
 # pgvector==0.2.4  # May not be needed with asyncpg
 
