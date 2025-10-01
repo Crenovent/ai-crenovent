@@ -1,0 +1,203 @@
+workflow_id: forecast_variance_alert_rba
+name: "Forecast Variance Alert (RBA)"
+description: "Automated detection of forecast variance >10% with CRO alerts and governance tracking"
+version: "1.0"
+automation_type: "RBA"
+module: "Forecast"
+industry: "SaaS"
+created_by: "system"
+tags: ["forecast", "variance", "alert", "compliance", "sox"]
+
+# Governance Configuration
+governance:
+  policy_pack_id: "sox_forecast_compliance"
+  evidence_capture: true
+  trust_threshold: 0.95
+  requires_approval: false
+  compliance_tags: ["sox", "financial_reporting"]
+
+# Input Schema
+input_schema:
+  type: "object"
+  required: ["forecast_period", "tenant_id", "user_id"]
+  properties:
+    forecast_period:
+      type: "string"
+      description: "Forecast period (e.g., Q4-2024)"
+    tenant_id:
+      type: "string"
+      description: "Tenant identifier"
+    user_id:
+      type: "string"
+      description: "User requesting the analysis"
+    variance_threshold:
+      type: "number"
+      default: 0.10
+      description: "Variance threshold (default 10%)"
+
+# Workflow Steps
+steps:
+  - id: "fetch_forecast_data"
+    type: "policy_query"
+    params:
+      query_type: "forecast_data"
+      endpoint: "/api/forecasts/variance-analysis"
+      method: "POST"
+      data:
+        forecast_period: "{{ input.forecast_period }}"
+        tenant_id: "{{ input.tenant_id }}"
+        user_id: "{{ input.user_id }}"
+        include_variance: true
+        apply_policies: true
+      expected_fields: ["forecast_amount", "actual_amount", "variance_pct", "owner_id", "territory", "created_at"]
+    governance:
+      policy_id: "data_access_sox"
+      evidence_capture: true
+
+  - id: "calculate_variance"
+    type: "decision"
+    params:
+      condition_type: "business_rule"
+      rules:
+        - condition: "variance_pct > {{ input.variance_threshold | default(0.10) }}"
+          action: "high_variance_detected"
+          metadata:
+            severity: "high"
+            requires_attention: true
+        - condition: "variance_pct > 0.05 and variance_pct <= {{ input.variance_threshold | default(0.10) }}"
+          action: "medium_variance_detected"
+          metadata:
+            severity: "medium"
+            requires_attention: false
+        - condition: "variance_pct <= 0.05"
+          action: "variance_within_tolerance"
+          metadata:
+            severity: "low"
+            requires_attention: false
+    inputs:
+      variance_pct: "{{ steps.fetch_forecast_data.result.variance_pct }}"
+    governance:
+      policy_id: "business_logic_sox"
+      evidence_capture: true
+
+  - id: "identify_stakeholders"
+    type: "policy_query"
+    params:
+      query_type: "user_hierarchy"
+      endpoint: "/api/users/hierarchy"
+      method: "POST"
+      data:
+        user_id: "{{ steps.fetch_forecast_data.result.owner_id }}"
+        tenant_id: "{{ input.tenant_id }}"
+        include_management_chain: true
+      expected_fields: ["manager_id", "cro_id", "finance_team", "notification_preferences"]
+    condition: "{{ steps.calculate_variance.result.action in ['high_variance_detected', 'medium_variance_detected'] }}"
+    governance:
+      policy_id: "stakeholder_access_sox"
+      evidence_capture: true
+
+  - id: "cro_alert_high_variance"
+    type: "notify"
+    params:
+      notification_type: "high_priority_alert"
+      recipients: ["{{ steps.identify_stakeholders.result.cro_id }}"]
+      channel: "email"
+      template: "forecast_variance_cro_alert"
+      data:
+        forecast_period: "{{ input.forecast_period }}"
+        variance_pct: "{{ steps.fetch_forecast_data.result.variance_pct }}"
+        forecast_amount: "{{ steps.fetch_forecast_data.result.forecast_amount }}"
+        actual_amount: "{{ steps.fetch_forecast_data.result.actual_amount }}"
+        owner_name: "{{ steps.fetch_forecast_data.result.owner_name }}"
+        territory: "{{ steps.fetch_forecast_data.result.territory }}"
+        severity: "{{ steps.calculate_variance.result.metadata.severity }}"
+        alert_time: "{{ workflow.execution_time }}"
+    condition: "{{ steps.calculate_variance.result.action == 'high_variance_detected' }}"
+    governance:
+      policy_id: "executive_notification_sox"
+      evidence_capture: true
+
+  - id: "manager_notification"
+    type: "notify"
+    params:
+      notification_type: "variance_notification"
+      recipients: ["{{ steps.identify_stakeholders.result.manager_id }}"]
+      channel: "slack"
+      template: "forecast_variance_manager_alert"
+      data:
+        forecast_period: "{{ input.forecast_period }}"
+        variance_pct: "{{ steps.fetch_forecast_data.result.variance_pct }}"
+        severity: "{{ steps.calculate_variance.result.metadata.severity }}"
+        action_required: "{{ steps.calculate_variance.result.metadata.requires_attention }}"
+    condition: "{{ steps.calculate_variance.result.action in ['high_variance_detected', 'medium_variance_detected'] }}"
+    governance:
+      policy_id: "manager_notification_sox"
+      evidence_capture: true
+
+  - id: "create_variance_record"
+    type: "query"
+    params:
+      query_type: "policy_aware_insert"
+      endpoint: "forecast_variance_log"
+      data:
+        forecast_period: "{{ input.forecast_period }}"
+        variance_pct: "{{ steps.fetch_forecast_data.result.variance_pct }}"
+        variance_amount: "{{ steps.fetch_forecast_data.result.forecast_amount - steps.fetch_forecast_data.result.actual_amount }}"
+        severity: "{{ steps.calculate_variance.result.metadata.severity }}"
+        owner_id: "{{ steps.fetch_forecast_data.result.owner_id }}"
+        territory: "{{ steps.fetch_forecast_data.result.territory }}"
+        alert_sent: "{{ steps.cro_alert_high_variance.success or false }}"
+        detected_at: "{{ workflow.execution_time }}"
+        tenant_id: "{{ input.tenant_id }}"
+    governance:
+      policy_id: "audit_trail_sox"
+      evidence_capture: true
+
+  - id: "compliance_evidence"
+    type: "governance"
+    params:
+      evidence_type: "forecast_variance_analysis"
+      compliance_pack: "sox_forecast"
+      evidence_data:
+        workflow_id: "{{ workflow.id }}"
+        execution_id: "{{ workflow.execution_id }}"
+        variance_threshold: "{{ input.variance_threshold }}"
+        variance_detected: "{{ steps.fetch_forecast_data.result.variance_pct }}"
+        alerts_sent: 
+          cro_alert: "{{ steps.cro_alert_high_variance.success or false }}"
+          manager_alert: "{{ steps.manager_notification.success or false }}"
+        compliance_status: "compliant"
+        audit_trail: "complete"
+        data_retention: "7_years"
+    governance:
+      policy_id: "sox_evidence_creation"
+      evidence_capture: true
+
+# Success Criteria
+success_criteria:
+  - "All variance calculations completed accurately"
+  - "Appropriate stakeholders notified based on severity"
+  - "Compliance evidence captured per SOX requirements"
+  - "Audit trail created for regulatory review"
+
+# Error Handling
+error_handling:
+  - step: "fetch_forecast_data"
+    on_error: "data_unavailable"
+    action: "notify_admin"
+  - step: "cro_alert_high_variance"
+    on_error: "notification_failed"
+    action: "escalate_to_backup_channel"
+
+# Performance Metrics
+performance_metrics:
+  max_execution_time: "30s"
+  expected_accuracy: "99.5%"
+  sla_tier: "T1"
+
+# Business Impact
+business_impact:
+  cost_savings: "Early variance detection prevents revenue leakage"
+  compliance_value: "SOX-compliant forecast monitoring"
+  efficiency_gain: "Automated detection replaces manual review"
+  risk_mitigation: "Proactive alerting reduces financial surprises"

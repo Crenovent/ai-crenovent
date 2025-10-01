@@ -1,0 +1,90 @@
+# Sample DSL Workflow with Governance Metadata
+# =============================================
+# Demonstrates Task 7.1.3: Mandatory governance metadata fields
+
+workflow_id: "wf_pipeline_hygiene_governance_demo"
+name: "Pipeline Hygiene with Governance"
+module: "Pipeline"
+automation_type: "RBA"
+version: "1.0.0"
+
+# Governance metadata (Task 7.1.3)
+governance:
+  tenant_id: 1300
+  region_id: "US"
+  sla_tier: "T1"
+  policy_pack_id: "550e8400-e29b-41d4-a716-446655440000"
+  trust_score_threshold: 0.8
+  evidence_pack_required: true
+  
+metadata:
+  description: "Automated pipeline hygiene analysis with governance enforcement"
+  created_by: "system"
+  industry_overlay: "SaaS"
+  compliance_frameworks: ["SOX", "GDPR"]
+  governance:
+    audit_trail_required: true
+    deterministic_validation: true
+    approval_required_for_overrides: true
+
+steps:
+  - id: "extract_opportunities"
+    type: "query"
+    params:
+      source: "postgres"
+      resource: "opportunities"
+      filters:
+        - field: "stage"
+          operator: "not_in"
+          value: ["Closed Won", "Closed Lost"]
+        - field: "tenant_id"
+          operator: "eq"
+          value: "{{tenant_id}}"  # Dynamic tenant scoping
+    outputs:
+      opportunities: "all_opportunities"
+    governance:
+      policy_id: "data_access_policy_v1"
+      evidence_capture: true
+      consent_required: false
+      
+  - id: "identify_stale_deals"
+    type: "decision"
+    params:
+      condition: "last_activity_date < (current_date - {{stale_threshold_days}} days)"
+      true_action: "flag_as_stale"
+      false_action: "continue"
+    outputs:
+      stale_opportunities: "stale_deals"
+    governance:
+      policy_id: "business_logic_policy_v1"
+      evidence_capture: true
+      trust_threshold: 0.9
+      
+  - id: "generate_alerts"
+    type: "notify"
+    params:
+      channel: "slack"
+      template: "stale_deals_alert"
+      recipients: ["sales_managers", "revops_team"]
+      data:
+        stale_count: "{{stale_opportunities.length}}"
+        total_value: "{{stale_opportunities.sum(amount)}}"
+    governance:
+      policy_id: "notification_policy_v1"
+      evidence_capture: true
+      approval_required: false
+      
+  - id: "log_evidence"
+    type: "governance"
+    params:
+      action: "create_evidence_pack"
+      include_inputs: true
+      include_outputs: true
+      include_decisions: true
+      retention_period: "2555"  # 7 years
+    governance:
+      policy_id: "evidence_generation_policy_v1"
+      immutable: true
+      compliance_frameworks: ["SOX"]
+
+

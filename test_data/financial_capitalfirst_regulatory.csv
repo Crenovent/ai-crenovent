@@ -1,0 +1,36 @@
+Full Name,Email,Position,Division,Reporting Manager Email,License Type,Office,Start Date,Employee ID,Risk Level
+Alexander Mitchell,alexander.mitchell@capitalfirst.com,Chief Executive Officer,Executive Office,,Series 24,New York HQ,2015-01-15,CF001,Executive
+Catherine Williams,catherine.williams@capitalfirst.com,Chief Risk Officer,Risk Management,alexander.mitchell@capitalfirst.com,CRM,New York HQ,2015-06-01,CF002,C-Level
+Jonathan Davis,jonathan.davis@capitalfirst.com,Chief Compliance Officer,Compliance,alexander.mitchell@capitalfirst.com,Series 24,New York HQ,2015-05-15,CF003,C-Level
+Elizabeth Rodriguez,elizabeth.rodriguez@capitalfirst.com,Chief Investment Officer,Investment Management,alexander.mitchell@capitalfirst.com,CFA,New York HQ,2015-07-01,CF004,C-Level
+Robert Chen,robert.chen@capitalfirst.com,Head of Wealth Management,Wealth Management,alexander.mitchell@capitalfirst.com,Series 7,Boston,2015-08-01,CF005,Director
+Patricia Martinez,patricia.martinez@capitalfirst.com,Head of Corporate Banking,Corporate Banking,alexander.mitchell@capitalfirst.com,Series 79,Chicago,2015-09-01,CF006,Director
+Michael Johnson,michael.johnson@capitalfirst.com,Head of Retail Banking,Retail Banking,alexander.mitchell@capitalfirst.com,Series 6,Atlanta,2015-10-01,CF007,Director
+Jennifer Kim,jennifer.kim@capitalfirst.com,Senior Risk Manager - Credit,Risk Management,catherine.williams@capitalfirst.com,FRM,New York HQ,2016-01-15,CF008,Senior Manager
+David Thompson,david.thompson@capitalfirst.com,Senior Risk Manager - Market,Risk Management,catherine.williams@capitalfirst.com,PRM,New York HQ,2016-02-01,CF009,Senior Manager
+Lisa Wilson,lisa.wilson@capitalfirst.com,Senior Risk Manager - Operational,Risk Management,catherine.williams@capitalfirst.com,CISA,New York HQ,2016-03-01,CF010,Senior Manager
+Amanda Brown,amanda.brown@capitalfirst.com,Senior Compliance Manager,Compliance,jonathan.davis@capitalfirst.com,CAMS,New York HQ,2016-04-01,CF011,Senior Manager
+Thomas Garcia,thomas.garcia@capitalfirst.com,Senior Portfolio Manager,Investment Management,elizabeth.rodriguez@capitalfirst.com,CFA,New York HQ,2016-05-01,CF012,Senior Manager
+Sarah Miller,sarah.miller@capitalfirst.com,Senior Wealth Advisor,Wealth Management,robert.chen@capitalfirst.com,CFP,Boston,2016-06-01,CF013,Senior Manager
+James Anderson,james.anderson@capitalfirst.com,Senior Relationship Manager,Corporate Banking,patricia.martinez@capitalfirst.com,Series 79,Chicago,2016-07-01,CF014,Senior Manager
+Rachel Lee,rachel.lee@capitalfirst.com,Branch Manager - Downtown,Retail Banking,michael.johnson@capitalfirst.com,Series 6,Atlanta,2016-08-01,CF015,Manager
+Kevin White,kevin.white@capitalfirst.com,Branch Manager - Midtown,Retail Banking,michael.johnson@capitalfirst.com,Series 6,Atlanta,2016-09-01,CF016,Manager
+Emily Clark,emily.clark@capitalfirst.com,Credit Risk Analyst,Risk Management,jennifer.kim@capitalfirst.com,Series 3,New York HQ,2017-01-15,CF017,Analyst
+Daniel Taylor,daniel.taylor@capitalfirst.com,Market Risk Analyst,Risk Management,david.thompson@capitalfirst.com,FRM,New York HQ,2017-02-01,CF018,Analyst
+Ashley Moore,ashley.moore@capitalfirst.com,Operational Risk Analyst,Risk Management,lisa.wilson@capitalfirst.com,CISA,New York HQ,2017-03-01,CF019,Analyst
+Christopher Jackson,christopher.jackson@capitalfirst.com,Compliance Analyst - AML,Compliance,amanda.brown@capitalfirst.com,CAMS,New York HQ,2017-04-01,CF020,Analyst
+Victoria Thompson,victoria.thompson@capitalfirst.com,Compliance Analyst - Trading,Compliance,amanda.brown@capitalfirst.com,Series 7,New York HQ,2017-05-01,CF021,Analyst
+Ryan Williams,ryan.williams@capitalfirst.com,Investment Analyst,Investment Management,thomas.garcia@capitalfirst.com,CFA Level II,New York HQ,2017-06-01,CF022,Analyst
+Maya Harris,maya.harris@capitalfirst.com,Portfolio Analyst,Investment Management,thomas.garcia@capitalfirst.com,Series 86,New York HQ,2017-07-01,CF023,Analyst
+Jordan Martin,jordan.martin@capitalfirst.com,Wealth Management Associate,Wealth Management,sarah.miller@capitalfirst.com,Series 7,Boston,2017-08-01,CF024,Associate
+Grace Davis,grace.davis@capitalfirst.com,Private Banking Associate,Wealth Management,sarah.miller@capitalfirst.com,Series 66,Boston,2017-09-01,CF025,Associate
+Tyler Rodriguez,tyler.rodriguez@capitalfirst.com,Corporate Banking Associate,Corporate Banking,james.anderson@capitalfirst.com,Series 79,Chicago,2017-10-01,CF026,Associate
+Olivia Garcia,olivia.garcia@capitalfirst.com,Credit Analyst,Corporate Banking,james.anderson@capitalfirst.com,Series 3,Chicago,2017-11-01,CF027,Associate
+Nathan Wilson,nathan.wilson@capitalfirst.com,Senior Teller,Retail Banking,rachel.lee@capitalfirst.com,None,Atlanta,2018-01-15,CF028,Teller
+Sophie Martinez,sophie.martinez@capitalfirst.com,Personal Banker,Retail Banking,rachel.lee@capitalfirst.com,Series 6,Atlanta,2018-02-01,CF029,Banker
+Lucas Johnson,lucas.johnson@capitalfirst.com,Loan Officer,Retail Banking,kevin.white@capitalfirst.com,MLO,Atlanta,2018-03-01,CF030,Loan Officer
+Chloe Anderson,chloe.anderson@capitalfirst.com,Customer Relationship Specialist,Retail Banking,kevin.white@capitalfirst.com,Series 6,Atlanta,2018-04-01,CF031,Specialist
+Ethan Thompson,ethan.thompson@capitalfirst.com,Junior Risk Analyst,Risk Management,emily.clark@capitalfirst.com,Series 3,New York HQ,2018-07-01,CF032,Junior Analyst
+Zoe Brown,zoe.brown@capitalfirst.com,Junior Compliance Officer,Compliance,christopher.jackson@capitalfirst.com,CAMS,New York HQ,2018-08-01,CF033,Junior Officer
+Ian Miller,ian.miller@capitalfirst.com,Research Associate,Investment Management,ryan.williams@capitalfirst.com,CFA Level I,New York HQ,2018-09-01,CF034,Associate
+Aria Davis,aria.davis@capitalfirst.com,Client Service Associate,Wealth Management,jordan.martin@capitalfirst.com,Series 7,Boston,2018-10-01,CF035,Associate

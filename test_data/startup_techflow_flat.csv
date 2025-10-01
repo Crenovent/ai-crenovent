@@ -1,0 +1,10 @@
+Name,Email,Role,Department,Phone,Manager Email,Location,Hire Date,Employee ID
+Sarah Kim,sarah.kim@techflow.io,CEO & Founder,Executive,+1-555-0101,,San Francisco,2023-01-15,TF001
+Marcus Chen,marcus.chen@techflow.io,CTO,Engineering,+1-555-0102,sarah.kim@techflow.io,San Francisco,2023-02-01,TF002
+Lisa Rodriguez,lisa.rodriguez@techflow.io,Head of Product,Product,+1-555-0103,sarah.kim@techflow.io,San Francisco,2023-02-15,TF003
+James Wilson,james.wilson@techflow.io,Senior Developer,Engineering,+1-555-0104,marcus.chen@techflow.io,San Francisco,2023-03-01,TF004
+Emma Thompson,emma.thompson@techflow.io,Full Stack Developer,Engineering,+1-555-0105,marcus.chen@techflow.io,Remote,2023-03-15,TF005
+David Park,david.park@techflow.io,Product Manager,Product,+1-555-0106,lisa.rodriguez@techflow.io,San Francisco,2023-04-01,TF006
+Rachel Green,rachel.green@techflow.io,UX Designer,Product,+1-555-0107,lisa.rodriguez@techflow.io,Remote,2023-04-15,TF007
+Alex Johnson,alex.johnson@techflow.io,Sales Lead,Sales,+1-555-0108,sarah.kim@techflow.io,San Francisco,2023-05-01,TF008
+Maya Patel,maya.patel@techflow.io,Marketing Manager,Marketing,+1-555-0109,sarah.kim@techflow.io,Remote,2023-05-15,TF009

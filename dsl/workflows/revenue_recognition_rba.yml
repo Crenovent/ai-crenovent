@@ -1,0 +1,288 @@
+workflow_id: revenue_recognition_rba
+name: "Revenue Recognition RBA"
+description: "Automated revenue recognition processing with ASC 606 compliance and SOX controls"
+version: "1.0"
+automation_type: "RBA"
+module: "Revenue"
+industry: "SaaS"
+created_by: "system"
+tags: ["revenue", "recognition", "asc606", "sox", "financial_compliance"]
+
+# Governance Configuration
+governance:
+  policy_pack_id: "revenue_recognition_sox"
+  evidence_capture: true
+  trust_threshold: 0.99
+  requires_approval: true
+  compliance_tags: ["sox", "asc606", "gaap", "financial_reporting"]
+
+# Input Schema
+input_schema:
+  type: "object"
+  required: ["contract_id", "recognition_period", "tenant_id", "user_id"]
+  properties:
+    contract_id:
+      type: "string"
+      description: "Contract identifier for revenue recognition"
+    recognition_period:
+      type: "string"
+      description: "Recognition period (e.g., 2024-12)"
+    tenant_id:
+      type: "string"
+      description: "Tenant identifier"
+    user_id:
+      type: "string"
+      description: "User initiating revenue recognition"
+    manual_override:
+      type: "boolean"
+      default: false
+      description: "Manual override flag for special cases"
+
+# Workflow Steps
+steps:
+  - id: "fetch_contract_details"
+    type: "query"
+    params:
+      query_type: "policy_aware_query"
+      endpoint: "contract_data"
+      filters:
+        contract_id: "{{ input.contract_id }}"
+        tenant_id: "{{ input.tenant_id }}"
+      projections: 
+        - "contract_value"
+        - "contract_start_date"
+        - "contract_end_date"
+        - "performance_obligations"
+        - "payment_terms"
+        - "contract_status"
+        - "customer_id"
+        - "billing_schedule"
+    governance:
+      policy_id: "contract_data_access_sox"
+      evidence_capture: true
+
+  - id: "validate_contract_status"
+    type: "decision"
+    params:
+      condition_type: "contract_validation"
+      rules:
+        - condition: "contract_status == 'executed' and contract_start_date <= '{{ input.recognition_period }}'"
+          action: "contract_valid_for_recognition"
+          metadata:
+            validation_status: "passed"
+        - condition: "contract_status != 'executed'"
+          action: "contract_not_executed"
+          metadata:
+            validation_status: "failed"
+            reason: "Contract not in executed status"
+        - condition: "contract_start_date > '{{ input.recognition_period }}'"
+          action: "contract_future_dated"
+          metadata:
+            validation_status: "failed"
+            reason: "Contract start date is in the future"
+    inputs:
+      contract_status: "{{ steps.fetch_contract_details.result.contract_status }}"
+      contract_start_date: "{{ steps.fetch_contract_details.result.contract_start_date }}"
+    governance:
+      policy_id: "contract_validation_sox"
+      evidence_capture: true
+
+  - id: "calculate_performance_obligations"
+    type: "decision"
+    params:
+      condition_type: "asc606_calculation"
+      calculations:
+        monthly_recognition: "{{ steps.fetch_contract_details.result.contract_value / contract_term_months }}"
+        current_period_recognition: "{{ steps.calculate_performance_obligations.calculations.monthly_recognition }}"
+        cumulative_recognized: "{{ sum(prior_period_recognitions) }}"
+        remaining_to_recognize: "{{ steps.fetch_contract_details.result.contract_value - steps.calculate_performance_obligations.calculations.cumulative_recognized }}"
+      business_rules:
+        asc606_compliance: "Performance obligations recognized over time based on service delivery"
+        recognition_method: "straight_line"
+        currency: "{{ steps.fetch_contract_details.result.contract_currency }}"
+    condition: "{{ steps.validate_contract_status.result.action == 'contract_valid_for_recognition' }}"
+    governance:
+      policy_id: "asc606_calculation_rules"
+      evidence_capture: true
+
+  - id: "check_payment_status"
+    type: "query"
+    params:
+      query_type: "policy_aware_query"
+      endpoint: "payment_history"
+      filters:
+        contract_id: "{{ input.contract_id }}"
+        payment_period: "{{ input.recognition_period }}"
+        tenant_id: "{{ input.tenant_id }}"
+      projections: ["payment_received", "payment_date", "payment_amount", "payment_status"]
+    condition: "{{ steps.validate_contract_status.result.action == 'contract_valid_for_recognition' }}"
+    governance:
+      policy_id: "payment_data_access_sox"
+      evidence_capture: true
+
+  - id: "determine_recognition_eligibility"
+    type: "decision"
+    params:
+      condition_type: "recognition_eligibility"
+      rules:
+        - condition: "payment_received == true and service_delivered == true"
+          action: "eligible_for_recognition"
+          metadata:
+            eligibility_status: "approved"
+            recognition_basis: "payment_and_delivery"
+        - condition: "payment_received == false and service_delivered == true"
+          action: "eligible_for_accrual"
+          metadata:
+            eligibility_status: "accrual_basis"
+            recognition_basis: "service_delivery"
+        - condition: "service_delivered == false"
+          action: "not_eligible_for_recognition"
+          metadata:
+            eligibility_status: "deferred"
+            recognition_basis: "service_pending"
+    inputs:
+      payment_received: "{{ steps.check_payment_status.result.payment_received }}"
+      service_delivered: true  # For SaaS, assume service is delivered monthly
+    governance:
+      policy_id: "recognition_eligibility_sox"
+      evidence_capture: true
+
+  - id: "generate_journal_entries"
+    type: "decision"
+    params:
+      condition_type: "journal_entry_generation"
+      journal_entries:
+        - account: "Deferred Revenue"
+          debit: 0
+          credit: "{{ steps.calculate_performance_obligations.calculations.current_period_recognition }}"
+        - account: "Revenue"
+          debit: "{{ steps.calculate_performance_obligations.calculations.current_period_recognition }}"
+          credit: 0
+      metadata:
+        entry_type: "revenue_recognition"
+        recognition_basis: "{{ steps.determine_recognition_eligibility.result.metadata.recognition_basis }}"
+        contract_reference: "{{ input.contract_id }}"
+        period: "{{ input.recognition_period }}"
+    condition: "{{ steps.determine_recognition_eligibility.result.action in ['eligible_for_recognition', 'eligible_for_accrual'] }}"
+    governance:
+      policy_id: "journal_entry_sox"
+      evidence_capture: true
+
+  - id: "finance_approval_required"
+    type: "notify"
+    params:
+      notification_type: "approval_request"
+      recipients: ["finance_controller", "revenue_accounting_manager"]
+      channel: "email"
+      template: "revenue_recognition_approval"
+      data:
+        contract_id: "{{ input.contract_id }}"
+        customer_id: "{{ steps.fetch_contract_details.result.customer_id }}"
+        recognition_amount: "{{ steps.calculate_performance_obligations.calculations.current_period_recognition }}"
+        recognition_period: "{{ input.recognition_period }}"
+        journal_entries: "{{ steps.generate_journal_entries.result.journal_entries }}"
+        manual_override: "{{ input.manual_override }}"
+        approval_required: true
+    condition: "{{ input.manual_override == true or steps.calculate_performance_obligations.calculations.current_period_recognition > 100000 }}"
+    governance:
+      policy_id: "finance_approval_sox"
+      evidence_capture: true
+
+  - id: "create_revenue_recognition_record"
+    type: "query"
+    params:
+      query_type: "policy_aware_insert"
+      endpoint: "revenue_recognition_log"
+      data:
+        contract_id: "{{ input.contract_id }}"
+        recognition_period: "{{ input.recognition_period }}"
+        recognition_amount: "{{ steps.calculate_performance_obligations.calculations.current_period_recognition }}"
+        recognition_status: "{{ steps.determine_recognition_eligibility.result.metadata.eligibility_status }}"
+        journal_entries: "{{ steps.generate_journal_entries.result.journal_entries }}"
+        approval_required: "{{ steps.finance_approval_required.success or false }}"
+        processed_by: "{{ input.user_id }}"
+        processed_at: "{{ workflow.execution_time }}"
+        compliance_flags: ["asc606", "sox"]
+        tenant_id: "{{ input.tenant_id }}"
+    condition: "{{ steps.determine_recognition_eligibility.result.action in ['eligible_for_recognition', 'eligible_for_accrual'] }}"
+    governance:
+      policy_id: "revenue_recognition_audit_trail"
+      evidence_capture: true
+
+  - id: "post_to_general_ledger"
+    type: "query"
+    params:
+      query_type: "policy_aware_insert"
+      endpoint: "general_ledger"
+      data:
+        transaction_type: "revenue_recognition"
+        journal_entries: "{{ steps.generate_journal_entries.result.journal_entries }}"
+        period: "{{ input.recognition_period }}"
+        source_document: "{{ input.contract_id }}"
+        posted_by: "automated_revenue_recognition"
+        posted_at: "{{ workflow.execution_time }}"
+        approval_status: "{{ 'pending_approval' if steps.finance_approval_required.success else 'auto_approved' }}"
+        tenant_id: "{{ input.tenant_id }}"
+    condition: "{{ steps.determine_recognition_eligibility.result.action in ['eligible_for_recognition', 'eligible_for_accrual'] and not steps.finance_approval_required.success }}"
+    governance:
+      policy_id: "general_ledger_posting_sox"
+      evidence_capture: true
+
+  - id: "sox_compliance_evidence"
+    type: "governance"
+    params:
+      evidence_type: "revenue_recognition_compliance"
+      compliance_pack: "sox_revenue_controls"
+      evidence_data:
+        workflow_id: "{{ workflow.id }}"
+        execution_id: "{{ workflow.execution_id }}"
+        contract_analyzed: "{{ input.contract_id }}"
+        recognition_period: "{{ input.recognition_period }}"
+        asc606_compliance: true
+        validation_results:
+          contract_status: "{{ steps.validate_contract_status.result.metadata.validation_status }}"
+          eligibility_check: "{{ steps.determine_recognition_eligibility.result.metadata.eligibility_status }}"
+        financial_impact:
+          recognition_amount: "{{ steps.calculate_performance_obligations.calculations.current_period_recognition }}"
+          journal_entries_count: "{{ steps.generate_journal_entries.result.journal_entries | length }}"
+        controls_executed:
+          segregation_of_duties: "{{ steps.finance_approval_required.success or false }}"
+          audit_trail_complete: true
+          authorization_proper: true
+        compliance_status: "compliant"
+        data_retention: "7_years"
+    governance:
+      policy_id: "sox_revenue_evidence_creation"
+      evidence_capture: true
+
+# Success Criteria
+success_criteria:
+  - "Revenue recognition calculated per ASC 606 standards"
+  - "All SOX controls executed and documented"
+  - "Journal entries generated and posted correctly"
+  - "Audit trail maintained for regulatory compliance"
+
+# Error Handling
+error_handling:
+  - step: "fetch_contract_details"
+    on_error: "contract_data_unavailable"
+    action: "notify_revenue_accounting_team"
+  - step: "post_to_general_ledger"
+    on_error: "gl_posting_failed"
+    action: "create_manual_journal_entry_request"
+  - step: "sox_compliance_evidence"
+    on_error: "evidence_creation_failed"
+    action: "alert_compliance_team"
+
+# Performance Metrics
+performance_metrics:
+  max_execution_time: "60s"
+  expected_accuracy: "99.9%"
+  sla_tier: "T0"  # Critical financial process
+
+# Business Impact
+business_impact:
+  financial_accuracy: "Ensures accurate revenue recognition per GAAP"
+  compliance_assurance: "Maintains SOX compliance and audit readiness"
+  efficiency_gain: "Automates manual revenue recognition processes"
+  risk_mitigation: "Reduces human error in financial reporting"

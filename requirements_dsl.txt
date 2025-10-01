@@ -1,0 +1,50 @@
+# DSL Service Requirements
+# Core DSL dependencies
+
+# FastAPI and ASGI server
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# YAML parsing and validation
+PyYAML==6.0.1
+jsonschema==4.20.0
+
+# Async database
+asyncpg==0.29.0
+
+# HTTP client for external APIs
+httpx==0.25.2
+aiohttp==3.9.1
+
+# Azure SDK for blob storage
+azure-storage-blob==12.19.0
+azure-identity==1.15.0
+
+# Data processing
+pandas==2.1.4
+numpy==1.24.4
+
+# Logging and monitoring
+structlog==23.2.0
+
+# Cryptography for evidence hashing
+cryptography==41.0.8
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.2
+
+# Development tools
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.1
+
+# Additional dependencies that may be needed
+python-multipart==0.0.6
+jinja2==3.1.2
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Environment management
+python-dotenv==1.0.0

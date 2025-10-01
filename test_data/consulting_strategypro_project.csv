@@ -1,0 +1,35 @@
+Name,Email,Title,Practice Area,Seniority Level,Reports To,Office Location,Start Date,Employee ID,Billable Rate
+Margaret Thompson,margaret.thompson@strategypro.com,Managing Partner,Leadership,Partner,,New York,2015-01-15,SP001,Executive
+Richard Chen,richard.chen@strategypro.com,Senior Partner - Strategy,Strategy,Partner,margaret.thompson@strategypro.com,New York,2016-03-01,SP002,Senior Partner
+Elizabeth Martinez,elizabeth.martinez@strategypro.com,Senior Partner - Operations,Operations,Partner,margaret.thompson@strategypro.com,Chicago,2016-02-15,SP003,Senior Partner
+James Rodriguez,james.rodriguez@strategypro.com,Senior Partner - Technology,Technology,Partner,margaret.thompson@strategypro.com,San Francisco,2016-04-01,SP004,Senior Partner
+Sarah Kim,sarah.kim@strategypro.com,Partner - Digital Transformation,Strategy,Partner,richard.chen@strategypro.com,New York,2017-01-15,SP005,Partner
+Michael Davis,michael.davis@strategypro.com,Partner - Supply Chain,Operations,Partner,elizabeth.martinez@strategypro.com,Chicago,2017-02-01,SP006,Partner
+Jennifer Wilson,jennifer.wilson@strategypro.com,Partner - IT Strategy,Technology,Partner,james.rodriguez@strategypro.com,San Francisco,2017-03-01,SP007,Partner
+David Johnson,david.johnson@strategypro.com,Principal - Corporate Strategy,Strategy,Principal,sarah.kim@strategypro.com,New York,2018-01-15,SP008,Principal
+Lisa Brown,lisa.brown@strategypro.com,Principal - Process Optimization,Operations,Principal,michael.davis@strategypro.com,Chicago,2018-02-01,SP009,Principal
+Amanda Garcia,amanda.garcia@strategypro.com,Principal - Cloud Architecture,Technology,Principal,jennifer.wilson@strategypro.com,San Francisco,2018-03-01,SP010,Principal
+Thomas Anderson,thomas.anderson@strategypro.com,Principal - M&A Strategy,Strategy,Principal,richard.chen@strategypro.com,Boston,2018-04-01,SP011,Principal
+Rachel Miller,rachel.miller@strategypro.com,Principal - Lean Operations,Operations,Principal,elizabeth.martinez@strategypro.com,Detroit,2018-05-01,SP012,Principal
+Kevin Lee,kevin.lee@strategypro.com,Principal - Data Strategy,Technology,Principal,james.rodriguez@strategypro.com,Austin,2018-06-01,SP013,Principal
+Emily White,emily.white@strategypro.com,Senior Manager - Growth Strategy,Strategy,Senior Manager,david.johnson@strategypro.com,New York,2019-01-15,SP014,Senior Manager
+Daniel Clark,daniel.clark@strategypro.com,Senior Manager - Operations Excellence,Operations,Senior Manager,lisa.brown@strategypro.com,Chicago,2019-02-01,SP015,Senior Manager
+Ashley Taylor,ashley.taylor@strategypro.com,Senior Manager - Digital Solutions,Technology,Senior Manager,amanda.garcia@strategypro.com,San Francisco,2019-03-01,SP016,Senior Manager
+Christopher Moore,christopher.moore@strategypro.com,Senior Manager - Market Entry,Strategy,Senior Manager,thomas.anderson@strategypro.com,Boston,2019-04-01,SP017,Senior Manager
+Victoria Jackson,victoria.jackson@strategypro.com,Senior Manager - Supply Chain Analytics,Operations,Senior Manager,rachel.miller@strategypro.com,Detroit,2019-05-01,SP018,Senior Manager
+Ryan Thompson,ryan.thompson@strategypro.com,Senior Manager - AI Implementation,Technology,Senior Manager,kevin.lee@strategypro.com,Austin,2019-06-01,SP019,Senior Manager
+Maya Patel,maya.patel@strategypro.com,Manager - Business Development,Strategy,Manager,emily.white@strategypro.com,New York,2020-01-15,SP020,Manager
+Jordan Williams,jordan.williams@strategypro.com,Manager - Process Improvement,Operations,Manager,daniel.clark@strategypro.com,Chicago,2020-02-01,SP021,Manager
+Grace Zhang,grace.zhang@strategypro.com,Manager - Software Architecture,Technology,Manager,ashley.taylor@strategypro.com,San Francisco,2020-03-01,SP022,Manager
+Nathan Scott,nathan.scott@strategypro.com,Manager - Competitive Analysis,Strategy,Manager,christopher.moore@strategypro.com,Boston,2020-04-01,SP023,Manager
+Olivia Martinez,olivia.martinez@strategypro.com,Manager - Quality Management,Operations,Manager,victoria.jackson@strategypro.com,Detroit,2020-05-01,SP024,Manager
+Tyler Rodriguez,tyler.rodriguez@strategypro.com,Manager - Machine Learning,Technology,Manager,ryan.thompson@strategypro.com,Austin,2020-06-01,SP025,Manager
+Sophia Green,sophia.green@strategypro.com,Senior Consultant - Market Research,Strategy,Senior Consultant,maya.patel@strategypro.com,New York,2020-09-01,SP026,Senior Consultant
+Logan Adams,logan.adams@strategypro.com,Senior Consultant - Operational Audit,Operations,Senior Consultant,jordan.williams@strategypro.com,Chicago,2020-10-01,SP027,Senior Consultant
+Chloe Liu,chloe.liu@strategypro.com,Senior Consultant - System Integration,Technology,Senior Consultant,grace.zhang@strategypro.com,San Francisco,2020-11-01,SP028,Senior Consultant
+Ethan Parker,ethan.parker@strategypro.com,Consultant - Financial Modeling,Strategy,Consultant,sophia.green@strategypro.com,New York,2021-03-01,SP029,Consultant
+Zoe Cooper,zoe.cooper@strategypro.com,Consultant - Process Mapping,Operations,Consultant,logan.adams@strategypro.com,Chicago,2021-04-01,SP030,Consultant
+Ian Hughes,ian.hughes@strategypro.com,Consultant - Database Design,Technology,Consultant,chloe.liu@strategypro.com,San Francisco,2021-05-01,SP031,Consultant
+Aria Bennett,aria.bennett@strategypro.com,Business Analyst - Market Intelligence,Strategy,Analyst,ethan.parker@strategypro.com,New York,2021-08-01,SP032,Analyst
+Noah Foster,noah.foster@strategypro.com,Business Analyst - Workflow Analysis,Operations,Analyst,zoe.cooper@strategypro.com,Chicago,2021-09-01,SP033,Analyst
+Emma Watson,emma.watson@strategypro.com,Business Analyst - Technical Requirements,Technology,Analyst,ian.hughes@strategypro.com,San Francisco,2021-10-01,SP034,Analyst

@@ -1,0 +1,327 @@
+# Industry-Specific Rule Templates
+# These templates provide industry-customized business rules
+# that inherit from base rules and apply industry-specific adjustments
+
+version: "1.0"
+description: "Industry-specific rule templates for RevAI Pro RBA workflows"
+
+# Base Templates (inherited by industry templates)
+base_templates:
+  standard_saas:
+    defaults:
+      stale_threshold_days: 21
+      critical_threshold_days: 45
+      sandbagging_threshold: 85
+      high_value_threshold: 50000
+      activity_threshold_days: 7
+      confidence_threshold: 75
+    industry_characteristics:
+      sales_cycle_length: "short_to_medium"  # 30-90 days
+      deal_velocity: "high"
+      probability_patterns: "aggressive"
+      compliance_requirements: "moderate"
+  
+  enterprise_software:
+    defaults:
+      stale_threshold_days: 45
+      critical_threshold_days: 90
+      sandbagging_threshold: 75
+      high_value_threshold: 250000
+      activity_threshold_days: 14
+      confidence_threshold: 70
+    industry_characteristics:
+      sales_cycle_length: "long"  # 6-18 months
+      deal_velocity: "slow"
+      probability_patterns: "conservative"
+      compliance_requirements: "high"
+  
+  financial_services:
+    defaults:
+      stale_threshold_days: 30
+      critical_threshold_days: 60
+      sandbagging_threshold: 90
+      high_value_threshold: 1000000
+      activity_threshold_days: 10
+      confidence_threshold: 85
+    industry_characteristics:
+      sales_cycle_length: "medium_to_long"  # 3-12 months
+      deal_velocity: "medium"
+      probability_patterns: "very_conservative"
+      compliance_requirements: "very_high"
+
+# Industry-Specific Templates
+industry_templates:
+  
+  # SaaS Industry Template
+  saas:
+    extends: "standard_saas"
+    name: "SaaS Industry Rules"
+    description: "Optimized for SaaS companies with subscription models"
+    
+    # SaaS-specific rule adjustments
+    rule_overrides:
+      sandbagging_detection:
+        defaults:
+          sandbagging_threshold: 85  # SaaS deals often have higher probabilities
+          high_value_threshold: 50000  # Lower threshold for SaaS ARR
+          mrr_multiplier: 12  # Convert MRR to ARR
+        
+        scoring_factors:
+          - name: "subscription_model_sandbagging"
+            description: "SaaS subscription deals with unrealistic probabilities"
+            weight: 35
+            condition:
+              deal_type: ["new_business", "expansion"]
+              Probability: "<= 80"
+              Amount: ">= ${high_value_threshold}"
+          
+          - name: "renewal_risk_sandbagging"
+            description: "Renewal deals with artificially low probability"
+            weight: 25
+            condition:
+              deal_type: "renewal"
+              Probability: "< 90"
+              days_to_renewal: "< 90"
+        
+        saas_specific_adjustments:
+          churn_risk_factor: 1.2
+          expansion_opportunity_factor: 0.8
+          freemium_conversion_factor: 1.1
+    
+    # SaaS-specific pipeline hygiene
+    pipeline_hygiene_overrides:
+      stale_deals:
+        # SaaS deals move faster
+        defaults:
+          stale_threshold_days: 21
+          critical_threshold_days: 45
+        
+        stage_velocity_expectations:
+          "lead": 7
+          "qualified": 14
+          "demo": 14
+          "proposal": 21
+          "negotiation": 14
+          "closed": 0
+    
+    # SaaS metrics and KPIs
+    saas_metrics:
+      track_arr_impact: true
+      track_churn_risk: true
+      track_expansion_opportunities: true
+      track_freemium_conversions: true
+  
+  # Technology/Software Industry
+  technology:
+    extends: "enterprise_software"
+    name: "Technology Industry Rules"
+    description: "Optimized for technology companies"
+    
+    rule_overrides:
+      sandbagging_detection:
+        defaults:
+          sandbagging_threshold: 80
+          high_value_threshold: 100000
+        
+        industry_adjustments:
+          Technology: 0.9  # Tech deals often have lower probabilities
+          Software: 0.85
+          Hardware: 1.0
+          Services: 0.95
+    
+    pipeline_hygiene_overrides:
+      stale_deals:
+        defaults:
+          stale_threshold_days: 30
+          critical_threshold_days: 60
+  
+  # Financial Services Industry
+  financial_services:
+    extends: "financial_services"
+    name: "Financial Services Industry Rules"
+    description: "Optimized for financial services with high compliance requirements"
+    
+    rule_overrides:
+      sandbagging_detection:
+        defaults:
+          sandbagging_threshold: 90  # Very conservative probabilities
+          high_value_threshold: 1000000
+          confidence_threshold: 90  # Higher confidence required
+        
+        compliance_requirements:
+          require_manager_approval: true
+          audit_trail_mandatory: true
+          risk_assessment_required: true
+        
+        regulatory_adjustments:
+          sox_compliance: true
+          gdpr_compliance: true
+          financial_regulations: true
+    
+    pipeline_hygiene_overrides:
+      missing_fields:
+        required_fields:
+          - "CloseDate"
+          - "Amount"
+          - "OwnerId"
+          - "ComplianceStatus"
+          - "RiskAssessment"
+          - "RegulatoryApproval"
+        compliance_threshold: 98  # Very high compliance required
+    
+    financial_services_specific:
+      risk_scoring_mandatory: true
+      regulatory_approval_tracking: true
+      audit_trail_retention_years: 7
+  
+  # Healthcare Industry
+  healthcare:
+    extends: "financial_services"  # Similar compliance requirements
+    name: "Healthcare Industry Rules"
+    description: "Optimized for healthcare with HIPAA compliance"
+    
+    rule_overrides:
+      sandbagging_detection:
+        defaults:
+          sandbagging_threshold: 85
+          high_value_threshold: 500000
+        
+        healthcare_adjustments:
+          hipaa_compliance_factor: 1.1
+          fda_approval_factor: 1.2
+          clinical_trial_factor: 0.8
+    
+    compliance_requirements:
+      hipaa_compliance: true
+      fda_regulations: true
+      clinical_data_protection: true
+    
+    healthcare_specific:
+      patient_data_protection: true
+      clinical_trial_tracking: true
+      regulatory_submission_tracking: true
+  
+  # Manufacturing Industry
+  manufacturing:
+    extends: "enterprise_software"
+    name: "Manufacturing Industry Rules"
+    description: "Optimized for manufacturing companies"
+    
+    rule_overrides:
+      sandbagging_detection:
+        defaults:
+          sandbagging_threshold: 75
+          high_value_threshold: 2000000  # Large capital equipment deals
+        
+        manufacturing_adjustments:
+          capital_equipment_factor: 1.1
+          supply_chain_factor: 1.05
+          seasonal_demand_factor: 1.2
+    
+    pipeline_hygiene_overrides:
+      stale_deals:
+        defaults:
+          stale_threshold_days: 60  # Longer sales cycles
+          critical_threshold_days: 120
+    
+    manufacturing_specific:
+      capital_equipment_tracking: true
+      supply_chain_impact_assessment: true
+      seasonal_demand_patterns: true
+  
+  # Retail Industry
+  retail:
+    extends: "standard_saas"
+    name: "Retail Industry Rules"
+    description: "Optimized for retail companies"
+    
+    rule_overrides:
+      sandbagging_detection:
+        defaults:
+          sandbagging_threshold: 80
+          high_value_threshold: 250000
+        
+        retail_adjustments:
+          seasonal_factor: 1.3  # High seasonal impact
+          inventory_factor: 1.1
+          location_factor: 0.95
+    
+    retail_specific:
+      seasonal_pattern_tracking: true
+      inventory_impact_assessment: true
+      location_based_analysis: true
+      
+  # Consulting Industry
+  consulting:
+    extends: "enterprise_software"
+    name: "Consulting Industry Rules"
+    description: "Optimized for consulting companies"
+    
+    rule_overrides:
+      sandbagging_detection:
+        defaults:
+          sandbagging_threshold: 75
+          high_value_threshold: 500000
+        
+        consulting_adjustments:
+          project_based_factor: 1.0
+          retainer_factor: 0.9
+          proposal_factor: 1.1
+    
+    consulting_specific:
+      project_milestone_tracking: true
+      retainer_vs_project_analysis: true
+      proposal_win_rate_tracking: true
+
+# Template Selection Rules
+template_selection:
+  # Automatic template selection based on company/deal characteristics
+  selection_criteria:
+    - condition:
+        company_industry: ["SaaS", "Software as a Service", "Cloud Software"]
+      template: "saas"
+      
+    - condition:
+        company_industry: ["Technology", "Software", "IT Services"]
+      template: "technology"
+      
+    - condition:
+        company_industry: ["Financial Services", "Banking", "Insurance", "Investment"]
+      template: "financial_services"
+      
+    - condition:
+        company_industry: ["Healthcare", "Medical", "Pharmaceutical", "Biotech"]
+      template: "healthcare"
+      
+    - condition:
+        company_industry: ["Manufacturing", "Industrial", "Automotive"]
+      template: "manufacturing"
+      
+    - condition:
+        company_industry: ["Retail", "E-commerce", "Consumer Goods"]
+      template: "retail"
+      
+    - condition:
+        company_industry: ["Consulting", "Professional Services", "Advisory"]
+      template: "consulting"
+  
+  # Default fallback template
+  default_template: "technology"
+
+# Template Usage Guidelines
+usage_guidelines:
+  template_inheritance:
+    - "Industry templates extend base templates"
+    - "Rule overrides are merged with base rules"
+    - "Industry-specific adjustments are applied on top"
+    
+  customization_approach:
+    - "Start with closest industry template"
+    - "Override specific rules as needed"
+    - "Test with historical data before deployment"
+    
+  best_practices:
+    - "Review and update templates quarterly"
+    - "Monitor template effectiveness with metrics"
+    - "Adjust thresholds based on business feedback"
+    - "Maintain audit trail of template changes"

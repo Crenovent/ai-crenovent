@@ -1,0 +1,32 @@
+Person Name,Email,Manager Email,Team,Job Title,Location,Deal Stage,Pipeline,Activity Type,Revenue Target
+Alexandra Foster,alexandra.foster@scaletechco.com,,Revenue,Chief Revenue Officer,London,Won,Enterprise,Strategic,5000000
+William Chen,william.chen@scaletechco.com,alexandra.foster@scaletechco.com,Revenue,VP Sales,London,Proposal,Enterprise,Inbound,2000000
+Isabella Martinez,isabella.martinez@scaletechco.com,alexandra.foster@scaletechco.com,Revenue,VP Marketing,London,Qualified,Growth,Content,1500000
+Oliver Thompson,oliver.thompson@scaletechco.com,william.chen@scaletechco.com,Revenue,Sales Director,Manchester,Demo,Mid-Market,Outbound,800000
+Emma Rodriguez,emma.rodriguez@scaletechco.com,william.chen@scaletechco.com,Revenue,Sales Director,Edinburgh,Negotiation,Mid-Market,Referral,750000
+Lucas Anderson,lucas.anderson@scaletechco.com,isabella.martinez@scaletechco.com,Marketing,Marketing Director,London,Qualified,Growth,Digital,600000
+Sophia Wang,sophia.wang@scaletechco.com,isabella.martinez@scaletechco.com,Marketing,Growth Director,London,Demo,SMB,Social,550000
+James Wilson,james.wilson@scaletechco.com,oliver.thompson@scaletechco.com,Revenue,Senior Account Manager,Manchester,Proposal,Mid-Market,Inbound,400000
+Charlotte Brown,charlotte.brown@scaletechco.com,oliver.thompson@scaletechco.com,Revenue,Senior Account Manager,Liverpool,Discovery,Mid-Market,Outbound,380000
+Noah Davis,noah.davis@scaletechco.com,emma.rodriguez@scaletechco.com,Revenue,Senior Account Manager,Edinburgh,Negotiation,Mid-Market,Partner,420000
+Grace Taylor,grace.taylor@scaletechco.com,emma.rodriguez@scaletechco.com,Revenue,Senior Account Manager,Glasgow,Demo,Mid-Market,Referral,390000
+Mason Lee,mason.lee@scaletechco.com,lucas.anderson@scaletechco.com,Marketing,Marketing Manager,London,Qualified,Growth,Content,300000
+Ava Johnson,ava.johnson@scaletechco.com,lucas.anderson@scaletechco.com,Marketing,Digital Marketing Manager,London,Discovery,SMB,PPC,280000
+Ethan Garcia,ethan.garcia@scaletechco.com,sophia.wang@scaletechco.com,Marketing,Growth Marketing Manager,London,Demo,SMB,Social,320000
+Mia Miller,mia.miller@scaletechco.com,sophia.wang@scaletechco.com,Marketing,Performance Marketing Manager,London,Proposal,SMB,Paid,290000
+Logan White,logan.white@scaletechco.com,james.wilson@scaletechco.com,Revenue,Account Manager,Manchester,Discovery,Mid-Market,Inbound,250000
+Chloe Harris,chloe.harris@scaletechco.com,james.wilson@scaletechco.com,Revenue,Account Manager,Salford,Qualified,Mid-Market,Cold Email,240000
+Jackson Clark,jackson.clark@scaletechco.com,charlotte.brown@scaletechco.com,Revenue,Account Manager,Liverpool,Demo,Mid-Market,LinkedIn,260000
+Lily Lewis,lily.lewis@scaletechco.com,charlotte.brown@scaletechco.com,Revenue,Account Manager,Preston,Proposal,Mid-Market,Referral,230000
+Aiden Walker,aiden.walker@scaletechco.com,noah.davis@scaletechco.com,Revenue,Account Manager,Edinburgh,Negotiation,Mid-Market,Partner,270000
+Zoe Hall,zoe.hall@scaletechco.com,noah.davis@scaletechco.com,Revenue,Account Manager,Stirling,Discovery,Mid-Market,Webinar,220000
+Carter Young,carter.young@scaletechco.com,grace.taylor@scaletechco.com,Revenue,Account Manager,Glasgow,Demo,Mid-Market,Event,280000
+Ella King,ella.king@scaletechco.com,grace.taylor@scaletechco.com,Revenue,Account Manager,Paisley,Qualified,Mid-Market,Direct,210000
+Owen Wright,owen.wright@scaletechco.com,mason.lee@scaletechco.com,Marketing,Content Marketing Specialist,London,Qualified,Growth,Blog,180000
+Aria Green,aria.green@scaletechco.com,mason.lee@scaletechco.com,Marketing,SEO Specialist,London,Discovery,SMB,Organic,170000
+Liam Adams,liam.adams@scaletechco.com,ava.johnson@scaletechco.com,Marketing,PPC Specialist,London,Demo,SMB,Google Ads,190000
+Luna Baker,luna.baker@scaletechco.com,ava.johnson@scaletechco.com,Marketing,Social Media Specialist,London,Proposal,SMB,Facebook,160000
+Caleb Nelson,caleb.nelson@scaletechco.com,ethan.garcia@scaletechco.com,Marketing,Growth Analyst,London,Qualified,SMB,Analytics,200000
+Maya Carter,maya.carter@scaletechco.com,ethan.garcia@scaletechco.com,Marketing,Conversion Specialist,London,Discovery,SMB,CRO,180000
+Grayson Mitchell,grayson.mitchell@scaletechco.com,mia.miller@scaletechco.com,Marketing,Performance Analyst,London,Demo,SMB,Attribution,190000
+Scarlett Perez,scarlett.perez@scaletechco.com,mia.miller@scaletechco.com,Marketing,Campaign Manager,London,Proposal,SMB,Email,170000

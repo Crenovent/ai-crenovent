@@ -1,0 +1,346 @@
+metadata:
+  name: "Crenovent Master Mapping"
+  description: "Universal mapping to Crenovent's specific business hierarchy format"
+  version: "1.0"
+  priority: 100  # Highest priority - this is our target format
+
+# This defines the EXACT format that Crenovent's frontend expects
+target_format:
+  required_columns:
+    - "Industry"
+    - "Org Leader" 
+    - "Role Function"
+    - "Business Function"
+    - "Level"
+    - "Role Title"
+    - "Name"
+    - "Email"
+    - "Reporting Role Function"
+    - "Reporting Manager Name"
+    - "Reporting Manager title"
+    - "Reporting Email"
+    - "Region"
+    - "Area"
+    - "District"
+    - "Territory"
+    - "Segment"
+    - "Modules"
+
+# Business rules for Crenovent organization
+business_rules:
+  industry:
+    default: "Sass"
+    valid_values: ["Sass"]
+  
+  org_leader:
+    default: "Org Leader"
+    valid_values: ["Org Leader"]
+  
+  business_functions:
+    valid_values: ["BF1 Global", "BF2 America", "BF3 EMEA", "BF4", "BF5"]
+    mapping:
+      "Sales": "BF2 America"
+      "Revenue": "BF2 America"
+      "Operations": "BF1 Global"
+      "Marketing": "BF2 America"
+      "Customer Success": "BF2 America"
+      "IT": "BF1 Global"
+      "Finance": "BF1 Global"
+      "HR": "BF1 Global"
+  
+  levels:
+    valid_values: ["IC", "M1", "M2", "M3", "M4", "M5", "M6", "M7"]
+    mapping:
+      # Map common titles to hierarchy levels
+      "Junior": "IC"
+      "Associate": "IC"
+      "Entry": "IC"
+      "Senior": "M1"
+      "Lead": "M1"
+      "Principal": "M2"
+      "Manager": "M2"
+      "Senior Manager": "M3"
+      "Director": "M3"
+      "Senior Director": "M4"
+      "VP": "M5"
+      "Vice President": "M5"
+      "SVP": "M6"
+      "Senior Vice President": "M6"
+      "EVP": "M6"
+      "Executive Vice President": "M6"
+      "CEO": "M7"
+      "President": "M7"
+      "Chief": "M7"
+  
+  regions:
+    valid_values: ["Global", "America", "Asia", "India", "EMEA"]
+    mapping:
+      "North America": "America"
+      "United States": "America"
+      "USA": "America"
+      "US": "America"
+      "Canada": "America"
+      "South America": "America"
+      "Europe": "EMEA"
+      "Middle East": "EMEA"
+      "Africa": "EMEA"
+      "Asia Pacific": "Asia"
+      "APAC": "Asia"
+      "Australia": "Asia"
+      "New Zealand": "Asia"
+      "Japan": "Asia"
+      "China": "Asia"
+      "Singapore": "Asia"
+  
+  segments:
+    valid_values: ["SMB", "Enterprise", "Startup"]
+    mapping:
+      "Small Business": "SMB"
+      "Small": "SMB"
+      "Mid-Market": "Enterprise"
+      "Large": "Enterprise"
+      "Corporate": "Enterprise"
+      "Strategic": "Enterprise"
+  
+  role_functions:
+    valid_values: ["Org Leader", "Top Business Function", "TOP FUNCTION", "Sales", "Marketing", "Customer Success", "Partner & Channel", "Revenue Operations"]
+    mapping:
+      "Revenue": "Sales"
+      "Business Development": "Sales"
+      "Account Management": "Sales"
+      "Inside Sales": "Sales"
+      "Field Sales": "Sales"
+      "Sales Development": "Sales"
+      "Operations": "TOP FUNCTION"
+      "IT": "TOP FUNCTION"
+      "Finance": "TOP FUNCTION"
+      "HR": "TOP FUNCTION"
+      "Legal": "TOP FUNCTION"
+      "Product": "TOP FUNCTION"
+      "Engineering": "TOP FUNCTION"
+      "Support": "Customer Success"
+      "Success": "Customer Success"
+      "Partnerships": "Partner & Channel"
+      "Channel": "Partner & Channel"
+      "RevOps": "Revenue Operations"
+      "Sales Operations": "Revenue Operations"
+      "Marketing Operations": "Marketing"
+  
+  modules:
+    valid_values: ["Forecasting", "Planning", "Pipeline", "DealDesk", "Market Intelligence", "Marketing operations", "Customer Success", "Sales Engineering", "My Customers", "Partner Management", "Performance Management", "Enablement", "Contract Management"]
+    default_by_role:
+      "Sales": ["Forecasting", "Planning", "Pipeline"]
+      "Marketing": ["Marketing operations", "Market Intelligence"]
+      "Customer Success": ["Customer Success", "My Customers"]
+      "Partner & Channel": ["Partner Management"]
+      "Revenue Operations": ["Forecasting", "Planning", "Pipeline", "Performance Management"]
+      "Org Leader": ["Forecasting", "Planning", "Pipeline", "Performance Management"]
+      "TOP FUNCTION": ["Planning", "Performance Management"]
+
+# Universal field mappings - maps ANY HRMS field to Crenovent format
+universal_mappings:
+  # Name field - can come from various sources
+  "Name":
+    source_patterns:
+      - "Name"
+      - "Full Name"
+      - "Employee Name"
+      - "Display Name"
+      - "First Name + Last Name"  # Combined
+    transformation: "combine_name_fields"
+  
+  # Email field
+  "Email":
+    source_patterns:
+      - "Email"
+      - "Work Email"
+      - "Business Email"
+      - "Corporate Email"
+      - "Official Email"
+      - "Email Address"
+      - "Email ID"
+    transformation: "standardize_email"
+  
+  # Role/Title fields
+  "Role Title":
+    source_patterns:
+      - "Role Title"
+      - "Job Title"
+      - "Position"
+      - "Designation"
+      - "Title"
+      - "Business Title"
+      - "Position Title"
+    transformation: "standardize_title"
+  
+  # Manager fields
+  "Reporting Manager Name":
+    source_patterns:
+      - "Manager Name"
+      - "Reporting Manager"
+      - "Reports To"
+      - "Supervisor"
+      - "Manager"
+      - "managername"
+    transformation: "standardize_manager_name"
+  
+  "Reporting Email":
+    source_patterns:
+      - "Manager Email"
+      - "Reporting Manager Email"
+      - "Supervisor Email"
+      - "Reports To Email"
+    transformation: "standardize_email"
+  
+  # Department/Function mapping
+  "Role Function":
+    source_patterns:
+      - "Department"
+      - "Team"
+      - "Function"
+      - "Division"
+      - "Business Unit"
+      - "Org"
+    transformation: "map_to_role_function"
+  
+  # Location fields
+  "Region":
+    source_patterns:
+      - "Region"
+      - "Country"
+      - "Location"
+      - "Office"
+      - "Site"
+    transformation: "map_to_region"
+
+# Transformation functions
+transformations:
+  combine_name_fields:
+    description: "Combine first, middle, last name or use full name"
+    logic: |
+      def combine_name_fields(row, source_patterns):
+          # Try full name first
+          for pattern in ['Name', 'Full Name', 'Employee Name', 'Display Name']:
+              if pattern in row and row[pattern]:
+                  return str(row[pattern]).strip()
+          
+          # Combine first + last
+          name_parts = []
+          for field in ['First Name', 'first_name']:
+              if field in row and row[field]:
+                  name_parts.append(str(row[field]).strip())
+          for field in ['Middle Name', 'middle_name']:
+              if field in row and row[field]:
+                  name_parts.append(str(row[field]).strip())
+          for field in ['Last Name', 'last_name']:
+              if field in row and row[field]:
+                  name_parts.append(str(row[field]).strip())
+          
+          return ' '.join(name_parts) if name_parts else ''
+  
+  map_to_role_function:
+    description: "Map department/team to valid role function"
+    logic: |
+      def map_to_role_function(row, source_patterns):
+          value = ''
+          for pattern in source_patterns:
+              if pattern in row and row[pattern]:
+                  value = str(row[pattern]).strip().lower()
+                  break
+          
+          # Use business rules mapping
+          role_mapping = {
+              'sales': 'Sales',
+              'revenue': 'Sales', 
+              'marketing': 'Marketing',
+              'customer success': 'Customer Success',
+              'success': 'Customer Success',
+              'operations': 'TOP FUNCTION',
+              'it': 'TOP FUNCTION',
+              'finance': 'TOP FUNCTION',
+              'hr': 'TOP FUNCTION'
+          }
+          
+          for key, mapped_value in role_mapping.items():
+              if key in value:
+                  return mapped_value
+          
+          return 'Sales'  # Default fallback
+  
+  map_to_region:
+    description: "Map location to valid region"
+    logic: |
+      def map_to_region(row, source_patterns):
+          value = ''
+          for pattern in source_patterns:
+              if pattern in row and row[pattern]:
+                  value = str(row[pattern]).strip().lower()
+                  break
+          
+          region_mapping = {
+              'north america': 'America',
+              'united states': 'America',
+              'usa': 'America',
+              'us': 'America',
+              'canada': 'America',
+              'europe': 'EMEA',
+              'uk': 'EMEA',
+              'germany': 'EMEA',
+              'france': 'EMEA',
+              'asia': 'Asia',
+              'india': 'India',
+              'china': 'Asia',
+              'singapore': 'Asia',
+              'japan': 'Asia'
+          }
+          
+          for key, mapped_value in region_mapping.items():
+              if key in value:
+                  return mapped_value
+          
+          return 'America'  # Default fallback
+
+# Default values for missing fields
+defaults:
+  "Industry": "Sass"
+  "Org Leader": "Org Leader"
+  "Business Function": "BF2 America"
+  "Level": "M1"
+  "Region": "America"
+  "Area": "East Area"
+  "District": "Main District"
+  "Territory": "Primary Territory"
+  "Segment": "Enterprise"
+  "Modules": "Forecasting,Planning,Pipeline"
+  "Reporting Role Function": "Sales"
+  "Reporting Manager title": "Manager"
+
+examples:
+  # Show how different HRMS formats get converted
+  salesforce_input:
+    "Full Name": "John Smith"
+    "Email": "john.smith@company.com"
+    "Manager Email": "jane.doe@company.com"
+    "Department": "Sales"
+    "Job Title": "Senior Account Executive"
+    "Location": "New York"
+  
+  expected_output:
+    "Industry": "Sass"
+    "Org Leader": "Org Leader"
+    "Role Function": "Sales"
+    "Business Function": "BF2 America"
+    "Level": "M1"
+    "Role Title": "Senior Account Executive"
+    "Name": "John Smith"
+    "Email": "john.smith@company.com"
+    "Reporting Email": "jane.doe@company.com"
+    "Region": "America"
+    "Segment": "Enterprise"
+    "Modules": "Forecasting,Planning,Pipeline"
+
+notes:
+  - "This is the master configuration that converts ANY HRMS format to Crenovent's exact business rules"
+  - "All mappings are intelligent and use fuzzy matching with fallbacks"
+  - "Business rules ensure data always validates against frontend requirements"
+  - "Default values ensure no required fields are missing"

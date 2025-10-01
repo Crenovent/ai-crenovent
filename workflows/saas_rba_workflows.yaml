@@ -1,0 +1,896 @@
+# ===============================================================================
+# SaaS RBA Workflow Templates - Task 19.3-T03, 19.3-T04 + Extensions
+# ===============================================================================
+
+# 0. Basic Data Query Workflow (for simple questions)
+basic_data_query_workflow:
+  name: "Basic Data Query"
+  description: "Simple data queries for counting, listing, and basic analytics"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "execute_basic_query"
+      type: "query"
+      params:
+        operator: "saas_pipeline_hygiene"
+        analysis_type: "basic_summary"
+
+# 0a. Pipeline Summary Workflow
+pipeline_summary_workflow:
+  name: "Pipeline Summary Analysis"
+  description: "Calculate pipeline summary including total open, weighted, and committed values"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "execute_pipeline_summary"
+      type: "query"
+      params:
+        operator: "saas_pipeline_hygiene"
+        analysis_type: "pipeline_summary"
+        committed_threshold: 80
+        weighted_calculation: true
+
+# 0b. Pipeline Health Overview Workflow
+pipeline_health_overview_workflow:
+  name: "Pipeline Health Overview"
+  description: "Comprehensive pipeline health analysis including coverage, risk, and stage distribution"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "execute_health_overview"
+      type: "query"
+      params:
+        operator: "saas_pipeline_hygiene"
+        analysis_type: "health_overview"
+        coverage_ratio_target: 3.0
+        include_stage_distribution: true
+        include_risk_analysis: true
+        include_coverage_analysis: true
+
+# 0b. Account Count Workflow (specific)
+account_count_workflow:
+  name: "Account Count Query"
+  description: "Count total number of accounts in the system"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "count_accounts"
+      type: "query"
+      params:
+        source: "csv_data"
+        resource: "csv_data"
+        query: "SELECT COUNT(*) as account_count FROM comprehensive_crm_data WHERE object = 'Account'"
+        output_format: "records"
+# 
+# These are DSL workflow definitions that compose existing operators to create
+# intelligent SaaS automation workflows. This follows the correct architecture:
+# 
+# User Input → LLM Intent Parser → Routing Orchestrator → DSL Workflow → 
+# DSL Runtime → Evidence Pack → Knowledge Graph
+#
+# Each workflow uses the 6 core DSL primitives:
+# - query: Data fetch from Azure Fabric
+# - decision: Rule-based logic
+# - ml_decision: ML model invocation  
+# - agent_call: AALA agent invocation
+# - notify: Alerts and notifications
+# - governance: Evidence and policy enforcement
+# ===============================================================================
+
+# 1. SaaS Churn Risk Assessment Workflow
+saas_churn_risk_workflow:
+  name: "SaaS Churn Risk Assessment"
+  description: "Comprehensive customer churn risk analysis and intervention using DSL composition"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  compliance: ["SOX", "GDPR"]
+  
+  steps:
+    # Step 1: Fetch comprehensive customer data (configurable source)
+    - id: "fetch_customer_data"
+      type: "query"
+      params:
+        source: "{{data_source | default('fabric')}}"
+        resource: "{{data_resource | default('fabric_warehouse')}}"
+        query: |
+          SELECT 
+            a.Id as account_id,
+            a.Name as account_name,
+            a.AnnualRevenue as annual_revenue,
+            a.CreatedDate as customer_since,
+            COUNT(o.Id) as total_opportunities,
+            SUM(CASE WHEN o.StageName = 'Closed Won' THEN o.Amount ELSE 0 END) as total_revenue,
+            COUNT(t.Id) as total_activities,
+            COUNT(CASE WHEN t.ActivityDate >= DATEADD(day, -30, GETDATE()) THEN 1 END) as recent_activities,
+            COUNT(c.Id) as total_support_cases,
+            COUNT(CASE WHEN c.Status = 'Open' THEN 1 END) as open_support_cases
+          FROM dbo.accounts a
+          LEFT JOIN dbo.opportunities o ON a.Id = o.AccountId
+          LEFT JOIN dbo.tasks t ON a.Id = t.AccountId  
+          LEFT JOIN dbo.cases c ON a.Id = c.AccountId
+          WHERE a.Type IN ('Customer', 'Customer - Direct', 'Customer - Partner')
+          GROUP BY a.Id, a.Name, a.AnnualRevenue, a.CreatedDate
+          HAVING SUM(CASE WHEN o.StageName = 'Closed Won' THEN o.Amount ELSE 0 END) > 0
+        output_format: "records"
+        
+    # Step 2: Calculate churn risk scores using decision logic
+    - id: "calculate_churn_risk"
+      type: "decision"
+      params:
+        logic_type: "scoring"
+        scoring_rules:
+          - condition: "recent_activities == 0"
+            score_impact: -25
+            risk_factor: "no_recent_activity"
+          - condition: "open_support_cases > 3"
+            score_impact: -20
+            risk_factor: "high_support_cases"
+          - condition: "total_activities < 5"
+            score_impact: -15
+            risk_factor: "low_engagement"
+          - condition: "total_revenue > 100000"
+            score_impact: +10
+            risk_factor: "high_value_customer"
+        base_score: 75
+        output_field: "churn_risk_score"
+        
+    # Step 3: Identify critical risk customers
+    - id: "identify_critical_risks"
+      type: "decision"
+      params:
+        logic_type: "filter"
+        conditions:
+          - field: "churn_risk_score"
+            operator: "lt"
+            value: 40
+        output_field: "critical_risk_customers"
+        
+    # Step 4: Send alerts for critical customers
+    - id: "alert_critical_customers"
+      type: "notify"
+      params:
+        channel: "slack"
+        recipients: ["#customer-success-critical"]
+        condition: "len(critical_risk_customers) > 0"
+        message_template: "🚨 CRITICAL CHURN RISK: {{len(critical_risk_customers)}} customers identified"
+        priority: "critical"
+        
+    # Step 5: Generate evidence pack for compliance
+    - id: "generate_churn_evidence"
+      type: "governance"
+      params:
+        evidence_type: "churn_risk_assessment"
+        evidence_data:
+          analysis_timestamp: "{{current_timestamp}}"
+          customers_analyzed: "{{len(fetch_customer_data)}}"
+          critical_risk_count: "{{len(critical_risk_customers)}}"
+          methodology: "multi_factor_scoring"
+        retention_years: 7
+        classification: "business_critical"
+        access_controls: ["CSM_TEAM", "EXECUTIVE_TEAM"]
+
+# 2. SaaS Renewal Management Workflow  
+saas_renewal_workflow:
+  name: "SaaS Renewal Management"
+  description: "Automated subscription renewal pipeline management using DSL composition"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  compliance: ["SOX", "GDPR"]
+  
+  steps:
+    # Step 1: Fetch contract and renewal data
+    - id: "fetch_renewal_data"
+      type: "query"
+      params:
+        resource: "fabric_warehouse"
+        query: |
+          SELECT 
+            a.Id as account_id,
+            a.Name as account_name,
+            o.Amount as contract_value,
+            o.CloseDate as contract_start,
+            DATEADD(year, 1, o.CloseDate) as renewal_date,
+            DATEDIFF(day, GETDATE(), DATEADD(year, 1, o.CloseDate)) as days_to_renewal,
+            COUNT(t.Id) as engagement_activities
+          FROM dbo.accounts a
+          INNER JOIN dbo.opportunities o ON a.Id = o.AccountId
+          LEFT JOIN dbo.tasks t ON a.Id = t.AccountId AND t.ActivityDate >= DATEADD(day, -90, GETDATE())
+          WHERE o.StageName = 'Closed Won'
+          AND DATEADD(year, 1, o.CloseDate) BETWEEN GETDATE() AND DATEADD(day, 120, GETDATE())
+          GROUP BY a.Id, a.Name, o.Amount, o.CloseDate
+        output_format: "records"
+        
+    # Step 2: Calculate renewal probability
+    - id: "calculate_renewal_probability"
+      type: "decision"
+      params:
+        logic_type: "scoring"
+        scoring_rules:
+          - condition: "engagement_activities > 10"
+            score_impact: +20
+          - condition: "contract_value > 50000"
+            score_impact: +15
+          - condition: "days_to_renewal < 30"
+            score_impact: -10
+          - condition: "days_to_renewal > 90"
+            score_impact: +5
+        base_score: 70
+        output_field: "renewal_probability"
+        
+    # Step 3: Identify at-risk renewals
+    - id: "identify_at_risk_renewals"
+      type: "decision"
+      params:
+        logic_type: "filter"
+        conditions:
+          - field: "renewal_probability"
+            operator: "lt"
+            value: 60
+          - field: "days_to_renewal"
+            operator: "lt"
+            value: 60
+        output_field: "at_risk_renewals"
+        
+    # Step 4: Create renewal tasks for account managers
+    - id: "create_renewal_tasks"
+      type: "notify"
+      params:
+        channel: "email"
+        recipients: ["ae-team@company.com"]
+        condition: "len(at_risk_renewals) > 0"
+        message_template: "📋 RENEWAL ACTION REQUIRED: {{len(at_risk_renewals)}} at-risk renewals need attention"
+        
+    # Step 5: Generate evidence pack
+    - id: "generate_renewal_evidence"
+      type: "governance"
+      params:
+        evidence_type: "renewal_management"
+        evidence_data:
+          renewals_analyzed: "{{len(fetch_renewal_data)}}"
+          at_risk_count: "{{len(at_risk_renewals)}}"
+          total_pipeline_value: "{{sum(contract_value)}}"
+        retention_years: 7
+        classification: "business_critical"
+
+# 3. SaaS Expansion Opportunity Workflow
+saas_expansion_workflow:
+  name: "SaaS Expansion Opportunities"
+  description: "Intelligent upsell and cross-sell opportunity identification using DSL"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    # Step 1: Fetch customer usage and engagement data
+    - id: "fetch_expansion_data"
+      type: "query"
+      params:
+        resource: "fabric_warehouse"
+        query: |
+          SELECT 
+            a.Id as account_id,
+            a.Name as account_name,
+            a.NumberOfEmployees as company_size,
+            SUM(o.Amount) as current_spend,
+            COUNT(t.Id) as engagement_level,
+            COUNT(CASE WHEN t.ActivityDate >= DATEADD(day, -30, GETDATE()) THEN 1 END) as recent_engagement
+          FROM dbo.accounts a
+          INNER JOIN dbo.opportunities o ON a.Id = o.AccountId AND o.StageName = 'Closed Won'
+          LEFT JOIN dbo.tasks t ON a.Id = t.AccountId
+          WHERE a.Type = 'Customer'
+          GROUP BY a.Id, a.Name, a.NumberOfEmployees
+        output_format: "records"
+        
+    # Step 2: Calculate expansion potential
+    - id: "calculate_expansion_potential"
+      type: "decision"
+      params:
+        logic_type: "scoring"
+        scoring_rules:
+          - condition: "company_size > 100 AND current_spend < 50000"
+            score_impact: +30
+            opportunity_type: "upsell"
+          - condition: "recent_engagement > 10"
+            score_impact: +20
+            opportunity_type: "cross_sell"
+          - condition: "engagement_level > 20"
+            score_impact: +15
+            opportunity_type: "expansion"
+        base_score: 50
+        output_field: "expansion_score"
+        
+    # Step 3: Identify high-potential opportunities
+    - id: "identify_expansion_opportunities"
+      type: "decision"
+      params:
+        logic_type: "filter"
+        conditions:
+          - field: "expansion_score"
+            operator: "gt"
+            value: 70
+        output_field: "high_potential_opportunities"
+        
+    # Step 4: Notify sales team
+    - id: "notify_expansion_opportunities"
+      type: "notify"
+      params:
+        channel: "slack"
+        recipients: ["#sales-expansion"]
+        condition: "len(high_potential_opportunities) > 0"
+        message_template: "💰 EXPANSION OPPORTUNITIES: {{len(high_potential_opportunities)}} high-potential accounts identified"
+        
+    # Step 5: Generate evidence
+    - id: "generate_expansion_evidence"
+      type: "governance"
+      params:
+        evidence_type: "expansion_opportunity_analysis"
+        evidence_data:
+          opportunities_identified: "{{len(high_potential_opportunities)}}"
+          total_expansion_potential: "{{sum(expansion_score)}}"
+        retention_years: 5
+        classification: "business_critical"
+
+# 4. SaaS Customer Health Monitoring Workflow
+saas_health_monitoring_workflow:
+  name: "SaaS Customer Health Monitoring"
+  description: "Comprehensive customer health scoring using DSL composition"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    # Step 1: Fetch comprehensive health data
+    - id: "fetch_health_data"
+      type: "query"
+      params:
+        resource: "fabric_warehouse"
+        query: |
+          SELECT 
+            a.Id as account_id,
+            a.Name as account_name,
+            COUNT(t.Id) as total_activities,
+            COUNT(CASE WHEN t.ActivityDate >= DATEADD(day, -30, GETDATE()) THEN 1 END) as recent_activities,
+            COUNT(c.Id) as support_cases,
+            AVG(CASE WHEN c.Status = 'Closed' THEN DATEDIFF(hour, c.CreatedDate, c.ClosedDate) END) as avg_resolution_time,
+            SUM(o.Amount) as revenue_contribution
+          FROM dbo.accounts a
+          LEFT JOIN dbo.tasks t ON a.Id = t.AccountId
+          LEFT JOIN dbo.cases c ON a.Id = c.AccountId
+          LEFT JOIN dbo.opportunities o ON a.Id = o.AccountId AND o.StageName = 'Closed Won'
+          WHERE a.Type = 'Customer'
+          GROUP BY a.Id, a.Name
+        output_format: "records"
+        
+    # Step 2: Calculate multi-dimensional health score
+    - id: "calculate_health_score"
+      type: "decision"
+      params:
+        logic_type: "scoring"
+        scoring_rules:
+          # Usage dimension (25%)
+          - condition: "recent_activities > 10"
+            score_impact: +25
+            dimension: "usage"
+          - condition: "recent_activities < 3"
+            score_impact: -15
+            dimension: "usage"
+          # Support dimension (20%)
+          - condition: "support_cases == 0"
+            score_impact: +20
+            dimension: "support"
+          - condition: "avg_resolution_time > 48"
+            score_impact: -10
+            dimension: "support"
+          # Value dimension (25%)
+          - condition: "revenue_contribution > 50000"
+            score_impact: +25
+            dimension: "value"
+          # Engagement dimension (30%)
+          - condition: "total_activities > 50"
+            score_impact: +30
+            dimension: "engagement"
+        base_score: 70
+        output_field: "health_score"
+        
+    # Step 3: Identify unhealthy customers
+    - id: "identify_unhealthy_customers"
+      type: "decision"
+      params:
+        logic_type: "filter"
+        conditions:
+          - field: "health_score"
+            operator: "lt"
+            value: 50
+        output_field: "unhealthy_customers"
+        
+    # Step 4: Alert customer success team
+    - id: "alert_health_issues"
+      type: "notify"
+      params:
+        channel: "slack"
+        recipients: ["#customer-success"]
+        condition: "len(unhealthy_customers) > 0"
+        message_template: "❤️ HEALTH ALERT: {{len(unhealthy_customers)}} customers need attention"
+        priority: "high"
+        
+    # Step 5: Generate health evidence
+    - id: "generate_health_evidence"
+      type: "governance"
+      params:
+        evidence_type: "customer_health_monitoring"
+        evidence_data:
+          customers_monitored: "{{len(fetch_health_data)}}"
+          unhealthy_count: "{{len(unhealthy_customers)}}"
+          avg_health_score: "{{avg(health_score)}}"
+        retention_years: 5
+        classification: "business_critical"
+
+# 5. SaaS Lead Scoring Workflow
+saas_lead_scoring_workflow:
+  name: "SaaS Lead Scoring & Qualification"
+  description: "Intelligent lead scoring and routing using DSL composition"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    # Step 1: Fetch recent leads
+    - id: "fetch_leads"
+      type: "query"
+      params:
+        resource: "fabric_warehouse"
+        query: |
+          SELECT 
+            l.Id as lead_id,
+            l.Name as lead_name,
+            l.Company as company,
+            l.Email as email,
+            l.LeadSource as source,
+            l.Industry as industry,
+            l.NumberOfEmployees as company_size,
+            COUNT(t.Id) as engagement_activities
+          FROM dbo.leads l
+          LEFT JOIN dbo.tasks t ON l.Id = t.WhoId
+          WHERE l.IsConverted = 0
+          AND l.CreatedDate >= DATEADD(day, -30, GETDATE())
+          GROUP BY l.Id, l.Name, l.Company, l.Email, l.LeadSource, l.Industry, l.NumberOfEmployees
+        output_format: "records"
+        
+    # Step 2: Calculate lead scores
+    - id: "calculate_lead_scores"
+      type: "decision"
+      params:
+        logic_type: "scoring"
+        scoring_rules:
+          # Demographics (30%)
+          - condition: "email NOT LIKE '%gmail.com%' AND email NOT LIKE '%yahoo.com%'"
+            score_impact: +15
+            factor: "business_email"
+          - condition: "source IN ('Referral', 'Event')"
+            score_impact: +15
+            factor: "high_quality_source"
+          # Firmographics (40%)
+          - condition: "company_size > 100"
+            score_impact: +20
+            factor: "enterprise_size"
+          - condition: "industry IN ('Technology', 'Software', 'Financial Services')"
+            score_impact: +20
+            factor: "target_industry"
+          # Behavioral (30%)
+          - condition: "engagement_activities > 3"
+            score_impact: +30
+            factor: "high_engagement"
+        base_score: 40
+        output_field: "lead_score"
+        
+    # Step 3: Classify leads by score
+    - id: "classify_leads"
+      type: "decision"
+      params:
+        logic_type: "classification"
+        classification_rules:
+          - condition: "lead_score >= 80"
+            classification: "hot"
+            routing: "immediate_sales"
+          - condition: "lead_score >= 60"
+            classification: "warm"
+            routing: "sales_development"
+          - condition: "lead_score >= 40"
+            classification: "cold"
+            routing: "marketing_nurture"
+          - condition: "lead_score < 40"
+            classification: "unqualified"
+            routing: "disqualify"
+        output_field: "lead_classification"
+        
+    # Step 4: Route hot leads to sales
+    - id: "route_hot_leads"
+      type: "notify"
+      params:
+        channel: "slack"
+        recipients: ["#sales-hot-leads"]
+        condition: "count(lead_classification == 'hot') > 0"
+        message_template: "🔥 HOT LEADS: {{count(lead_classification == 'hot')}} qualified leads ready for sales"
+        priority: "high"
+        
+    # Step 5: Generate lead scoring evidence
+    - id: "generate_lead_evidence"
+      type: "governance"
+      params:
+        evidence_type: "lead_scoring_analysis"
+        evidence_data:
+          leads_scored: "{{len(fetch_leads)}}"
+          hot_leads: "{{count(lead_classification == 'hot')}}"
+          warm_leads: "{{count(lead_classification == 'warm')}}"
+          avg_score: "{{avg(lead_score)}}"
+        retention_years: 3
+        classification: "business_critical"
+
+# ===============================================================================
+# VELOCITY ANALYSIS WORKFLOWS
+# ===============================================================================
+
+# Velocity Analysis - Stage Duration Analysis
+stage_velocity_analysis_workflow:
+  name: "Pipeline Stage Velocity Analysis"
+  description: "Analyze pipeline velocity by stage and identify bottlenecks"
+  version: "1.0"
+  automation_type: "RBIA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "execute_stage_velocity_analysis"
+      type: "query"
+      params:
+        operator: "saas_pipeline_hygiene"
+        analysis_type: "stage_velocity"
+        velocity_threshold_days: 30
+        bottleneck_threshold: 1.5
+
+# Velocity Analysis - Conversion Rate Analysis  
+conversion_rate_analysis_workflow:
+  name: "Stage Conversion Rate Analysis"
+  description: "Analyze conversion rates between pipeline stages by team/rep"
+  version: "1.0"
+  automation_type: "RBIA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "fetch_conversion_data"
+      type: "query"
+      params:
+        source: "csv_data"
+        resource: "csv_data"
+        query: "SELECT owner_name, stage_name, COUNT(*) as deal_count FROM comprehensive_crm_data WHERE object = 'Opportunity' GROUP BY owner_name, stage_name"
+        output_format: "records"
+        
+    - id: "calculate_conversion_rates"
+      type: "decision"
+      params:
+        condition: "deal_count > 0"
+        true_action: "calculate_stage_conversion"
+        false_action: "skip_conversion"
+        
+    - id: "generate_conversion_report"
+      type: "notify"
+      params:
+        channel: "ui_response"
+        message_template: "📈 Conversion Analysis Complete"
+
+# ===============================================================================
+# PERFORMANCE ANALYSIS WORKFLOWS  
+# ===============================================================================
+
+# Performance Analysis - Pipeline Coverage
+pipeline_coverage_analysis_workflow:
+  name: "Pipeline Coverage Ratio Analysis"
+  description: "Enforce pipeline coverage ratio (e.g., 3x quota rule)"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "execute_coverage_analysis"
+      type: "query"
+      params:
+        operator: "saas_pipeline_hygiene"
+        analysis_type: "coverage_analysis"
+        coverage_ratio_target: 3.0
+        quota_threshold: 1000000
+
+# Performance Analysis - Forecast vs System Comparison
+forecast_comparison_workflow:
+  name: "Rep Forecast vs System Forecast Comparison"
+  description: "Compare rep forecast vs system forecast vs AI prediction"
+  version: "1.0"
+  automation_type: "RBIA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "execute_forecast_comparison"
+      type: "query"
+      params:
+        operator: "saas_pipeline_hygiene"
+        analysis_type: "forecast_comparison"
+        probability_variance_threshold: 20
+        confidence_threshold: 0.8
+
+# ===============================================================================
+# COACHING INSIGHTS WORKFLOWS
+# ===============================================================================
+
+# Coaching - Stalled Deal Coaching
+stalled_deal_coaching_workflow:
+  name: "Stalled Deal Coaching Insights"
+  description: "Coach reps on stalled deals (pipeline stuck >30 days)"
+  version: "1.0"
+  automation_type: "AALA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "identify_stalled_deals"
+      type: "query"
+      params:
+        source: "csv_data"
+        resource: "csv_data"
+        query: "SELECT * FROM comprehensive_crm_data WHERE object = 'Opportunity' AND days_in_stage > 30"
+        output_format: "records"
+        
+    - id: "generate_coaching_recommendations"
+      type: "agent_call"
+      params:
+        agent_type: "coaching_agent"
+        task: "analyze_stalled_deals"
+        context: "{{identify_stalled_deals}}"
+        
+    - id: "deliver_coaching_insights"
+      type: "notify"
+      params:
+        channel: "ui_response"
+        message_template: "🎯 Coaching: {{coaching_recommendations}}"
+
+# Coaching - Next Best Actions
+next_best_actions_workflow:
+  name: "Next Best Actions for Negotiation Stage"
+  description: "Get next best actions for deals in negotiation stage"
+  version: "1.0"
+  automation_type: "AALA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "fetch_negotiation_deals"
+      type: "query"
+      params:
+        source: "csv_data"
+        resource: "csv_data"
+        query: "SELECT * FROM comprehensive_crm_data WHERE object = 'Opportunity' AND stage_name = 'Negotiation'"
+        output_format: "records"
+        
+    - id: "analyze_next_actions"
+      type: "agent_call"
+      params:
+        agent_type: "action_planning_agent"
+        task: "recommend_next_actions"
+        context: "{{fetch_negotiation_deals}}"
+        
+    - id: "present_action_plan"
+      type: "notify"
+      params:
+        channel: "ui_response"
+        message_template: "🎯 Next Actions: {{action_recommendations}}"
+
+# ===============================================================================
+# DATA QUALITY WORKFLOWS (Additional)
+# ===============================================================================
+
+# Data Quality - Ownerless Deals Detection
+ownerless_deals_detection_workflow:
+  name: "Ownerless/Unassigned Deals Detection"
+  description: "Detect deals without owners or unassigned deals"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "find_ownerless_deals"
+      type: "query"
+      params:
+        source: "csv_data"
+        resource: "csv_data"
+        query: "SELECT * FROM comprehensive_crm_data WHERE object = 'Opportunity' AND (owner_name IS NULL OR owner_name = '' OR owner_name = 'Unassigned')"
+        output_format: "records"
+        
+    - id: "assess_impact"
+      type: "decision"
+      params:
+        condition: "COUNT(find_ownerless_deals) > 0"
+        true_action: "ownerless_deals_found"
+        false_action: "all_deals_assigned"
+        
+    - id: "generate_assignment_alert"
+      type: "notify"
+      params:
+        channel: "ui_response"
+        message_template: "⚠️ {{COUNT(find_ownerless_deals)}} unassigned deals found"
+
+# Data Quality - Missing Critical Fields
+missing_fields_audit_workflow:
+  name: "Missing Critical Fields Audit"
+  description: "Identify deals missing close dates, amounts, or other critical data"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "audit_critical_fields"
+      type: "query"
+      params:
+        source: "csv_data"
+        resource: "csv_data"
+        query: "SELECT * FROM comprehensive_crm_data WHERE object = 'Opportunity' AND (close_date IS NULL OR amount IS NULL OR amount = 0)"
+        output_format: "records"
+        
+    - id: "categorize_missing_data"
+      type: "decision"
+      params:
+        condition: "close_date IS NULL"
+        true_action: "missing_close_date"
+        false_action: "check_amount"
+        
+    - id: "generate_data_quality_report"
+      type: "notify"
+      params:
+        channel: "ui_response"
+        message_template: "📋 Data Quality: {{missing_fields_count}} issues found"
+
+# 10. Activity Tracking Audit Workflow
+activity_tracking_audit_workflow:
+  name: "Activity Tracking Audit"
+  description: "Identify deals missing activities/logs (no calls/emails logged in specified period)"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "execute_activity_audit"
+      type: "query"
+      params:
+        operator: "saas_pipeline_hygiene"
+
+# 11. Missing Fields Audit Workflow  
+missing_fields_audit_workflow:
+  name: "Missing Critical Fields Audit"
+  description: "Identify deals missing close dates, amounts, or other critical data"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "execute_missing_fields_audit"
+      type: "query"
+      params:
+        operator: "saas_pipeline_hygiene"
+
+# 12. Ownerless Deals Detection Workflow
+ownerless_deals_detection_workflow:
+  name: "Ownerless Deals Detection"
+  description: "Detect ownerless or unassigned deals"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "execute_ownerless_deals_detection"
+      type: "query"
+      params:
+        operator: "saas_pipeline_hygiene"
+
+# 13. Duplicate Detection Workflow
+duplicate_detection_workflow:
+  name: "Duplicate Deals Detection"
+  description: "Check duplicate deals across Salesforce/CRM and flag for review"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "execute_duplicate_detection"
+      type: "query"
+      params:
+        operator: "saas_pipeline_hygiene"
+
+# 14. Risk Scoring Analysis Workflow
+risk_scoring_analysis_workflow:
+  name: "Risk Scoring Analysis"
+  description: "Apply risk scoring to deals and categorize into high/medium/low risk categories"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "execute_risk_scoring"
+      type: "query"
+      params:
+        operator: "saas_pipeline_hygiene"
+        analysis_type: "risk_scoring"
+        risk_categories: ["HIGH", "MEDIUM", "LOW"]
+        confidence_threshold: 0.7
+
+# 15. Pipeline Hygiene Stale Deals Workflow
+pipeline_hygiene_stale_deals_workflow:
+  name: "Pipeline Hygiene - Stale Deals Analysis"
+  description: "Identify deals stuck in pipeline stages for extended periods (e.g., >60 days)"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "execute_stale_deals_analysis"
+      type: "query"
+      params:
+        operator: "saas_pipeline_hygiene"
+        analysis_type: "stale_deals"
+        stale_threshold_days: 60
+        critical_threshold_days: 90
+
+# 16. Sandbagging Detection Workflow
+sandbagging_detection_workflow:
+  name: "Sandbagging & Inflated Deals Detection"
+  description: "Identify high-value deals with artificially low probability or potential sandbagging behavior"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "execute_sandbagging_analysis"
+      type: "query"
+      params:
+        operator: "saas_pipeline_hygiene"
+        analysis_type: "sandbagging_detection"
+        high_value_threshold: 100000
+        low_probability_threshold: 30
+        advanced_stage_threshold: "Proposal"
+
+# 17. Deals at Risk Analysis Workflow  
+deals_at_risk_workflow:
+  name: "Deals at Risk Analysis"
+  description: "Identify deals that are slipping, have customer disengagement, or need immediate attention"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "execute_deals_at_risk_analysis"
+      type: "query"
+      params:
+        operator: "saas_pipeline_hygiene"
+        analysis_type: "deals_at_risk"
+        engagement_threshold_days: 30
+        stage_velocity_threshold: 60
+
+# 18. Quarter-End Deal Dumping Detection Workflow
+quarter_end_dumping_workflow:
+  name: "Quarter-End Deal Dumping Detection"
+  description: "Identify deals with suspicious close date patterns and potential quarter-end dumping"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    - id: "execute_quarter_end_analysis"
+      type: "query"
+      params:
+        operator: "saas_pipeline_hygiene"
+        analysis_type: "quarter_end_dumping"
+        quarter_end_window_days: 3
+        suspicious_pattern_threshold: 20

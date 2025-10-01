@@ -1,0 +1,68 @@
+metadata:
+  name: "Level Mapping"
+  description: "Maps job titles/seniority to Crenovent Levels"
+  version: "1.0"
+  last_updated: "2024-09-24"
+
+# Default level if no match is found
+default_level: "IC"
+
+# Level mapping rules from job title keywords to Levels
+level_rules:
+  - keywords: ["ceo", "chief executive", "chief executive officer", "president"]
+    level: "M7"
+    priority: 100
+  
+  - keywords: ["cfo", "cto", "cmo", "cro", "chief revenue officer", "chief financial officer", "chief technology officer", "chief marketing officer", "chief operating officer", "chief information officer", "c-level"]
+    level: "M7"
+    priority: 95
+  
+  - keywords: ["vp", "vice president", "vice-president", "svp", "senior vice president", "vp sales", "vp operations", "vp marketing", "vp finance"]
+    level: "M6"
+    priority: 90
+  
+  - keywords: ["director", "head of", "regional director", "global director", "sales director", "marketing director", "operations director"]
+    level: "M5"
+    priority: 85
+  
+  - keywords: ["senior director", "sr director", "principal director"]
+    level: "M5"
+    priority: 87
+  
+  - keywords: ["senior manager", "sr manager", "principal manager", "group manager"]
+    level: "M3"
+    priority: 82
+  
+  - keywords: ["manager", "team lead", "team leader", "lead", "supervisor"]
+    level: "M2"
+    priority: 80
+  
+  - keywords: ["senior", "sr", "principal", "staff", "senior analyst", "senior specialist"]
+    level: "M1"
+    priority: 75
+  
+  - keywords: ["junior", "jr", "associate", "entry", "intern", "trainee"]
+    level: "IC"
+    priority: 70
+  
+  # Catch-all for individual contributors
+  - keywords: ["analyst", "specialist", "coordinator", "representative", "executive", "consultant"]
+    level: "IC"
+    priority: 60
+
+# Configuration for matching
+matching_config:
+  case_sensitive: false
+  partial_match: true
+  minimum_keyword_length: 2
+  
+# Special rules for combining keywords (AND logic)
+combined_rules:
+  - keywords: ["senior", "manager"]
+    level: "M3"
+    priority: 85
+  
+  - keywords: ["senior", "director"]
+    level: "M5"
+    priority: 88
+

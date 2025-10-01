@@ -1,0 +1,41 @@
+metadata:
+  name: "Segment Mapping"
+  description: "Maps user levels to customer segments"
+  version: "1.0"
+  last_updated: "2024-09-24"
+
+# Default segment if no match is found
+default_segment: "SMB"
+
+# Segment mapping rules based on Level
+segment_rules:
+  - levels: ["M7", "M6", "M5"]
+    segment: "Enterprise"
+    priority: 100
+    description: "Senior leadership and directors handle Enterprise accounts"
+  
+  - levels: ["M4", "M3"]
+    segment: "Mid-Market"
+    priority: 90
+    description: "Senior managers handle Mid-Market accounts"
+  
+  - levels: ["M2", "M1"]
+    segment: "SMB"
+    priority: 80
+    description: "Managers and senior ICs handle SMB accounts"
+  
+  - levels: ["IC"]
+    segment: "SMB"
+    priority: 70
+    description: "Individual contributors handle SMB accounts"
+
+# Role Function based segment overrides
+role_function_overrides:
+  "TOP FUNCTION": "Enterprise"
+  "Customer Success": "Enterprise"  # CS typically handles larger accounts
+
+# Configuration for matching
+matching_config:
+  case_sensitive: false
+  priority_order: ["level", "role_function", "default"]
+

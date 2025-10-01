@@ -1,0 +1,30 @@
+Employee Name,Work Email,Reports To Email,Team,Role,Office Location,Employee Number,Hire Date,User Status,Permissions,Department
+Amanda Foster,amanda.foster@techstartup.io,,Revenue,Chief Revenue Officer,Boston,HUB001,2021-01-15,Active,Super Admin,Executive
+Carlos Mendoza,carlos.mendoza@techstartup.io,amanda.foster@techstartup.io,Revenue,VP Sales,Boston,HUB002,2021-03-20,Active,Admin,Sales
+Priya Sharma,priya.sharma@techstartup.io,amanda.foster@techstartup.io,Marketing,VP Marketing,Boston,HUB003,2021-05-10,Active,Admin,Marketing
+Jake Morrison,jake.morrison@techstartup.io,carlos.mendoza@techstartup.io,Revenue,Sales Manager,Boston,HUB004,2021-08-15,Active,User,Sales
+Maria Gonzalez,maria.gonzalez@techstartup.io,carlos.mendoza@techstartup.io,Revenue,Sales Manager,Austin,HUB005,2021-09-22,Active,User,Sales
+Ben Parker,ben.parker@techstartup.io,priya.sharma@techstartup.io,Marketing,Marketing Manager,Boston,HUB006,2021-11-05,Active,User,Marketing
+Lisa Chang,lisa.chang@techstartup.io,priya.sharma@techstartup.io,Marketing,Growth Marketing Manager,San Francisco,HUB007,2022-01-12,Active,User,Marketing
+Ryan O'Connor,ryan.oconnor@techstartup.io,jake.morrison@techstartup.io,Revenue,Senior Account Executive,Boston,HUB008,2022-02-28,Active,User,Sales
+Sarah Kim,sarah.kim@techstartup.io,jake.morrison@techstartup.io,Revenue,Senior Account Executive,Boston,HUB009,2022-03-15,Active,User,Sales
+Diego Ramirez,diego.ramirez@techstartup.io,maria.gonzalez@techstartup.io,Revenue,Senior Account Executive,Austin,HUB010,2022-04-20,Active,User,Sales
+Jessica Wu,jessica.wu@techstartup.io,maria.gonzalez@techstartup.io,Revenue,Senior Account Executive,Austin,HUB011,2022-05-25,Active,User,Sales
+Emma Thompson,emma.thompson@techstartup.io,ben.parker@techstartup.io,Marketing,Content Marketing Specialist,Boston,HUB012,2022-06-30,Active,User,Marketing
+Nathan Lee,nathan.lee@techstartup.io,ben.parker@techstartup.io,Marketing,Digital Marketing Specialist,Boston,HUB013,2022-08-05,Active,User,Marketing
+Sophia Chen,sophia.chen@techstartup.io,lisa.chang@techstartup.io,Marketing,Growth Analyst,San Francisco,HUB014,2022-09-10,Active,User,Marketing
+Alex Rodriguez,alex.rodriguez@techstartup.io,lisa.chang@techstartup.io,Marketing,SEO Specialist,San Francisco,HUB015,2022-10-15,Active,User,Marketing
+Tyler Johnson,tyler.johnson@techstartup.io,ryan.oconnor@techstartup.io,Revenue,Account Executive,Boston,HUB016,2022-11-20,Active,User,Sales
+Maya Patel,maya.patel@techstartup.io,ryan.oconnor@techstartup.io,Revenue,Account Executive,Boston,HUB017,2022-12-25,Active,User,Sales
+Jordan Smith,jordan.smith@techstartup.io,sarah.kim@techstartup.io,Revenue,Account Executive,Boston,HUB018,2023-01-30,Active,User,Sales
+Chloe Davis,chloe.davis@techstartup.io,sarah.kim@techstartup.io,Revenue,Account Executive,Boston,HUB019,2023-02-15,Active,User,Sales
+Luis Martinez,luis.martinez@techstartup.io,diego.ramirez@techstartup.io,Revenue,Account Executive,Austin,HUB020,2023-03-20,Active,User,Sales
+Zara Ahmed,zara.ahmed@techstartup.io,diego.ramirez@techstartup.io,Revenue,Account Executive,Austin,HUB021,2023-04-25,Active,User,Sales
+Kevin Zhang,kevin.zhang@techstartup.io,jessica.wu@techstartup.io,Revenue,Account Executive,Austin,HUB022,2023-05-30,Active,User,Sales
+Rachel Green,rachel.green@techstartup.io,jessica.wu@techstartup.io,Revenue,Account Executive,Austin,HUB023,2023-06-15,Active,User,Sales
+Ethan Moore,ethan.moore@techstartup.io,tyler.johnson@techstartup.io,Revenue,Sales Development Rep,Boston,HUB024,2023-07-20,Active,User,Sales
+Grace Liu,grace.liu@techstartup.io,maya.patel@techstartup.io,Revenue,Sales Development Rep,Boston,HUB025,2023-08-25,Active,User,Sales
+Noah Williams,noah.williams@techstartup.io,jordan.smith@techstartup.io,Revenue,Sales Development Rep,Boston,HUB026,2023-09-30,Active,User,Sales
+Ava Brown,ava.brown@techstartup.io,chloe.davis@techstartup.io,Revenue,Sales Development Rep,Boston,HUB027,2023-10-15,Active,User,Sales
+Logan Garcia,logan.garcia@techstartup.io,luis.martinez@techstartup.io,Revenue,Sales Development Rep,Austin,HUB028,2023-11-20,Active,User,Sales
+Mia Taylor,mia.taylor@techstartup.io,zara.ahmed@techstartup.io,Revenue,Sales Development Rep,Austin,HUB029,2023-12-25,Active,User,Sales

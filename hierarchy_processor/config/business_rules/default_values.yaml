@@ -1,0 +1,79 @@
+metadata:
+  name: "Default Values"
+  description: "Default values for Crenovent fields"
+  version: "1.0"
+  last_updated: "2024-09-24"
+
+# Default values for required fields (matching Node.js backend profile structure)
+defaults:
+  industry: "Sass"  # Will be inherited from admin signup in production
+  org_leader: "RevOp Manager"
+  role_function: "Sales"
+  business_function: "BF2 America"
+  level: "IC"
+  region: "America"
+  segment: "SMB"
+  modules: "Forecasting,Planning,Pipeline"
+
+# Optional field defaults (empty by default, matching Node.js profile structure)
+optional_defaults:
+  area: ""
+  district: ""
+  territory: ""
+  reporting_role_function: ""
+  reporting_manager_name: ""
+  reporting_manager_title: ""
+  reporting_email: ""
+
+# Field name mappings from YAML snake_case to Node.js profile structure
+field_mappings:
+  industry: "Industry"
+  org_leader: "Org Leader"
+  role_function: "Role Function"
+  business_function: "Business Function"
+  level: "Level"
+  region: "Region"
+  segment: "Segment"
+  modules: "Modules"
+  area: "Area"
+  district: "District"
+  territory: "Territory"
+  reporting_role_function: "Reporting Role Function"
+  reporting_manager_name: "Reporting Manager Name"
+  reporting_manager_title: "Reporting Manager title"
+  reporting_email: "Reporting Email"
+
+# Conditional defaults based on other fields
+conditional_defaults:
+  # If Role Function is TOP FUNCTION, set specific defaults
+  - condition:
+      field: "Role Function"
+      value: "TOP FUNCTION"
+    defaults:
+      business_function: "BF1 Global"
+      level: "M7"
+      segment: "Enterprise"
+      # Modules now handled by centralized_module_assignment.py
+  
+  # If Level is M6 or M7, give more access
+  - condition:
+      field: "Level"
+      values: ["M6", "M7"]
+    defaults:
+      segment: "Enterprise"
+      # Modules now handled by centralized_module_assignment.py
+  
+  # Role Function specific defaults (non-module related)
+  - condition:
+      field: "Role Function"
+      value: "Marketing"
+    defaults:
+      segment: "Mid Market"
+      # Modules now handled by centralized_module_assignment.py
+  
+  - condition:
+      field: "Role Function"
+      value: "Customer Success"
+    defaults:
+      segment: "Mid Market"
+      # Modules now handled by centralized_module_assignment.py

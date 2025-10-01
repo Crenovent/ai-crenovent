@@ -1,0 +1,51 @@
+Full Name,Work Email,Job Title,Business Unit,Contact Number,Manager Email,Office Location,Start Date,Employee Code,Grade Level
+Catherine Williams,catherine.williams@globaltech.com,Chief Executive Officer,Executive Office,+1-555-3001,,New York HQ,2018-01-15,GT001,C1
+Jonathan Martinez,jonathan.martinez@globaltech.com,Chief Operating Officer,Operations,+1-555-3002,catherine.williams@globaltech.com,New York HQ,2018-03-01,GT002,C2
+Elizabeth Chen,elizabeth.chen@globaltech.com,Chief Technology Officer,Technology,+1-555-3003,catherine.williams@globaltech.com,San Francisco,2018-02-15,GT003,C2
+Richard Thompson,richard.thompson@globaltech.com,Chief Financial Officer,Finance,+1-555-3004,catherine.williams@globaltech.com,New York HQ,2018-04-01,GT004,C2
+Angela Davis,angela.davis@globaltech.com,Chief Marketing Officer,Marketing,+1-555-3005,catherine.williams@globaltech.com,Chicago,2018-05-15,GT005,C2
+Steven Rodriguez,steven.rodriguez@globaltech.com,Chief Human Resources Officer,Human Resources,+1-555-3006,catherine.williams@globaltech.com,New York HQ,2018-06-01,GT006,C2
+Patricia Kim,patricia.kim@globaltech.com,VP of Sales - Americas,Sales,+1-555-3007,jonathan.martinez@globaltech.com,New York HQ,2019-01-15,GT007,VP1
+Michael Johnson,michael.johnson@globaltech.com,VP of Sales - EMEA,Sales,+1-555-3008,jonathan.martinez@globaltech.com,London,2019-02-01,GT008,VP1
+Sandra Liu,sandra.liu@globaltech.com,VP of Sales - APAC,Sales,+1-555-3009,jonathan.martinez@globaltech.com,Singapore,2019-02-15,GT009,VP1
+David Wilson,david.wilson@globaltech.com,VP of Engineering,Technology,+1-555-3010,elizabeth.chen@globaltech.com,San Francisco,2019-03-01,GT010,VP1
+Jennifer Brown,jennifer.brown@globaltech.com,VP of Product,Technology,+1-555-3011,elizabeth.chen@globaltech.com,San Francisco,2019-03-15,GT011,VP1
+Robert Garcia,robert.garcia@globaltech.com,VP of Infrastructure,Technology,+1-555-3012,elizabeth.chen@globaltech.com,Austin,2019-04-01,GT012,VP1
+Lisa Anderson,lisa.anderson@globaltech.com,VP of Finance,Finance,+1-555-3013,richard.thompson@globaltech.com,New York HQ,2019-04-15,GT013,VP1
+Mark Taylor,mark.taylor@globaltech.com,VP of Marketing - Digital,Marketing,+1-555-3014,angela.davis@globaltech.com,Chicago,2019-05-01,GT014,VP1
+Amanda Miller,amanda.miller@globaltech.com,VP of Marketing - Brand,Marketing,+1-555-3015,angela.davis@globaltech.com,Los Angeles,2019-05-15,GT015,VP1
+Christopher Lee,christopher.lee@globaltech.com,Director of Sales - North America,Sales,+1-555-3016,patricia.kim@globaltech.com,New York HQ,2019-07-01,GT016,D1
+Sarah White,sarah.white@globaltech.com,Director of Sales - Latin America,Sales,+1-555-3017,patricia.kim@globaltech.com,Miami,2019-07-15,GT017,D1
+Thomas Clark,thomas.clark@globaltech.com,Director of Sales - UK,Sales,+1-555-3018,michael.johnson@globaltech.com,London,2019-08-01,GT018,D1
+Maria Gonzalez,maria.gonzalez@globaltech.com,Director of Sales - Germany,Sales,+1-555-3019,michael.johnson@globaltech.com,Berlin,2019-08-15,GT019,D1
+Kevin Zhang,kevin.zhang@globaltech.com,Director of Sales - China,Sales,+1-555-3020,sandra.liu@globaltech.com,Shanghai,2019-09-01,GT020,D1
+Rachel Patel,rachel.patel@globaltech.com,Director of Sales - India,Sales,+1-555-3021,sandra.liu@globaltech.com,Mumbai,2019-09-15,GT021,D1
+James Murphy,james.murphy@globaltech.com,Director of Backend Engineering,Technology,+1-555-3022,david.wilson@globaltech.com,San Francisco,2019-10-01,GT022,D1
+Emily Turner,emily.turner@globaltech.com,Director of Frontend Engineering,Technology,+1-555-3023,david.wilson@globaltech.com,San Francisco,2019-10-15,GT023,D1
+Daniel Cooper,daniel.cooper@globaltech.com,Director of Mobile Engineering,Technology,+1-555-3024,david.wilson@globaltech.com,Austin,2019-11-01,GT024,D1
+Ashley Adams,ashley.adams@globaltech.com,Director of Product Management,Technology,+1-555-3025,jennifer.brown@globaltech.com,San Francisco,2019-11-15,GT025,D1
+Ryan Scott,ryan.scott@globaltech.com,Director of UX Design,Technology,+1-555-3026,jennifer.brown@globaltech.com,San Francisco,2019-12-01,GT026,D1
+Victoria Hall,victoria.hall@globaltech.com,Director of DevOps,Technology,+1-555-3027,robert.garcia@globaltech.com,Austin,2020-01-15,GT027,D1
+Nathan Green,nathan.green@globaltech.com,Director of Security,Technology,+1-555-3028,robert.garcia@globaltech.com,New York HQ,2020-02-01,GT028,D1
+Sophie Parker,sophie.parker@globaltech.com,Director of Financial Planning,Finance,+1-555-3029,lisa.anderson@globaltech.com,New York HQ,2020-02-15,GT029,D1
+Jordan Brooks,jordan.brooks@globaltech.com,Director of Corporate Finance,Finance,+1-555-3030,lisa.anderson@globaltech.com,New York HQ,2020-03-01,GT030,D1
+Grace Hill,grace.hill@globaltech.com,Sales Manager - Enterprise,Sales,+1-555-3031,christopher.lee@globaltech.com,New York HQ,2020-04-01,GT031,M1
+Tyler Wang,tyler.wang@globaltech.com,Sales Manager - SMB,Sales,+1-555-3032,christopher.lee@globaltech.com,Boston,2020-04-15,GT032,M1
+Olivia Martinez,olivia.martinez@globaltech.com,Sales Manager - West Coast,Sales,+1-555-3033,sarah.white@globaltech.com,Los Angeles,2020-05-01,GT033,M1
+Brian Collins,brian.collins@globaltech.com,Senior Engineering Manager,Technology,+1-555-3034,james.murphy@globaltech.com,San Francisco,2020-05-15,GT034,M1
+Jessica Rodriguez,jessica.rodriguez@globaltech.com,Engineering Manager - Platform,Technology,+1-555-3035,james.murphy@globaltech.com,Austin,2020-06-01,GT035,M1
+Alex Thompson,alex.thompson@globaltech.com,Engineering Manager - API,Technology,+1-555-3036,emily.turner@globaltech.com,San Francisco,2020-06-15,GT036,M1
+Maya Johnson,maya.johnson@globaltech.com,Engineering Manager - Mobile,Technology,+1-555-3037,daniel.cooper@globaltech.com,Austin,2020-07-01,GT037,M1
+Lucas Davis,lucas.davis@globaltech.com,Product Manager - Core,Technology,+1-555-3038,ashley.adams@globaltech.com,San Francisco,2020-07-15,GT038,M1
+Chloe Wilson,chloe.wilson@globaltech.com,Product Manager - Analytics,Technology,+1-555-3039,ashley.adams@globaltech.com,San Francisco,2020-08-01,GT039,M1
+Ethan Brown,ethan.brown@globaltech.com,UX Manager,Technology,+1-555-3040,ryan.scott@globaltech.com,San Francisco,2020-08-15,GT040,M1
+Zoe Garcia,zoe.garcia@globaltech.com,Senior Sales Representative,Sales,+1-555-3041,grace.hill@globaltech.com,New York HQ,2020-10-01,GT041,S1
+Ian Miller,ian.miller@globaltech.com,Sales Representative,Sales,+1-555-3042,tyler.wang@globaltech.com,Boston,2020-10-15,GT042,IC1
+Aria Lee,aria.lee@globaltech.com,Account Executive,Sales,+1-555-3043,olivia.martinez@globaltech.com,Los Angeles,2020-11-01,GT043,IC1
+Noah White,noah.white@globaltech.com,Senior Software Engineer,Technology,+1-555-3044,brian.collins@globaltech.com,San Francisco,2020-11-15,GT044,S1
+Emma Clark,emma.clark@globaltech.com,Software Engineer,Technology,+1-555-3045,jessica.rodriguez@globaltech.com,Austin,2020-12-01,GT045,IC1
+Liam Gonzalez,liam.gonzalez@globaltech.com,Frontend Engineer,Technology,+1-555-3046,alex.thompson@globaltech.com,San Francisco,2021-01-15,GT046,IC1
+Ava Zhang,ava.zhang@globaltech.com,Mobile Developer,Technology,+1-555-3047,maya.johnson@globaltech.com,Austin,2021-02-01,GT047,IC1
+Owen Patel,owen.patel@globaltech.com,Product Analyst,Technology,+1-555-3048,lucas.davis@globaltech.com,San Francisco,2021-02-15,GT048,IC1
+Mia Murphy,mia.murphy@globaltech.com,Data Analyst,Technology,+1-555-3049,chloe.wilson@globaltech.com,San Francisco,2021-03-01,GT049,IC1
+Logan Turner,logan.turner@globaltech.com,UX Designer,Technology,+1-555-3050,ethan.brown@globaltech.com,San Francisco,2021-03-15,GT050,IC1

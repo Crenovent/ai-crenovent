@@ -1,0 +1,237 @@
+# RBA DSL Workflow: Hierarchy Processing Automation
+# =================================================
+# This workflow should handle ALL hierarchy processing automatically
+# No manual processing in Node.js or frontend JavaScript should be needed
+
+workflow_id: "hierarchy_processing_rba"
+workflow_name: "Automated Hierarchy Processing"
+workflow_type: "RBA"  # Rule-Based Automation
+version: "1.0.0"
+description: "Fully automated CSV hierarchy processing using RBA DSL"
+
+# Governance Metadata (Required for all RBA workflows)
+governance:
+  tenant_id: "{{ tenant_id }}"
+  region_id: "{{ region_id }}"
+  sla_tier: "production"
+  policy_pack: "hierarchy_processing_policy"
+  compliance_frameworks: ["SOX", "GDPR"]
+  evidence_capture: true
+  override_ledger: true
+  trust_threshold: 0.95
+
+# Input Parameters
+parameters:
+  csv_file_path: 
+    type: "string"
+    description: "Path to uploaded CSV file"
+    required: true
+  tenant_id:
+    type: "integer" 
+    description: "Tenant ID for multi-tenant isolation"
+    required: true
+  uploaded_by_user_id:
+    type: "integer"
+    description: "User ID who uploaded the CSV"
+    required: true
+  processing_options:
+    type: "object"
+    description: "Hierarchy processing configuration"
+    default:
+      enable_circular_detection: true
+      enable_level_inference: true
+      max_hierarchy_depth: 10
+      include_virtual_nodes: true
+
+# RBA Workflow Steps
+steps:
+  # Step 1: CSV Ingestion and Validation
+  - id: "csv_ingestion"
+    type: "query"
+    description: "Load and validate CSV file"
+    params:
+      source_type: "csv_file"
+      file_path: "{{ csv_file_path }}"
+      validation_rules:
+        - required_columns: ["Name", "Email"]
+        - email_validation: true
+        - duplicate_detection: true
+    governance:
+      policy_id: "csv_validation_policy"
+      evidence.capture: true
+    output_variable: "raw_csv_data"
+
+  # Step 2: Universal Field Mapping with LLM Fallback
+  - id: "field_mapping"
+    type: "query"
+    description: "Map CSV fields to Crenovent standard format using Enhanced Universal Mapper with LLM fallback"
+    params:
+      processor: "enhanced_universal_mapper"
+      input_data: "{{ raw_csv_data }}"
+      tenant_id: "{{ tenant_id }}"
+      confidence_threshold: 0.75
+      fallback_processor: "csv_llm_processor"
+      fallback_enabled: true
+      fallback_threshold: 0.5  # Use LLM if confidence < 50%
+    governance:
+      policy_id: "field_mapping_policy"
+      evidence.capture: true
+    branches:
+      success: "hierarchy_building"
+      fallback_required: "llm_fallback_processing"
+    output_variable: "normalized_data"
+
+  # Step 2b: LLM Fallback Processing (when rule-based fails)
+  - id: "llm_fallback_processing"
+    type: "query"
+    description: "Process CSV using LLM when rule-based processing fails or has low confidence"
+    params:
+      processor: "csv_llm_processor"
+      input_data: "{{ raw_csv_data }}"
+      tenant_id: "{{ tenant_id }}"
+      processing_context: "{{ normalized_data.processing_context }}"
+      llm_model: "gpt-4"
+      temperature: 0.1
+    governance:
+      policy_id: "llm_fallback_policy"
+      evidence.capture: true
+      override_required: true  # LLM processing requires human oversight
+    output_variable: "normalized_data"
+
+  # Step 3: Hierarchy Construction
+  - id: "hierarchy_building"
+    type: "query"
+    description: "Build organizational hierarchy using Improved Hierarchy Builder"
+    params:
+      processor: "improved_hierarchy_builder"
+      input_data: "{{ normalized_data }}"
+      options: "{{ processing_options }}"
+      algorithms:
+        - circular_detection: "tarjan_dfs"
+        - level_assignment: "bfs_topological"
+        - validation: "comprehensive"
+    governance:
+      policy_id: "hierarchy_building_policy"
+      evidence.capture: true
+    output_variable: "hierarchy_structure"
+
+  # Step 4: Hierarchy Validation
+  - id: "hierarchy_validation"
+    type: "decision"
+    description: "Validate hierarchy health and compliance"
+    params:
+      condition: "{{ hierarchy_structure.validation_result.hierarchy_health_score >= 0.5 }}"
+      validation_checks:
+        - health_score_minimum: 0.5
+        - circular_references: 0
+        - max_depth_compliance: true
+        - orphan_node_threshold: 0.2
+    governance:
+      policy_id: "hierarchy_validation_policy"
+      evidence.capture: true
+    branches:
+      success: "database_storage"
+      failure: "validation_failure_handling"
+
+  # Step 5: Database Storage
+  - id: "database_storage"
+    type: "query"
+    description: "Store processed hierarchy in database"
+    params:
+      operation: "bulk_insert_update"
+      target_table: "users"
+      data_source: "{{ hierarchy_structure.processed_users }}"
+      tenant_isolation: true
+      fields_mapping:
+        user_id: "auto_generated"
+        username: "Name"
+        email: "Email"
+        role_title: "Role Title"
+        reports_to: "manager_user_id"  # Store as USER_ID
+        reporting_email: "Reports To (Email)"  # Store original EMAIL
+        hierarchy_level: "Level"
+        hierarchy_depth: "hierarchy_depth"
+        tenant_id: "{{ tenant_id }}"
+    governance:
+      policy_id: "database_storage_policy"
+      evidence.capture: true
+    output_variable: "storage_result"
+
+  # Step 6: Audit Trail Generation
+  - id: "audit_trail"
+    type: "governance"
+    description: "Generate comprehensive audit trail"
+    params:
+      audit_type: "hierarchy_processing"
+      tenant_id: "{{ tenant_id }}"
+      user_id: "{{ uploaded_by_user_id }}"
+      processing_summary: "{{ hierarchy_structure.validation_result }}"
+      compliance_evidence:
+        - field_mappings: "{{ normalized_data.mapping_summary }}"
+        - hierarchy_metrics: "{{ hierarchy_structure.validation_result }}"
+        - storage_confirmation: "{{ storage_result }}"
+    governance:
+      policy_id: "audit_trail_policy"
+      evidence.capture: true
+      immutable: true
+    output_variable: "audit_result"
+
+  # Step 7: Success Notification
+  - id: "success_notification"
+    type: "notify"
+    description: "Notify completion of hierarchy processing"
+    params:
+      notification_type: "hierarchy_processed"
+      recipients:
+        - user_id: "{{ uploaded_by_user_id }}"
+        - role: "admin"
+      message_template: "hierarchy_processing_success"
+      data:
+        total_users: "{{ hierarchy_structure.total_users }}"
+        health_score: "{{ hierarchy_structure.validation_result.hierarchy_health_score }}"
+        processing_time: "{{ execution_duration }}"
+    governance:
+      policy_id: "notification_policy"
+
+  # Error Handling Step
+  - id: "validation_failure_handling"
+    type: "governance"
+    description: "Handle hierarchy validation failures"
+    params:
+      failure_type: "hierarchy_validation_failed"
+      escalation_required: true
+      override_ledger_entry: true
+      recommendations: "{{ hierarchy_structure.validation_result.recommendations }}"
+    governance:
+      policy_id: "failure_handling_policy"
+      evidence.capture: true
+
+# Success Criteria
+success_criteria:
+  - hierarchy_health_score: ">= 0.5"
+  - circular_references: "== 0"
+  - database_storage: "successful"
+  - audit_trail: "generated"
+
+# Error Handling
+error_handling:
+  retry_policy:
+    max_retries: 3
+    backoff_strategy: "exponential"
+  escalation:
+    on_failure: "human_review_required"
+    notify_roles: ["admin", "revenue_manager"]
+
+# Compliance & Governance
+compliance:
+  data_residency: true
+  audit_retention: "7_years"
+  encryption_at_rest: true
+  encryption_in_transit: true
+  access_logging: true
+
+# Performance SLAs
+sla:
+  execution_time_max: "30_seconds"
+  memory_limit: "2GB"
+  concurrent_executions: 5

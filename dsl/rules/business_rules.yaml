@@ -1,0 +1,446 @@
+# Business Rules Configuration
+# Configuration-driven rules for RBA workflows with real-world defaults
+# Based on industry best practices and sales methodology knowledge
+
+version: "2.0"
+description: "Real-world business rules for RevAI Pro RBA workflows with industry-standard defaults"
+
+# Rule Templates for inheritance - Based on sales methodology best practices
+templates:
+  base_pipeline_hygiene:
+    defaults:
+      stale_threshold_days: 30      # Industry standard: 30 days without activity
+      critical_threshold_days: 60   # Critical: 60+ days stale
+      minimum_hygiene_score: 75     # 75% hygiene score benchmark
+      confidence_threshold: 80      # High confidence threshold
+    compliance_threshold: 75
+    
+  base_sandbagging:
+    defaults:
+      high_value_threshold: 250000     # $250K+ deals (enterprise threshold)
+      low_probability_threshold: 35    # <35% probability is suspicious
+      sandbagging_threshold: 65        # 65+ score indicates sandbagging
+      advanced_stage_multiplier: 1.8   # Higher weight for advanced stages
+      confidence_threshold: 70
+    risk_thresholds:
+      LOW: 25
+      MEDIUM: 45  
+      HIGH: 65
+      CRITICAL: 85
+      
+  base_velocity:
+    defaults:
+      prospecting_max_days: 14      # Max 2 weeks in prospecting
+      qualification_max_days: 21    # Max 3 weeks in qualification
+      proposal_max_days: 30         # Max 1 month in proposal
+      negotiation_max_days: 21      # Max 3 weeks in negotiation
+      velocity_threshold: 1.5       # 1.5x longer than average = slow
+      
+  base_coverage:
+    defaults:
+      minimum_coverage_ratio: 3.0   # 3:1 pipeline to quota ratio
+      healthy_coverage_ratio: 4.0   # 4:1 is healthy
+      optimal_coverage_ratio: 5.0   # 5:1 is optimal
+      
+  base_activity:
+    defaults:
+      minimum_activities_per_week: 3  # At least 3 activities per week
+      max_days_without_activity: 7    # No more than 7 days without activity
+      critical_inactivity_days: 14    # 14+ days is critical
+
+# Business Rules Configuration
+rules:
+  # Sandbagging Detection Rules - Industry Best Practices
+  sandbagging_detection:
+    name: "Sandbagging Detection Rules"
+    description: "Identify high-value deals with artificially low probability based on sales methodology"
+    extends: "base_sandbagging"
+    user_configurable: true
+    
+    # REAL-WORLD DEFAULTS - Based on enterprise sales best practices
+    defaults:
+      high_value_threshold: 250000      # $250K+ enterprise threshold
+      low_probability_threshold: 35     # <35% probability is suspicious in advanced stages
+      sandbagging_threshold: 65         # 65+ score indicates likely sandbagging
+      stage_probability_minimums:       # Minimum probabilities by stage
+        "Prospecting": 10
+        "Qualification": 20
+        "Needs Analysis": 25
+        "Value Proposition": 35
+        "Id. Decision Makers": 45
+        "Proposal/Price Quote": 60
+        "Contract Negotiation": 75
+        "Closed Won": 90
+    
+    # SCORING FACTORS - Based on sales methodology
+    scoring_factors:
+      - name: "high_value_low_probability"
+        description: "High value deal with suspiciously low probability (primary red flag)"
+        weight: 60
+        condition:
+          Amount: ">= ${high_value_threshold}"
+          Probability: "<= ${low_probability_threshold}"
+        
+      - name: "stage_probability_mismatch"
+        description: "Probability too low for current stage (methodology violation)"
+        weight: 40
+        condition:
+          stage_probability_check: true  # Custom logic in engine
+    
+    # RECOMMENDATIONS - Actionable insights
+    recommendations:
+      high_sandbagging_score:
+        - "Review deal qualification with sales manager"
+        - "Conduct pipeline review meeting with rep"
+        - "Validate probability against stage methodology"
+        - "Check for competitive pressure or budget constraints"
+      medium_sandbagging_score:
+        - "Schedule 1:1 with rep to discuss deal status"
+        - "Review recent activity and customer engagement"
+
+  # Stale Deals Analysis - Pipeline Velocity Management
+  stale_deals:
+    name: "Stale Deals Analysis"
+    description: "Identify deals stuck in pipeline stages based on velocity benchmarks"
+    extends: "base_pipeline_hygiene"
+    user_configurable: true
+    
+    # REAL-WORLD DEFAULTS - Based on sales velocity benchmarks
+    defaults:
+      stale_threshold_days: 45          # 45 days without stage progression
+      critical_threshold_days: 75       # 75+ days is critical
+      stage_velocity_benchmarks:        # Days per stage benchmarks
+        "Prospecting": 14
+        "Qualification": 21  
+        "Needs Analysis": 28
+        "Value Proposition": 21
+        "Id. Decision Makers": 14
+        "Proposal/Price Quote": 30
+        "Contract Negotiation": 21
+      minimum_activity_days: 14         # Must have activity within 14 days
+    
+    scoring_factors:
+      - name: "velocity_violation"
+        description: "Deal exceeds stage velocity benchmark"
+        weight: 50
+        condition:
+          stage_velocity_check: true
+      
+      - name: "activity_stagnation"
+        description: "No recent activity on deal"
+        weight: 30
+        condition:
+          DaysSinceActivity: "> ${minimum_activity_days}"
+      
+      - name: "high_value_stagnation"
+        description: "High-value deal with no progression"
+        weight: 20
+        condition:
+          Amount: ">= 100000"
+          DaysSinceActivity: "> 7"
+    
+    recommendations:
+      high_stale_score:
+        - "Schedule immediate pipeline review with rep"
+        - "Identify blockers and create action plan"
+        - "Consider deal qualification status"
+        - "Evaluate if deal should be closed lost"
+      medium_stale_score:
+        - "Review deal progression with sales manager"
+        - "Schedule customer touchpoint within 48 hours"
+        - "Update deal status and next steps"
+
+  # Missing Fields Analysis - Data Quality Management  
+  missing_fields:
+    name: "Missing Fields Analysis"
+    description: "Identify opportunities with incomplete critical data"
+    user_configurable: true
+    
+    # REAL-WORLD DEFAULTS - Critical fields for sales process
+    defaults:
+      critical_fields: ["Amount", "CloseDate", "StageName", "Probability"]
+      important_fields: ["LeadSource", "Type", "Owner.Name", "Account.Name"]
+      data_quality_threshold: 80        # 80% data completeness required
+      minimum_amount_threshold: 1000    # Deals >$1K must have complete data
+    
+    scoring_factors:
+      - name: "missing_critical_fields"
+        description: "Critical fields missing (Amount, CloseDate, etc.)"
+        weight: 70
+        condition:
+          critical_field_check: true
+      
+      - name: "missing_important_fields"
+        description: "Important fields missing (LeadSource, Type, etc.)"
+        weight: 30
+        condition:
+          important_field_check: true
+    
+    recommendations:
+      high_missing_score:
+        - "Immediate data cleanup required"
+        - "Block deal progression until fields complete"
+        - "Sales manager review required"
+      medium_missing_score:
+        - "Complete missing fields within 24 hours"
+        - "Review data entry processes with rep"
+
+  # Stage Velocity Analysis - Sales Process Optimization
+  stage_velocity:
+    name: "Stage Velocity Analysis"
+    description: "Analyze deal progression velocity by stage"
+    extends: "base_velocity"
+    user_configurable: true
+    
+    # REAL-WORLD DEFAULTS - Based on SaaS sales benchmarks
+    defaults:
+      velocity_benchmarks:
+        "Prospecting": 14              # 2 weeks max
+        "Qualification": 21            # 3 weeks max
+        "Needs Analysis": 28           # 4 weeks max
+        "Value Proposition": 21        # 3 weeks max
+        "Id. Decision Makers": 14      # 2 weeks max
+        "Proposal/Price Quote": 30     # 1 month max
+        "Contract Negotiation": 21     # 3 weeks max
+      slow_velocity_multiplier: 1.5    # 1.5x benchmark = slow
+      critical_velocity_multiplier: 2.0 # 2x benchmark = critical
+    
+    scoring_factors:
+      - name: "slow_stage_progression"
+        description: "Deal moving slower than benchmark"
+        weight: 60
+        condition:
+          velocity_benchmark_check: true
+      
+      - name: "stage_regression"
+        description: "Deal moved backwards in stages"
+        weight: 40
+        condition:
+          stage_regression_check: true
+
+  # Coverage Analysis - Pipeline Health Management
+  coverage_analysis:
+    name: "Pipeline Coverage Analysis" 
+    description: "Analyze pipeline coverage ratios and health metrics"
+    extends: "base_coverage"
+    user_configurable: true
+    
+    # REAL-WORLD DEFAULTS - Industry standard coverage ratios
+    defaults:
+      minimum_coverage_ratio: 3.0      # 3:1 minimum
+      healthy_coverage_ratio: 4.0      # 4:1 healthy
+      optimal_coverage_ratio: 5.0      # 5:1 optimal
+      quarterly_quota: 1000000         # $1M quarterly quota (configurable)
+      pipeline_stages_included: ["Qualification", "Needs Analysis", "Value Proposition", "Id. Decision Makers", "Proposal/Price Quote", "Contract Negotiation"]
+    
+    scoring_factors:
+      - name: "insufficient_coverage"
+        description: "Pipeline coverage below minimum threshold"
+        weight: 70
+        condition:
+          coverage_ratio_check: true
+      
+      - name: "stage_distribution_risk"
+        description: "Too much pipeline in early stages"
+        weight: 30
+        condition:
+          stage_distribution_check: true
+    
+    recommendations:
+      insufficient_coverage:
+        - "Increase prospecting activities"
+        - "Review pipeline generation strategies"
+        - "Focus on lead qualification"
+      stage_distribution_risk:
+        - "Review deal progression with sales rep"
+        - "Update deal stage if appropriate"
+        - "Schedule customer check-in"
+        - "Consider deal qualification review"
+
+  # Pipeline Hygiene - Missing Fields
+  pipeline_hygiene_missing_fields:
+    name: "Pipeline Hygiene - Missing Fields"
+    description: "Identify deals with missing critical data"
+    extends: "base_pipeline_hygiene"
+    
+    required_fields:
+      - "CloseDate"
+      - "Amount" 
+      - "OwnerId"
+      - "StageName"
+      - "Probability"
+    
+    conditions:
+      - name: "missing_critical_fields"
+        required_fields_missing: "> 0"
+    
+    compliance_threshold: 95
+    
+    recommendations:
+      missing_critical_fields:
+        - "Complete missing deal information"
+        - "Ensure data quality standards"
+        - "Update CRM fields"
+
+  # Pipeline Hygiene - Activity Tracking
+  pipeline_hygiene_activity_tracking:
+    name: "Pipeline Hygiene - Activity Tracking"
+    description: "Identify deals with missing recent activities"
+    extends: "base_pipeline_hygiene"
+    
+    defaults:
+      activity_threshold_days: 14
+      minimum_activity_score: 80
+    
+    conditions:
+      - name: "missing_recent_activity"
+        days_since_activity: "> ${activity_threshold_days}"
+        StageName: "!= closed won"
+        StageName: "!= closed lost"
+    
+    compliance_threshold: 80
+    
+    recommendations:
+      missing_recent_activity:
+        - "Log recent customer interactions"
+        - "Schedule follow-up activities"
+        - "Update deal status"
+
+  # Pipeline Hygiene - Duplicate Detection
+  pipeline_hygiene_duplicate_detection:
+    name: "Pipeline Hygiene - Duplicate Detection"
+    description: "Identify potential duplicate deals"
+    extends: "base_pipeline_hygiene"
+    
+    duplicate_criteria:
+      - fields: ["AccountId", "Amount"]
+        tolerance: 0.05  # 5% amount tolerance
+        
+      - fields: ["AccountId", "Name"]
+        similarity_threshold: 0.85
+    
+    compliance_threshold: 95
+    
+    recommendations:
+      potential_duplicates:
+        - "Review for duplicate deals"
+        - "Merge or close duplicate opportunities"
+        - "Validate deal uniqueness"
+
+  # Pipeline Hygiene - Ownerless Deals
+  pipeline_hygiene_ownerless_deals:
+    name: "Pipeline Hygiene - Ownerless Deals"
+    description: "Identify deals without assigned owners"
+    extends: "base_pipeline_hygiene"
+    
+    conditions:
+      - name: "ownerless_deals"
+        OwnerId: "is_null"
+        
+      - name: "inactive_owner_deals"
+        OwnerIsActive: "= false"
+    
+    compliance_threshold: 95
+    
+    recommendations:
+      ownerless_deals:
+        - "Assign deal owner immediately"
+        - "Review territory assignment"
+        - "Ensure proper deal routing"
+
+  # Deals at Risk Analysis
+  deals_at_risk:
+    name: "Deals at Risk Analysis"
+    description: "Identify deals that are slipping or need attention"
+    extends: "base_pipeline_hygiene"
+    
+    defaults:
+      engagement_threshold_days: 30
+      stage_velocity_threshold: 60
+      risk_score_threshold: 70
+    
+    risk_factors:
+      - name: "customer_disengagement"
+        weight: 30
+        condition:
+          days_since_activity: "> ${engagement_threshold_days}"
+          
+      - name: "stage_stagnation"
+        weight: 25
+        condition:
+          days_in_stage: "> ${stage_velocity_threshold}"
+          
+      - name: "probability_decline"
+        weight: 20
+        condition:
+          probability_trend: "declining"
+          
+      - name: "competitive_pressure"
+        weight: 15
+        condition:
+          competitor_count: "> 2"
+          
+      - name: "budget_concerns"
+        weight: 10
+        condition:
+          budget_status: ["uncertain", "reduced", "frozen"]
+    
+    recommendations:
+      HIGH:
+        - "Immediate customer outreach required"
+        - "Schedule executive engagement"
+        - "Review competitive positioning"
+        
+      customer_disengagement:
+        - "Schedule customer check-in call"
+        - "Re-engage key stakeholders"
+        
+      stage_stagnation:
+        - "Assess stage progression barriers"
+        - "Identify next steps with customer"
+
+  # Quarter-End Deal Dumping
+  quarter_end_dumping:
+    name: "Quarter-End Deal Dumping Detection"
+    description: "Identify suspicious close date patterns"
+    extends: "base_pipeline_hygiene"
+    
+    defaults:
+      quarter_end_window_days: 3
+      dumping_threshold_percentage: 30
+    
+    patterns:
+      - name: "last_day_clustering"
+        description: "Too many deals closing on last day of quarter"
+        condition:
+          close_date_day_of_quarter: "last_day"
+          percentage_of_deals: "> ${dumping_threshold_percentage}"
+          
+      - name: "quarter_end_window_clustering"
+        description: "Unusual clustering in quarter-end window"
+        condition:
+          close_date_days_from_quarter_end: "<= ${quarter_end_window_days}"
+          percentage_of_deals: "> ${dumping_threshold_percentage}"
+    
+    recommendations:
+      last_day_clustering:
+        - "Review close date authenticity"
+        - "Validate customer commitment"
+        - "Audit revenue recognition timing"
+        
+      quarter_end_window_clustering:
+        - "Assess deal timing patterns"
+        - "Review sales process compliance"
+
+# Global Configuration
+global_settings:
+  default_confidence_threshold: 70
+  default_compliance_threshold: 70
+  enable_industry_adjustments: true
+  enable_seasonal_adjustments: true
+  enable_rep_history_patterns: true
+  
+  # Logging and audit settings
+  log_rule_evaluations: true
+  store_evaluation_history: true
+  enable_performance_metrics: true

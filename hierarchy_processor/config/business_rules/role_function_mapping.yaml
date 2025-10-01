@@ -1,0 +1,58 @@
+metadata:
+  name: "Role Function Mapping"
+  description: "Maps job titles/roles to Crenovent Role Functions"
+  version: "1.0"
+  last_updated: "2024-09-24"
+
+# Default Role Function if no match is found
+default_role_function: "Sales"
+
+# Mapping rules from job title keywords to Role Functions
+role_function_rules:
+  - keywords: ["ceo", "chief executive", "chief executive officer"]
+    role_function: "TOP FUNCTION"
+    priority: 100
+  
+  - keywords: ["marketing", "market", "brand", "campaign", "digital marketing", "content"]
+    role_function: "Marketing"
+    priority: 90
+  
+  - keywords: ["customer success", "success", "cs", "customer experience", "client success"]
+    role_function: "Customer Success"
+    priority: 90
+  
+  - keywords: ["operations", "ops", "revenue operations", "revops", "business operations"]
+    role_function: "Revenue Operations"
+    priority: 90
+  
+  - keywords: ["product", "product manager", "pm", "product owner", "product development"]
+    role_function: "Product"
+    priority: 90
+  
+  - keywords: ["engineering", "developer", "software", "tech", "technical", "engineer"]
+    role_function: "Engineering"
+    priority: 90
+  
+  - keywords: ["finance", "financial", "accounting", "controller", "cfo", "analyst"]
+    role_function: "Finance"
+    priority: 90
+  
+  - keywords: ["hr", "human resources", "people", "talent", "recruiting", "recruiter"]
+    role_function: "Human Resources"
+    priority: 90
+  
+  - keywords: ["legal", "compliance", "attorney", "counsel", "risk"]
+    role_function: "Legal"
+    priority: 90
+  
+  # Sales roles (catch-all for sales-related positions)
+  - keywords: ["sales", "account", "business development", "bd", "revenue", "quota", "territory"]
+    role_function: "Sales"
+    priority: 80
+
+# Configuration for case sensitivity and matching
+matching_config:
+  case_sensitive: false
+  partial_match: true
+  minimum_keyword_length: 2
+

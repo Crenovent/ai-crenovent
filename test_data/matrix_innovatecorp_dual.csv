@@ -1,0 +1,26 @@
+Employee Name,Email Address,Position,Functional Department,Project Team,Direct Manager,Project Manager,Location,Join Date,ID
+Rebecca Johnson,rebecca.johnson@innovatecorp.com,CEO,Executive,,,,,New York,2019-01-15,IC001
+Marcus Williams,marcus.williams@innovatecorp.com,VP of Engineering,Engineering,,rebecca.johnson@innovatecorp.com,,New York,2019-03-01,IC002
+Diana Chen,diana.chen@innovatecorp.com,VP of Product,Product,,rebecca.johnson@innovatecorp.com,,San Francisco,2019-02-15,IC003
+Robert Martinez,robert.martinez@innovatecorp.com,VP of Sales,Sales,,rebecca.johnson@innovatecorp.com,,Chicago,2019-04-01,IC004
+Jennifer Kim,jennifer.kim@innovatecorp.com,Engineering Director,Engineering,,marcus.williams@innovatecorp.com,,New York,2019-06-01,IC005
+Sarah Thompson,sarah.thompson@innovatecorp.com,Product Director,Product,,diana.chen@innovatecorp.com,,San Francisco,2019-05-15,IC006
+Michael Davis,michael.davis@innovatecorp.com,Sales Director,Sales,,robert.martinez@innovatecorp.com,,Chicago,2019-07-01,IC007
+Lisa Rodriguez,lisa.rodriguez@innovatecorp.com,Senior Engineering Manager,Engineering,Alpha Project,jennifer.kim@innovatecorp.com,sarah.thompson@innovatecorp.com,New York,2020-01-15,IC008
+James Wilson,james.wilson@innovatecorp.com,Engineering Manager,Engineering,Beta Project,jennifer.kim@innovatecorp.com,diana.chen@innovatecorp.com,Austin,2020-02-01,IC009
+Emma Garcia,emma.garcia@innovatecorp.com,Product Manager,Product,Alpha Project,sarah.thompson@innovatecorp.com,lisa.rodriguez@innovatecorp.com,San Francisco,2020-03-01,IC010
+David Park,david.park@innovatecorp.com,Product Manager,Product,Beta Project,sarah.thompson@innovatecorp.com,james.wilson@innovatecorp.com,San Francisco,2020-03-15,IC011
+Rachel Green,rachel.green@innovatecorp.com,Sales Manager - Enterprise,Sales,Alpha Project,michael.davis@innovatecorp.com,sarah.thompson@innovatecorp.com,Chicago,2020-04-01,IC012
+Alex Johnson,alex.johnson@innovatecorp.com,Sales Manager - SMB,Sales,Beta Project,michael.davis@innovatecorp.com,diana.chen@innovatecorp.com,Boston,2020-04-15,IC013
+Maya Patel,maya.patel@innovatecorp.com,Senior Software Engineer,Engineering,Alpha Project,lisa.rodriguez@innovatecorp.com,emma.garcia@innovatecorp.com,New York,2020-07-01,IC014
+Thomas Anderson,thomas.anderson@innovatecorp.com,Senior Software Engineer,Engineering,Beta Project,james.wilson@innovatecorp.com,david.park@innovatecorp.com,Austin,2020-07-15,IC015
+Amanda Brown,amanda.brown@innovatecorp.com,Software Engineer,Engineering,Alpha Project,lisa.rodriguez@innovatecorp.com,emma.garcia@innovatecorp.com,Remote,2020-08-01,IC016
+Kevin Zhang,kevin.zhang@innovatecorp.com,Software Engineer,Engineering,Beta Project,james.wilson@innovatecorp.com,david.park@innovatecorp.com,Austin,2020-08-15,IC017
+Sophie Turner,sophie.turner@innovatecorp.com,UX Designer,Product,Alpha Project,emma.garcia@innovatecorp.com,lisa.rodriguez@innovatecorp.com,San Francisco,2020-09-01,IC018
+Ryan Murphy,ryan.murphy@innovatecorp.com,UX Designer,Product,Beta Project,david.park@innovatecorp.com,james.wilson@innovatecorp.com,Remote,2020-09-15,IC019
+Victoria Adams,victoria.adams@innovatecorp.com,Sales Representative,Sales,Alpha Project,rachel.green@innovatecorp.com,emma.garcia@innovatecorp.com,Chicago,2020-10-01,IC020
+Jordan Hill,jordan.hill@innovatecorp.com,Sales Representative,Sales,Beta Project,alex.johnson@innovatecorp.com,david.park@innovatecorp.com,Boston,2020-10-15,IC021
+Grace Wang,grace.wang@innovatecorp.com,QA Engineer,Engineering,Alpha Project,lisa.rodriguez@innovatecorp.com,emma.garcia@innovatecorp.com,New York,2020-11-01,IC022
+Tyler Scott,tyler.scott@innovatecorp.com,QA Engineer,Engineering,Beta Project,james.wilson@innovatecorp.com,david.park@innovatecorp.com,Austin,2020-11-15,IC023
+Olivia Martinez,olivia.martinez@innovatecorp.com,Business Analyst,Product,Alpha Project,emma.garcia@innovatecorp.com,sarah.thompson@innovatecorp.com,San Francisco,2020-12-01,IC024
+Nathan Brooks,nathan.brooks@innovatecorp.com,Business Analyst,Product,Beta Project,david.park@innovatecorp.com,diana.chen@innovatecorp.com,Remote,2020-12-15,IC025

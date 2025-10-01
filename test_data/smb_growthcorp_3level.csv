@@ -1,0 +1,31 @@
+Name,Email,Role,Department,Phone,Reports To Email,Location,Hire Date,Employee ID,Salary Band
+Michael Thompson,michael.thompson@growthcorp.com,CEO,Executive,+1-555-2001,,New York,2020-01-15,GC001,Executive
+Jennifer Walsh,jennifer.walsh@growthcorp.com,VP of Sales,Sales,+1-555-2002,michael.thompson@growthcorp.com,New York,2020-03-01,GC002,VP
+Robert Kim,robert.kim@growthcorp.com,VP of Engineering,Engineering,+1-555-2003,michael.thompson@growthcorp.com,Austin,2020-02-15,GC003,VP
+Amanda Davis,amanda.davis@growthcorp.com,VP of Marketing,Marketing,+1-555-2004,michael.thompson@growthcorp.com,Chicago,2020-04-01,GC004,VP
+Carlos Martinez,carlos.martinez@growthcorp.com,CFO,Finance,+1-555-2005,michael.thompson@growthcorp.com,New York,2020-05-15,GC005,C-Suite
+Linda Chen,linda.chen@growthcorp.com,Head of HR,Human Resources,+1-555-2006,michael.thompson@growthcorp.com,New York,2020-06-01,GC006,Director
+Thomas Anderson,thomas.anderson@growthcorp.com,Sales Director - East,Sales,+1-555-2007,jennifer.walsh@growthcorp.com,New York,2020-07-01,GC007,Director
+Sarah Johnson,sarah.johnson@growthcorp.com,Sales Director - West,Sales,+1-555-2008,jennifer.walsh@growthcorp.com,Los Angeles,2020-07-15,GC008,Director
+Mark Wilson,mark.wilson@growthcorp.com,Engineering Manager,Engineering,+1-555-2009,robert.kim@growthcorp.com,Austin,2020-08-01,GC009,Manager
+Jessica Brown,jessica.brown@growthcorp.com,Product Manager,Engineering,+1-555-2010,robert.kim@growthcorp.com,Austin,2020-08-15,GC010,Manager
+Daniel Lee,daniel.lee@growthcorp.com,Marketing Manager - Digital,Marketing,+1-555-2011,amanda.davis@growthcorp.com,Chicago,2020-09-01,GC011,Manager
+Rachel Miller,rachel.miller@growthcorp.com,Marketing Manager - Content,Marketing,+1-555-2012,amanda.davis@growthcorp.com,Remote,2020-09-15,GC012,Manager
+Kevin Zhang,kevin.zhang@growthcorp.com,Senior Sales Rep,Sales,+1-555-2013,thomas.anderson@growthcorp.com,Boston,2021-01-15,GC013,Senior
+Lisa Garcia,lisa.garcia@growthcorp.com,Senior Sales Rep,Sales,+1-555-2014,thomas.anderson@growthcorp.com,New York,2021-02-01,GC014,Senior
+James Rodriguez,james.rodriguez@growthcorp.com,Sales Rep,Sales,+1-555-2015,sarah.johnson@growthcorp.com,San Diego,2021-03-01,GC015,Mid-Level
+Amy Liu,amy.liu@growthcorp.com,Sales Rep,Sales,+1-555-2016,sarah.johnson@growthcorp.com,Los Angeles,2021-03-15,GC016,Mid-Level
+Chris Taylor,chris.taylor@growthcorp.com,Senior Developer,Engineering,+1-555-2017,mark.wilson@growthcorp.com,Austin,2021-04-01,GC017,Senior
+Emily White,emily.white@growthcorp.com,Software Developer,Engineering,+1-555-2018,mark.wilson@growthcorp.com,Remote,2021-04-15,GC018,Mid-Level
+Ryan Murphy,ryan.murphy@growthcorp.com,Frontend Developer,Engineering,+1-555-2019,mark.wilson@growthcorp.com,Austin,2021-05-01,GC019,Mid-Level
+Sophie Turner,sophie.turner@growthcorp.com,UX Designer,Engineering,+1-555-2020,jessica.brown@growthcorp.com,Austin,2021-05-15,GC020,Mid-Level
+Alex Johnson,alex.johnson@growthcorp.com,QA Engineer,Engineering,+1-555-2021,mark.wilson@growthcorp.com,Remote,2021-06-01,GC021,Mid-Level
+Maria Santos,maria.santos@growthcorp.com,Digital Marketing Specialist,Marketing,+1-555-2022,daniel.lee@growthcorp.com,Chicago,2021-07-01,GC022,Mid-Level
+Brian Cooper,brian.cooper@growthcorp.com,SEO Specialist,Marketing,+1-555-2023,daniel.lee@growthcorp.com,Remote,2021-07-15,GC023,Mid-Level
+Ashley Parker,ashley.parker@growthcorp.com,Content Writer,Marketing,+1-555-2024,rachel.miller@growthcorp.com,Remote,2021-08-01,GC024,Mid-Level
+Nathan Brooks,nathan.brooks@growthcorp.com,Social Media Manager,Marketing,+1-555-2025,rachel.miller@growthcorp.com,Chicago,2021-08-15,GC025,Mid-Level
+Victoria Adams,victoria.adams@growthcorp.com,Financial Analyst,Finance,+1-555-2026,carlos.martinez@growthcorp.com,New York,2021-09-01,GC026,Mid-Level
+Jordan Hill,jordan.hill@growthcorp.com,Accountant,Finance,+1-555-2027,carlos.martinez@growthcorp.com,New York,2021-09-15,GC027,Mid-Level
+Grace Wang,grace.wang@growthcorp.com,HR Specialist,Human Resources,+1-555-2028,linda.chen@growthcorp.com,New York,2021-10-01,GC028,Mid-Level
+Tyler Scott,tyler.scott@growthcorp.com,Recruiter,Human Resources,+1-555-2029,linda.chen@growthcorp.com,Remote,2021-10-15,GC029,Mid-Level
+Olivia Martinez,olivia.martinez@growthcorp.com,Customer Success Manager,Sales,+1-555-2030,jennifer.walsh@growthcorp.com,Austin,2021-11-01,GC030,Mid-Level

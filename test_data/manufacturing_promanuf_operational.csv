@@ -1,0 +1,41 @@
+Employee Name,Work Email,Job Role,Department,Shift,Supervisor Email,Plant Location,Hire Date,Badge Number,Union Status
+William Harrison,william.harrison@promanuf.com,Chief Executive Officer,Executive,Day,,Detroit Main,2016-01-15,PM001,Non-Union
+Susan Martinez,susan.martinez@promanuf.com,VP of Operations,Operations,Day,william.harrison@promanuf.com,Detroit Main,2016-06-01,PM002,Non-Union
+Robert Chen,robert.chen@promanuf.com,VP of Manufacturing,Manufacturing,Day,william.harrison@promanuf.com,Detroit Main,2016-05-15,PM003,Non-Union
+Patricia Kim,patricia.kim@promanuf.com,VP of Quality,Quality Assurance,Day,william.harrison@promanuf.com,Detroit Main,2016-07-01,PM004,Non-Union
+Charles Rodriguez,charles.rodriguez@promanuf.com,VP of Supply Chain,Supply Chain,Day,william.harrison@promanuf.com,Chicago Plant,2016-08-01,PM005,Non-Union
+Linda Thompson,linda.thompson@promanuf.com,Plant Manager - Detroit,Manufacturing,Day,robert.chen@promanuf.com,Detroit Main,2017-01-15,PM006,Non-Union
+Michael Davis,michael.davis@promanuf.com,Plant Manager - Chicago,Manufacturing,Day,robert.chen@promanuf.com,Chicago Plant,2017-02-01,PM007,Non-Union
+Jennifer Wilson,jennifer.wilson@promanuf.com,Plant Manager - Atlanta,Manufacturing,Day,robert.chen@promanuf.com,Atlanta Plant,2017-03-01,PM008,Non-Union
+David Johnson,david.johnson@promanuf.com,Quality Manager - Detroit,Quality Assurance,Day,patricia.kim@promanuf.com,Detroit Main,2017-04-01,PM009,Non-Union
+Lisa Brown,lisa.brown@promanuf.com,Quality Manager - Chicago,Quality Assurance,Day,patricia.kim@promanuf.com,Chicago Plant,2017-05-01,PM010,Non-Union
+Thomas Anderson,thomas.anderson@promanuf.com,Supply Chain Manager,Supply Chain,Day,charles.rodriguez@promanuf.com,Chicago Plant,2017-06-01,PM011,Non-Union
+Amanda Garcia,amanda.garcia@promanuf.com,Production Supervisor - A Shift,Manufacturing,Day,linda.thompson@promanuf.com,Detroit Main,2018-01-15,PM012,Non-Union
+Mark Miller,mark.miller@promanuf.com,Production Supervisor - B Shift,Manufacturing,Evening,linda.thompson@promanuf.com,Detroit Main,2018-02-01,PM013,Non-Union
+Sarah Lee,sarah.lee@promanuf.com,Production Supervisor - C Shift,Manufacturing,Night,linda.thompson@promanuf.com,Detroit Main,2018-03-01,PM014,Non-Union
+Kevin White,kevin.white@promanuf.com,Production Supervisor - A Shift,Manufacturing,Day,michael.davis@promanuf.com,Chicago Plant,2018-04-01,PM015,Non-Union
+Rachel Clark,rachel.clark@promanuf.com,Production Supervisor - B Shift,Manufacturing,Evening,michael.davis@promanuf.com,Chicago Plant,2018-05-01,PM016,Non-Union
+James Taylor,james.taylor@promanuf.com,Production Supervisor - A Shift,Manufacturing,Day,jennifer.wilson@promanuf.com,Atlanta Plant,2018-06-01,PM017,Non-Union
+Emily Moore,emily.moore@promanuf.com,Quality Inspector - Day,Quality Assurance,Day,david.johnson@promanuf.com,Detroit Main,2018-09-01,PM018,Union
+Daniel Jackson,daniel.jackson@promanuf.com,Quality Inspector - Evening,Quality Assurance,Evening,david.johnson@promanuf.com,Detroit Main,2018-10-01,PM019,Union
+Ashley Thompson,ashley.thompson@promanuf.com,Quality Inspector - Day,Quality Assurance,Day,lisa.brown@promanuf.com,Chicago Plant,2018-11-01,PM020,Union
+Christopher Williams,christopher.williams@promanuf.com,Warehouse Supervisor,Supply Chain,Day,thomas.anderson@promanuf.com,Chicago Plant,2019-01-15,PM021,Non-Union
+Victoria Harris,victoria.harris@promanuf.com,Inventory Manager,Supply Chain,Day,thomas.anderson@promanuf.com,Chicago Plant,2019-02-01,PM022,Non-Union
+Ryan Martin,ryan.martin@promanuf.com,Machine Operator - Line 1,Manufacturing,Day,amanda.garcia@promanuf.com,Detroit Main,2019-06-01,PM023,Union
+Maya Wilson,maya.wilson@promanuf.com,Machine Operator - Line 2,Manufacturing,Day,amanda.garcia@promanuf.com,Detroit Main,2019-07-01,PM024,Union
+Jordan Davis,jordan.davis@promanuf.com,Machine Operator - Line 3,Manufacturing,Evening,mark.miller@promanuf.com,Detroit Main,2019-08-01,PM025,Union
+Grace Rodriguez,grace.rodriguez@promanuf.com,Machine Operator - Line 1,Manufacturing,Night,sarah.lee@promanuf.com,Detroit Main,2019-09-01,PM026,Union
+Tyler Garcia,tyler.garcia@promanuf.com,Machine Operator - Line 1,Manufacturing,Day,kevin.white@promanuf.com,Chicago Plant,2019-10-01,PM027,Union
+Olivia Martinez,olivia.martinez@promanuf.com,Machine Operator - Line 2,Manufacturing,Day,kevin.white@promanuf.com,Chicago Plant,2019-11-01,PM028,Union
+Nathan Lopez,nathan.lopez@promanuf.com,Machine Operator - Line 3,Manufacturing,Evening,rachel.clark@promanuf.com,Chicago Plant,2019-12-01,PM029,Union
+Sophie Johnson,sophie.johnson@promanuf.com,Machine Operator - Line 1,Manufacturing,Day,james.taylor@promanuf.com,Atlanta Plant,2020-01-15,PM030,Union
+Lucas Brown,lucas.brown@promanuf.com,Assembly Worker - Station A,Manufacturing,Day,amanda.garcia@promanuf.com,Detroit Main,2020-03-01,PM031,Union
+Chloe Wilson,chloe.wilson@promanuf.com,Assembly Worker - Station B,Manufacturing,Day,amanda.garcia@promanuf.com,Detroit Main,2020-04-01,PM032,Union
+Ethan Miller,ethan.miller@promanuf.com,Assembly Worker - Station C,Manufacturing,Evening,mark.miller@promanuf.com,Detroit Main,2020-05-01,PM033,Union
+Zoe Anderson,zoe.anderson@promanuf.com,Assembly Worker - Station A,Manufacturing,Night,sarah.lee@promanuf.com,Detroit Main,2020-06-01,PM034,Union
+Ian Thompson,ian.thompson@promanuf.com,Assembly Worker - Station A,Manufacturing,Day,kevin.white@promanuf.com,Chicago Plant,2020-07-01,PM035,Union
+Aria White,aria.white@promanuf.com,Assembly Worker - Station B,Manufacturing,Day,kevin.white@promanuf.com,Chicago Plant,2020-08-01,PM036,Union
+Noah Garcia,noah.garcia@promanuf.com,Forklift Operator,Supply Chain,Day,christopher.williams@promanuf.com,Chicago Plant,2020-10-01,PM037,Union
+Emma Martinez,emma.martinez@promanuf.com,Forklift Operator,Supply Chain,Evening,christopher.williams@promanuf.com,Chicago Plant,2020-11-01,PM038,Union
+Liam Davis,liam.davis@promanuf.com,Shipping Clerk,Supply Chain,Day,christopher.williams@promanuf.com,Chicago Plant,2021-01-15,PM039,Union
+Ava Rodriguez,ava.rodriguez@promanuf.com,Receiving Clerk,Supply Chain,Day,christopher.williams@promanuf.com,Chicago Plant,2021-02-01,PM040,Union

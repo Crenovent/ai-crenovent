@@ -1,0 +1,31 @@
+FullName,EmailAddress,ManagerEmail,BusinessUnit,JobTitle,PrimaryAddress,EmployeeId,HireDate,SecurityRole,UserType,AccessMode
+Robert Mitchell,robert.mitchell@globaltech.com,,Sales,Chief Revenue Officer,Seattle,D365001,2019-06-15,CRO Role,Licensed User,Read-Write
+Jennifer Adams,jennifer.adams@globaltech.com,robert.mitchell@globaltech.com,Sales,VP Enterprise Sales,Seattle,D365002,2019-09-20,Sales Manager,Licensed User,Read-Write
+Thomas Wilson,thomas.wilson@globaltech.com,robert.mitchell@globaltech.com,Sales,VP Commercial Sales,Chicago,D365003,2020-01-10,Sales Manager,Licensed User,Read-Write
+Laura Martinez,laura.martinez@globaltech.com,robert.mitchell@globaltech.com,Sales,VP International Sales,London,D365004,2020-03-15,Sales Manager,Licensed User,Read-Write
+David Thompson,david.thompson@globaltech.com,jennifer.adams@globaltech.com,Sales,Enterprise Sales Director,Seattle,D365005,2020-06-20,Salesperson,Licensed User,Read-Write
+Michelle Brown,michelle.brown@globaltech.com,jennifer.adams@globaltech.com,Sales,Enterprise Sales Director,New York,D365006,2020-08-25,Salesperson,Licensed User,Read-Write
+Kevin Johnson,kevin.johnson@globaltech.com,thomas.wilson@globaltech.com,Sales,Commercial Sales Director,Chicago,D365007,2020-10-30,Salesperson,Licensed User,Read-Write
+Sarah Davis,sarah.davis@globaltech.com,thomas.wilson@globaltech.com,Sales,Commercial Sales Director,Dallas,D365008,2020-12-15,Salesperson,Licensed User,Read-Write
+James Anderson,james.anderson@globaltech.com,laura.martinez@globaltech.com,Sales,International Sales Director,London,D365009,2021-02-20,Salesperson,Licensed User,Read-Write
+Maria Garcia,maria.garcia@globaltech.com,laura.martinez@globaltech.com,Sales,International Sales Director,Frankfurt,D365010,2021-04-25,Salesperson,Licensed User,Read-Write
+Christopher Lee,christopher.lee@globaltech.com,david.thompson@globaltech.com,Sales,Senior Enterprise Account Executive,Seattle,D365011,2021-06-30,Salesperson,Licensed User,Read-Write
+Amanda White,amanda.white@globaltech.com,david.thompson@globaltech.com,Sales,Senior Enterprise Account Executive,Portland,D365012,2021-08-15,Salesperson,Licensed User,Read-Write
+Daniel Rodriguez,daniel.rodriguez@globaltech.com,michelle.brown@globaltech.com,Sales,Senior Enterprise Account Executive,New York,D365013,2021-10-20,Salesperson,Licensed User,Read-Write
+Lisa Taylor,lisa.taylor@globaltech.com,michelle.brown@globaltech.com,Sales,Senior Enterprise Account Executive,Boston,D365014,2021-12-25,Salesperson,Licensed User,Read-Write
+Michael Clark,michael.clark@globaltech.com,kevin.johnson@globaltech.com,Sales,Commercial Account Executive,Chicago,D365015,2022-01-30,Salesperson,Licensed User,Read-Write
+Jessica Lewis,jessica.lewis@globaltech.com,kevin.johnson@globaltech.com,Sales,Commercial Account Executive,Milwaukee,D365016,2022-03-15,Salesperson,Licensed User,Read-Write
+Ryan Walker,ryan.walker@globaltech.com,sarah.davis@globaltech.com,Sales,Commercial Account Executive,Dallas,D365017,2022-05-20,Salesperson,Licensed User,Read-Write
+Emily Hall,emily.hall@globaltech.com,sarah.davis@globaltech.com,Sales,Commercial Account Executive,Austin,D365018,2022-07-25,Salesperson,Licensed User,Read-Write
+Andrew Young,andrew.young@globaltech.com,james.anderson@globaltech.com,Sales,International Account Executive,Manchester,D365019,2022-09-30,Salesperson,Licensed User,Read-Write
+Sophie King,sophie.king@globaltech.com,james.anderson@globaltech.com,Sales,International Account Executive,Birmingham,D365020,2022-11-15,Salesperson,Licensed User,Read-Write
+Oliver Wright,oliver.wright@globaltech.com,maria.garcia@globaltech.com,Sales,International Account Executive,Munich,D365021,2023-01-20,Salesperson,Licensed User,Read-Write
+Emma Lopez,emma.lopez@globaltech.com,maria.garcia@globaltech.com,Sales,International Account Executive,Hamburg,D365022,2023-03-25,Salesperson,Licensed User,Read-Write
+Noah Green,noah.green@globaltech.com,christopher.lee@globaltech.com,Sales,Account Executive,Spokane,D365023,2023-05-30,Salesperson,Licensed User,Read-Write
+Grace Adams,grace.adams@globaltech.com,amanda.white@globaltech.com,Sales,Account Executive,Eugene,D365024,2023-07-15,Salesperson,Licensed User,Read-Write
+Ethan Baker,ethan.baker@globaltech.com,daniel.rodriguez@globaltech.com,Sales,Account Executive,Albany,D365025,2023-09-20,Salesperson,Licensed User,Read-Write
+Chloe Nelson,chloe.nelson@globaltech.com,lisa.taylor@globaltech.com,Sales,Account Executive,Providence,D365026,2023-11-25,Salesperson,Licensed User,Read-Write
+Lucas Carter,lucas.carter@globaltech.com,michael.clark@globaltech.com,Sales,Junior Account Executive,Rockford,D365027,2023-12-30,Salesperson,Licensed User,Read-Write
+Mia Mitchell,mia.mitchell@globaltech.com,jessica.lewis@globaltech.com,Sales,Junior Account Executive,Madison,D365028,2024-01-15,Salesperson,Licensed User,Read-Write
+Logan Perez,logan.perez@globaltech.com,ryan.walker@globaltech.com,Sales,Junior Account Executive,Fort Worth,D365029,2024-02-20,Salesperson,Licensed User,Read-Write
+Ava Roberts,ava.roberts@globaltech.com,emily.hall@globaltech.com,Sales,Junior Account Executive,San Antonio,D365030,2024-03-25,Salesperson,Licensed User,Read-Write

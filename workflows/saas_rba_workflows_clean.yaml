@@ -1,0 +1,110 @@
+# SaaS RBA Workflow Templates - Clean Version
+# Basic Data Query Workflow
+basic_data_query_workflow:
+  name: "Basic Data Query"
+  description: "Simple data queries for counting, listing, and basic analytics"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    # Step 1: Execute basic query - count accounts
+    - id: "execute_basic_query"
+      type: "query"
+      params:
+        source: "csv_data"
+        resource: "csv_data"
+        query: "SELECT COUNT(*) as total_count FROM comprehensive_crm_data WHERE object = 'Account'"
+        output_format: "records"
+        
+    # Step 2: Generate evidence
+    - id: "generate_query_evidence"
+      type: "governance"
+      params:
+        evidence_type: "basic_data_query"
+        evidence_data:
+          query_type: "account_count"
+          table: "comprehensive_crm_data"
+
+# Account Count Workflow
+account_count_workflow:
+  name: "Account Count Query"
+  description: "Count total number of accounts in the system"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    # Step 1: Count accounts from CSV data
+    - id: "count_accounts"
+      type: "query"
+      params:
+        source: "csv_data"
+        resource: "csv_data"
+        query: "SELECT COUNT(*) as account_count FROM comprehensive_crm_data WHERE object = 'Account'"
+        output_format: "records"
+        
+    # Step 2: Generate evidence for governance
+    - id: "generate_evidence"
+      type: "governance"
+      params:
+        evidence_type: "account_count_query"
+        evidence_data:
+          query_executed: "account_count"
+          data_source: "csv_data"
+          table: "comprehensive_crm_data"
+
+# Pipeline Hygiene Workflow
+pipeline_hygiene_workflow:
+  name: "Pipeline Hygiene Workflow"
+  description: "Automated pipeline data validation and hygiene checks"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    # Step 1: Identify stale opportunities
+    - id: "identify_stale_opportunities"
+      type: "query"
+      params:
+        source: "csv_data"
+        resource: "csv_data"
+        query: "SELECT id, Name, StageName, CreatedDate FROM comprehensive_crm_data WHERE object = 'Opportunity' AND CreatedDate < date('now', '-30 days')"
+        output_format: "records"
+        
+    # Step 2: Generate evidence
+    - id: "generate_hygiene_evidence"
+      type: "governance"
+      params:
+        evidence_type: "pipeline_hygiene"
+        evidence_data:
+          action: "stale_opportunity_identification"
+          criteria: "last_modified > 30 days"
+
+# Risk Scoring Analysis Workflow
+risk_scoring_analysis_workflow:
+  name: "Risk Scoring Analysis"
+  description: "Apply risk scoring to deals and categorize into high/medium/low risk categories"
+  version: "1.0"
+  automation_type: "RBA"
+  industry: "SaaS"
+  
+  steps:
+    # Step 1: Execute risk scoring analysis
+    - id: "execute_risk_scoring"
+      type: "saas_pipeline_hygiene"
+      params:
+        source: "csv_data"
+        resource: "csv_data"
+        analysis_type: "risk_scoring"
+        risk_categories: ["HIGH", "MEDIUM", "LOW"]
+        confidence_threshold: 0.7
+        
+    # Step 2: Generate evidence
+    - id: "generate_risk_evidence"
+      type: "governance"
+      params:
+        evidence_type: "risk_scoring_analysis"
+        evidence_data:
+          action: "risk_categorization"
+          categories: "high/medium/low"

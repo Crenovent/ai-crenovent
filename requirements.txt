@@ -1,0 +1,69 @@
+# Core web framework
+flask==2.3.3
+flask-cors==4.0.0
+fastapi==0.104.1
+uvicorn==0.24.0
+
+# Environment and utilities
+python-dotenv==1.0.0
+requests==2.31.0
+sqlalchemy==2.0.20
+# Fixed: Use asyncpg instead of psycopg2-binary for better Windows compatibility
+asyncpg==0.29.0
+typing_extensions==4.7.1
+
+# LangChain and LangGraph for advanced AI workflows
+langchain==0.1.17
+langchain-community==0.0.38
+langchain-openai==0.1.7
+langgraph==0.0.53
+langsmith==0.1.56
+
+# Memory and conversation management (optional)
+# redis==4.6.0
+# chromadb==0.4.15
+
+# Real-time communication
+websockets==11.0.3
+socketio==5.9.0
+flask-socketio==5.3.6
+
+# Agent tools and utilities
+pydantic==2.4.2
+tenacity==8.2.3
+tiktoken==0.5.1
+
+# RPA and automation dependencies
+selenium==4.15.0
+beautifulsoup4==4.12.2
+pandas==2.1.1
+numpy==1.24.3
+
+# Email automation
+# smtplib-async==1.1.3
+
+# Data processing
+pyodbc==4.0.39
+
+# Enterprise LangChain Tools for Revolutionary AI
+langchain-experimental==0.0.58
+tavily-python==0.3.3
+# pgvector==0.2.4  # May not be needed with asyncpg
+
+# Advanced Analytics & Business Intelligence
+scikit-learn==1.3.0
+scipy==1.11.0
+yfinance==0.2.28
+
+# Market Intelligence Tools
+newsapi-python==0.2.7
+alpha-vantage==2.3.1
+
+# Enhanced PostgreSQL Vector Support
+langchain-postgres==0.0.9
+
+# Ultra-Dynamic Geolocation Services
+geopy==2.4.1
+pycountry==24.6.1
+pycountry-convert==0.7.2
+reverse-geocoder==1.5.1

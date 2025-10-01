@@ -1,0 +1,156 @@
+workflow_id: unknown_workflow
+name: Unknown Workflow
+module: Unknown
+automation_type: RBA
+version: 1.0.0
+metadata:
+  description: Automated account planning form filling using revolutionary AI agents
+  industry: SaaS
+  sla_tier: T1
+  tags:
+  - account_planning
+  - form_automation
+  - rba
+steps:
+- id: extract_user_input
+  type: query
+  params:
+    source: user_input
+    resource: message
+    extract_patterns:
+    - field: account_id
+      pattern: account[:\s]+([A-Z0-9]+)
+    - field: plan_name
+      pattern: plan[:\s]+([^,\.]+)
+    - field: industry
+      pattern: industry[:\s]+([^,\.]+)
+  outputs:
+    extracted_data: result.extracted_fields
+  governance:
+    policy_id: gdpr_data_extraction
+    evidence_capture: true
+- id: fetch_account_context
+  type: query
+  params:
+    source: postgres
+    resource: strategic_account_plans
+    filters:
+    - field: account_id
+      op: '='
+      value: '{{extract_user_input.extracted_data.account_id}}'
+    select:
+    - plan_id
+    - plan_name
+    - account_owner
+    - industry
+    - annual_revenue
+    limit: 5
+  outputs:
+    existing_plans: result.rows
+  governance:
+    policy_id: tenant_isolation
+    evidence_capture: true
+- id: generate_personalized_fields
+  type: agent_call
+  params:
+    agent_id: revolutionary_form_filler
+    context:
+      message: '{{input_data.message}}'
+      user_context:
+        user_id: '{{user_context.user_id}}'
+        tenant_id: '{{user_context.tenant_id}}'
+      account_data: '{{fetch_account_context.existing_plans}}'
+      extracted_input: '{{extract_user_input.extracted_data}}'
+    tools:
+    - database_query
+    - user_intelligence
+    max_depth: 3
+    timeout_sec: 30
+  outputs:
+    personalized_form: result.form_data
+    completeness_score: result.completeness_ratio
+  governance:
+    policy_id: ai_agent_execution
+    evidence_capture: true
+    trust_threshold: 0.85
+- id: validate_required_fields
+  type: decision
+  params:
+    expression: '{{personalized_form | has_required_fields([''plan_name'', ''account_id'',
+      ''account_owner''])}}'
+    on_true: create_plan_record
+    on_false: notify_missing_fields
+  governance:
+    policy_id: data_validation
+    evidence_capture: true
+- id: create_plan_record
+  type: query
+  params:
+    source: postgres
+    resource: strategic_account_plans
+    operation: INSERT
+    data:
+      plan_name: '{{personalized_form.plan_name}}'
+      account_id: '{{personalized_form.account_id}}'
+      account_owner: '{{personalized_form.account_owner}}'
+      industry: '{{personalized_form.industry}}'
+      annual_revenue: '{{personalized_form.annual_revenue}}'
+      account_tier: '{{personalized_form.account_tier}}'
+      region_territory: '{{personalized_form.region_territory}}'
+      short_term_goals: '{{personalized_form.short_term_goals}}'
+      long_term_goals: '{{personalized_form.long_term_goals}}'
+      revenue_growth_target: '{{personalized_form.revenue_growth_target}}'
+      key_opportunities: '{{personalized_form.key_opportunities}}'
+      known_risks: '{{personalized_form.known_risks}}'
+      communication_cadence: '{{personalized_form.communication_cadence}}'
+      created_by_user_id: '{{user_context.user_id}}'
+      tenant_id: '{{user_context.tenant_id}}'
+    return_fields:
+    - plan_id
+  outputs:
+    new_plan: result.inserted_record
+  governance:
+    policy_id: data_creation
+    evidence_capture: true
+    override_ledger_id: plan_creation_overrides
+- id: notify_success
+  type: notify
+  params:
+    channel: ui_response
+    template: 'Account plan ''{{new_plan.plan_name}}'' created successfully with plan
+      ID: {{new_plan.plan_id}}'
+    message_type: success
+    attachments:
+    - name: plan_summary
+      type: data
+      data: '{{new_plan}}'
+    - name: completion_metrics
+      type: data
+      data:
+        completeness_score: '{{completeness_score}}'
+        fields_filled: '{{personalized_form | count_non_empty}}'
+  governance:
+    policy_id: user_notification
+    evidence_capture: true
+- id: notify_missing_fields
+  type: notify
+  params:
+    channel: ui_response
+    template: 'Account plan creation failed: Missing required fields. Please provide
+      plan name, account ID, and account owner.'
+    message_type: error
+    attachments:
+    - name: extracted_data
+      type: data
+      data: '{{extract_user_input.extracted_data}}'
+    - name: validation_errors
+      type: data
+      data:
+        missing_fields:
+        - plan_name
+        - account_id
+        - account_owner
+        suggestion: Please include these fields in your request
+  governance:
+    policy_id: error_notification
+    evidence_capture: true

@@ -1,0 +1,31 @@
+Full Name,Email,Manager Email,Department,Job Title,Location,Employee ID,Start Date,Territory,Quota,Account Tier
+Sarah Chen,sarah.chen@acmecorp.com,,Executive,Chief Revenue Officer,San Francisco,SF001,2020-01-15,Global,5000000,Enterprise
+Michael Rodriguez,michael.rodriguez@acmecorp.com,sarah.chen@acmecorp.com,Sales,VP Sales - Americas,New York,NY002,2020-03-10,Americas,2000000,Enterprise
+Jennifer Wang,jennifer.wang@acmecorp.com,sarah.chen@acmecorp.com,Sales,VP Sales - EMEA,London,LD003,2020-05-20,EMEA,1800000,Enterprise
+David Kim,david.kim@acmecorp.com,sarah.chen@acmecorp.com,Sales,VP Sales - APAC,Singapore,SG004,2020-07-12,APAC,1500000,Enterprise
+Lisa Thompson,lisa.thompson@acmecorp.com,michael.rodriguez@acmecorp.com,Sales,Sales Director - East,New York,NY005,2021-02-01,East Coast,800000,Enterprise
+Robert Johnson,robert.johnson@acmecorp.com,michael.rodriguez@acmecorp.com,Sales,Sales Director - West,Los Angeles,LA006,2021-03-15,West Coast,750000,Enterprise
+Emily Davis,emily.davis@acmecorp.com,jennifer.wang@acmecorp.com,Sales,Sales Director - UK,London,LD007,2021-04-20,UK,600000,Enterprise
+James Wilson,james.wilson@acmecorp.com,jennifer.wang@acmecorp.com,Sales,Sales Director - DACH,Berlin,BE008,2021-06-10,DACH,550000,Enterprise
+Anna Patel,anna.patel@acmecorp.com,david.kim@acmecorp.com,Sales,Sales Director - ANZ,Sydney,SY009,2021-08-05,ANZ,500000,Enterprise
+Kevin Zhang,kevin.zhang@acmecorp.com,david.kim@acmecorp.com,Sales,Sales Director - SEA,Singapore,SG010,2021-09-20,SEA,450000,Enterprise
+Mark Stevens,mark.stevens@acmecorp.com,lisa.thompson@acmecorp.com,Sales,Senior Account Executive,Boston,BT011,2022-01-10,Northeast,400000,Enterprise
+Rachel Green,rachel.green@acmecorp.com,lisa.thompson@acmecorp.com,Sales,Senior Account Executive,New York,NY012,2022-02-15,Metro NY,350000,Enterprise
+Thomas Brown,thomas.brown@acmecorp.com,robert.johnson@acmecorp.com,Sales,Senior Account Executive,San Francisco,SF013,2022-03-20,Bay Area,380000,Enterprise
+Jessica Miller,jessica.miller@acmecorp.com,robert.johnson@acmecorp.com,Sales,Senior Account Executive,Los Angeles,LA014,2022-04-25,SoCal,320000,Enterprise
+Daniel Garcia,daniel.garcia@acmecorp.com,emily.davis@acmecorp.com,Sales,Account Executive,Manchester,MN015,2022-05-30,North England,250000,Mid-Market
+Sophie Martinez,sophie.martinez@acmecorp.com,emily.davis@acmecorp.com,Sales,Account Executive,Birmingham,BM016,2022-07-08,Midlands,240000,Mid-Market
+Oliver Schmidt,oliver.schmidt@acmecorp.com,james.wilson@acmecorp.com,Sales,Account Executive,Munich,MU017,2022-08-12,Bavaria,230000,Mid-Market
+Hans Mueller,hans.mueller@acmecorp.com,james.wilson@acmecorp.com,Sales,Account Executive,Frankfurt,FR018,2022-09-18,Hesse,220000,Mid-Market
+Emma Taylor,emma.taylor@acmecorp.com,anna.patel@acmecorp.com,Sales,Account Executive,Melbourne,ML019,2022-10-22,Victoria,210000,Mid-Market
+Jack Wilson,jack.wilson@acmecorp.com,anna.patel@acmecorp.com,Sales,Account Executive,Brisbane,BR020,2022-11-28,Queensland,200000,Mid-Market
+Ryan Tan,ryan.tan@acmecorp.com,kevin.zhang@acmecorp.com,Sales,Account Executive,Bangkok,BK021,2023-01-15,Thailand,190000,Mid-Market
+Maya Lim,maya.lim@acmecorp.com,kevin.zhang@acmecorp.com,Sales,Account Executive,Kuala Lumpur,KL022,2023-02-20,Malaysia,180000,Mid-Market
+Alex Johnson,alex.johnson@acmecorp.com,mark.stevens@acmecorp.com,Sales,Junior Account Executive,Hartford,HT023,2023-03-25,Connecticut,150000,SMB
+Chloe Davis,chloe.davis@acmecorp.com,rachel.green@acmecorp.com,Sales,Junior Account Executive,Newark,NW024,2023-04-30,New Jersey,140000,SMB
+Noah Williams,noah.williams@acmecorp.com,thomas.brown@acmecorp.com,Sales,Junior Account Executive,San Jose,SJ025,2023-05-15,Silicon Valley,160000,SMB
+Grace Lee,grace.lee@acmecorp.com,jessica.miller@acmecorp.com,Sales,Junior Account Executive,Pasadena,PA026,2023-06-20,LA County,130000,SMB
+Ethan Moore,ethan.moore@acmecorp.com,daniel.garcia@acmecorp.com,Sales,Sales Development Rep,Liverpool,LV027,2023-07-25,Merseyside,80000,SMB
+Zoe Clark,zoe.clark@acmecorp.com,sophie.martinez@acmecorp.com,Sales,Sales Development Rep,Coventry,CV028,2023-08-30,West Midlands,75000,SMB
+Lucas Weber,lucas.weber@acmecorp.com,oliver.schmidt@acmecorp.com,Sales,Sales Development Rep,Stuttgart,ST029,2023-09-05,Baden-Württemberg,85000,SMB
+Mia Fischer,mia.fischer@acmecorp.com,hans.mueller@acmecorp.com,Sales,Sales Development Rep,Cologne,CL030,2023-10-10,North Rhine-Westphalia,82000,SMB

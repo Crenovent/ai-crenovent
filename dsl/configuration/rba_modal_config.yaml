@@ -1,0 +1,110 @@
+# Dynamic RBA Agent Modal Configuration
+# Each agent self-describes its output format and UI requirements
+# The frontend orchestrator dynamically adapts to ANY agent without hardcoding
+
+# Agent Self-Description Protocol
+agent_modal_protocol:
+  # Every RBA agent should include this metadata in their response
+  required_response_fields:
+    - "modal_config"      # Agent's self-described UI configuration
+    - "display_metrics"   # Key metrics to show in cards
+    - "insights"          # Recommendations/insights
+    - "flagged_items"     # Items requiring attention
+    
+  # Standard modal configuration structure
+  modal_config_schema:
+    title: "string"                    # Display title
+    subtitle: "string"                 # Subtitle with dynamic values
+    category: "string"                 # Agent category (risk, quality, velocity, etc.)
+    success_message: "string"          # Message when no issues found
+    action_items: "array"              # Suggested actions
+    
+  # Standard display metrics structure  
+  display_metrics_schema:
+    primary_metrics: "array"           # Main 4 metrics to highlight
+    secondary_metrics: "array"         # Additional metrics
+    compliance_score: "number"         # Overall compliance/health score
+    
+  # Standard insights structure
+  insights_schema:
+    recommendations: "array"           # Action recommendations
+    key_findings: "array"              # Important discoveries
+    risk_factors: "array"              # Risk indicators
+    
+# Dynamic Formatters - Applied based on metric type
+formatters:
+  number:
+    format: "{value:,}"
+    
+  percentage:
+    format: "{value:.1f}%"
+    
+  currency:
+    format: "${value:,.0f}"
+    
+  currency_millions:
+    format: "${value_millions:.0f}M"
+    transform: "divide_by_million"
+    
+  currency_thousands:
+    format: "${value_thousands:.0f}K" 
+    transform: "divide_by_thousand"
+    
+  days:
+    format: "{value} days"
+    
+  rate:
+    format: "{value:.2f}"
+    
+  score:
+    format: "{value}/100"
+
+# Agent Categories for UI Theming
+agent_categories:
+  risk_analysis:
+    color: "#ff6b6b"
+    icon: "warning"
+    agents: ["sandbagging_detection", "at_risk_deals", "deal_risk_scoring"]
+    
+  data_quality:
+    color: "#4ecdc4"
+    icon: "check_circle"
+    agents: ["data_quality", "missing_fields", "duplicate_detection", "ownerless_deals"]
+    
+  velocity_analysis:
+    color: "#45b7d1"
+    icon: "speed"
+    agents: ["stage_velocity", "stale_deals", "conversion_rate", "pipeline_hygiene_stale_deals"]
+    
+  performance_analysis:
+    color: "#96ceb4"
+    icon: "analytics"
+    agents: ["pipeline_summary", "coverage_analysis", "health_overview", "forecast_alignment"]
+    
+  activity_analysis:
+    color: "#ffeaa7"
+    icon: "activity"
+    agents: ["activity_tracking", "quarter_end_dumping"]
+
+# Fallback Configuration for Legacy Agents
+fallback_config:
+  title: "Analysis Results"
+  subtitle: "Analysis completed successfully"
+  category: "analysis"
+  default_metrics:
+    - key: "total_processed"
+      label: "Total Processed"
+      type: "number"
+      source: "total_opportunities"
+    - key: "flagged_items"
+      label: "Items Flagged"
+      type: "number"
+      source: "flagged_opportunities"
+    - key: "success_rate"
+      label: "Success Rate"
+      type: "percentage"
+      source: "success_rate"
+    - key: "compliance"
+      label: "Compliance"
+      type: "percentage"
+      source: "compliance_score"

@@ -1,0 +1,40 @@
+Full Name,Corporate Email,Job Title,Region,Country,Manager Email,Office,Hire Date,Employee Number,Cost Center
+Alexander Hamilton,alexander.hamilton@megacorp.com,Global CEO,Global,USA,,New York,2017-01-15,MC001,CC001
+Catherine Rodriguez,catherine.rodriguez@megacorp.com,President - Americas,Americas,USA,alexander.hamilton@megacorp.com,New York,2017-03-01,MC002,CC002
+Jonathan Schmidt,jonathan.schmidt@megacorp.com,President - EMEA,EMEA,Germany,alexander.hamilton@megacorp.com,Frankfurt,2017-02-15,MC003,CC003
+Li Wei Chen,li.wei.chen@megacorp.com,President - APAC,APAC,Singapore,alexander.hamilton@megacorp.com,Singapore,2017-04-01,MC004,CC004
+Maria Gonzalez,maria.gonzalez@megacorp.com,VP Sales - North America,Americas,USA,catherine.rodriguez@megacorp.com,New York,2018-01-15,MC005,CC005
+Carlos Santos,carlos.santos@megacorp.com,VP Sales - Latin America,Americas,Brazil,catherine.rodriguez@megacorp.com,São Paulo,2018-02-01,MC006,CC006
+Pierre Dubois,pierre.dubois@megacorp.com,VP Sales - Western Europe,EMEA,France,jonathan.schmidt@megacorp.com,Paris,2018-02-15,MC007,CC007
+Ahmed Hassan,ahmed.hassan@megacorp.com,VP Sales - Middle East,EMEA,UAE,jonathan.schmidt@megacorp.com,Dubai,2018-03-01,MC008,CC008
+Raj Sharma,raj.sharma@megacorp.com,VP Sales - India,APAC,India,li.wei.chen@megacorp.com,Mumbai,2018-03-15,MC009,CC009
+Tanaka Hiroshi,tanaka.hiroshi@megacorp.com,VP Sales - Japan,APAC,Japan,li.wei.chen@megacorp.com,Tokyo,2018-04-01,MC010,CC010
+Jennifer Williams,jennifer.williams@megacorp.com,Sales Director - USA East,Americas,USA,maria.gonzalez@megacorp.com,New York,2018-07-01,MC011,CC011
+Michael Johnson,michael.johnson@megacorp.com,Sales Director - USA West,Americas,USA,maria.gonzalez@megacorp.com,Los Angeles,2018-07-15,MC012,CC012
+Patricia Davis,patricia.davis@megacorp.com,Sales Director - Canada,Americas,Canada,maria.gonzalez@megacorp.com,Toronto,2018-08-01,MC013,CC013
+Ricardo Silva,ricardo.silva@megacorp.com,Sales Director - Brazil,Americas,Brazil,carlos.santos@megacorp.com,São Paulo,2018-08-15,MC014,CC014
+Ana Martinez,ana.martinez@megacorp.com,Sales Director - Mexico,Americas,Mexico,carlos.santos@megacorp.com,Mexico City,2018-09-01,MC015,CC015
+François Martin,francois.martin@megacorp.com,Sales Director - France,EMEA,France,pierre.dubois@megacorp.com,Paris,2018-09-15,MC016,CC016
+Klaus Mueller,klaus.mueller@megacorp.com,Sales Director - Germany,EMEA,Germany,jonathan.schmidt@megacorp.com,Frankfurt,2018-10-01,MC017,CC017
+Isabella Rossi,isabella.rossi@megacorp.com,Sales Director - Italy,EMEA,Italy,pierre.dubois@megacorp.com,Milan,2018-10-15,MC018,CC018
+Omar Al-Rashid,omar.alrashid@megacorp.com,Sales Director - UAE,EMEA,UAE,ahmed.hassan@megacorp.com,Dubai,2018-11-01,MC019,CC019
+Priya Patel,priya.patel@megacorp.com,Sales Manager - Mumbai,APAC,India,raj.sharma@megacorp.com,Mumbai,2019-01-15,MC020,CC020
+Arjun Kumar,arjun.kumar@megacorp.com,Sales Manager - Bangalore,APAC,India,raj.sharma@megacorp.com,Bangalore,2019-02-01,MC021,CC021
+Yuki Nakamura,yuki.nakamura@megacorp.com,Sales Manager - Tokyo,APAC,Japan,tanaka.hiroshi@megacorp.com,Tokyo,2019-02-15,MC022,CC022
+Kenji Watanabe,kenji.watanabe@megacorp.com,Sales Manager - Osaka,APAC,Japan,tanaka.hiroshi@megacorp.com,Osaka,2019-03-01,MC023,CC023
+Robert Thompson,robert.thompson@megacorp.com,Senior Sales Rep - NYC,Americas,USA,jennifer.williams@megacorp.com,New York,2019-06-01,MC024,CC024
+Lisa Chen,lisa.chen@megacorp.com,Senior Sales Rep - Boston,Americas,USA,jennifer.williams@megacorp.com,Boston,2019-06-15,MC025,CC025
+David Park,david.park@megacorp.com,Sales Rep - San Francisco,Americas,USA,michael.johnson@megacorp.com,San Francisco,2019-07-01,MC026,CC026
+Emma Wilson,emma.wilson@megacorp.com,Sales Rep - Seattle,Americas,USA,michael.johnson@megacorp.com,Seattle,2019-07-15,MC027,CC027
+Sarah Brown,sarah.brown@megacorp.com,Sales Rep - Toronto,Americas,Canada,patricia.davis@megacorp.com,Toronto,2019-08-01,MC028,CC028
+James Garcia,james.garcia@megacorp.com,Sales Rep - Vancouver,Americas,Canada,patricia.davis@megacorp.com,Vancouver,2019-08-15,MC029,CC029
+Paulo Oliveira,paulo.oliveira@megacorp.com,Sales Rep - Rio,Americas,Brazil,ricardo.silva@megacorp.com,Rio de Janeiro,2019-09-01,MC030,CC030
+Diego Lopez,diego.lopez@megacorp.com,Sales Rep - Guadalajara,Americas,Mexico,ana.martinez@megacorp.com,Guadalajara,2019-09-15,MC031,CC031
+Sophie Leblanc,sophie.leblanc@megacorp.com,Sales Rep - Lyon,EMEA,France,francois.martin@megacorp.com,Lyon,2019-10-01,MC032,CC032
+Hans Weber,hans.weber@megacorp.com,Sales Rep - Munich,EMEA,Germany,klaus.mueller@megacorp.com,Munich,2019-10-15,MC033,CC033
+Marco Ferrari,marco.ferrari@megacorp.com,Sales Rep - Rome,EMEA,Italy,isabella.rossi@megacorp.com,Rome,2019-11-01,MC034,CC034
+Fatima Al-Zahra,fatima.alzahra@megacorp.com,Sales Rep - Abu Dhabi,EMEA,UAE,omar.alrashid@megacorp.com,Abu Dhabi,2019-11-15,MC035,CC035
+Vikram Singh,vikram.singh@megacorp.com,Sales Rep - Mumbai Central,APAC,India,priya.patel@megacorp.com,Mumbai,2020-01-15,MC036,CC036
+Ravi Gupta,ravi.gupta@megacorp.com,Sales Rep - Bangalore Tech,APAC,India,arjun.kumar@megacorp.com,Bangalore,2020-02-01,MC037,CC037
+Akira Sato,akira.sato@megacorp.com,Sales Rep - Tokyo Central,APAC,Japan,yuki.nakamura@megacorp.com,Tokyo,2020-02-15,MC038,CC038
+Mei Suzuki,mei.suzuki@megacorp.com,Sales Rep - Osaka Bay,APAC,Japan,kenji.watanabe@megacorp.com,Osaka,2020-03-01,MC039,CC039

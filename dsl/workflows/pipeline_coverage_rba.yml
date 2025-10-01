@@ -1,0 +1,353 @@
+workflow_id: unknown_workflow
+name: Unknown Workflow
+module: Unknown
+automation_type: RBA
+version: 1.0.0
+metadata:
+  description: Analyzes pipeline coverage gaps against revenue targets and recommends
+    specific actions to achieve quota attainment
+  industry_focus:
+  - SaaS
+  persona_tags:
+  - Sales Manager
+  - Account Executive
+  - VP Sales
+  - Revenue Operations
+  business_value: Identifies pipeline gaps 2-3 quarters ahead, enabling proactive
+    pipeline generation with 40% higher quota attainment
+  customer_impact: Provides actionable pipeline gap analysis with specific account
+    and territory recommendations for immediate action
+  estimated_time_minutes: 4
+  sla_tier: T1
+  compliance_tags:
+  - Revenue Forecasting
+  - Territory Management
+steps:
+- id: initialize_coverage_analysis
+  type: governance
+  params:
+    policy_id: pipeline_coverage_policy
+    evidence_required: true
+    action: workflow_start
+    description: Initialize pipeline coverage analysis with governance validation
+- id: fetch_quota_targets
+  type: query
+  params:
+    data_source: postgres
+    query_type: quota_targets
+    custom_sql: "SELECT \n  user_id,\n  quarter,\n  annual_quota,\n  quarterly_quota,\n\
+      \  territory,\n  segment,\n  quota_type,\n  ramping_factor\nFROM quota_assignments\
+      \ qa\nJOIN users u ON qa.user_id = u.user_id\nWHERE qa.user_id = $1 \n  AND\
+      \ qa.year = EXTRACT(YEAR FROM CURRENT_DATE)\nORDER BY quarter\n"
+    params:
+    - '{{ context.user_id }}'
+    metadata_capture:
+      business_context: User quota targets for pipeline coverage calculation
+      knowledge_tags:
+      - quota_baseline
+      - territory_targets
+      - ramping_schedule
+- id: calculate_current_pipeline
+  type: query
+  params:
+    data_source: salesforce
+    query_type: pipeline_summary
+    filters:
+      owner_id: '{{ context.user_id }}'
+      stage:
+      - Qualification
+      - Needs Analysis
+      - Proposal
+      - Negotiation
+      - Verbal Commit
+      close_date_range: next_12_months
+    aggregations:
+    - field: amount
+      function: sum
+      group_by:
+      - close_quarter
+      - stage
+      - account_tier
+    - field: probability
+      function: avg
+      group_by:
+      - close_quarter
+      - stage
+    custom_calculations:
+      weighted_pipeline: SUM(amount * (probability / 100))
+      stage_distribution: COUNT(*) GROUP BY stage
+      account_tier_split: SUM(amount) GROUP BY account_tier
+    metadata_capture:
+      business_context: Current pipeline state for coverage gap analysis
+      knowledge_tags:
+      - pipeline_snapshot
+      - weighted_values
+      - stage_distribution
+- id: analyze_historical_conversion
+  type: query
+  params:
+    data_source: postgres
+    query_type: historical_conversion_rates
+    custom_sql: "WITH conversion_analysis AS (\n  SELECT \n    EXTRACT(QUARTER FROM\
+      \ close_date) as quarter,\n    stage,\n    account_tier,\n    COUNT(*) as total_opportunities,\n\
+      \    COUNT(CASE WHEN stage_outcome = 'won' THEN 1 END) as won_count,\n    AVG(CASE\
+      \ WHEN stage_outcome = 'won' THEN amount ELSE 0 END) as avg_won_amount,\n  \
+      \  AVG(days_in_stage) as avg_cycle_time\n  FROM opportunity_history \n  WHERE\
+      \ owner_id = $1 \n    AND close_date >= CURRENT_DATE - INTERVAL '2 years'\n\
+      \    AND close_date < CURRENT_DATE\n  GROUP BY quarter, stage, account_tier\n\
+      )\nSELECT \n  quarter,\n  stage,\n  account_tier,\n  CASE \n    WHEN total_opportunities\
+      \ > 0 THEN won_count::float / total_opportunities\n    ELSE 0 \n  END as conversion_rate,\n\
+      \  avg_won_amount,\n  avg_cycle_time,\n  total_opportunities as sample_size\n\
+      FROM conversion_analysis\nORDER BY quarter DESC, stage, account_tier\n"
+    params:
+    - '{{ context.user_id }}'
+    metadata_capture:
+      business_context: Historical conversion patterns for pipeline coverage modeling
+      knowledge_tags:
+      - conversion_rates
+      - deal_velocity
+      - account_tier_performance
+- id: calculate_coverage_gaps
+  type: decision
+  params:
+    condition: '{{ steps.fetch_quota_targets.output | length > 0 }}'
+    actions:
+      when_true:
+      - id: perform_gap_analysis
+        type: query
+        params:
+          data_source: internal
+          query_type: coverage_gap_calculation
+          algorithm: "def calculate_coverage_gaps(quotas, pipeline, conversions):\n\
+            \  gaps = []\n  \n  for quarter_quota in quotas:\n    quarter = quarter_quota['quarter']\n\
+            \    target = quarter_quota['quarterly_quota']\n    \n    # Get current\
+            \ pipeline for this quarter\n    quarter_pipeline = [p for p in pipeline\
+            \ if p.get('close_quarter') == quarter]\n    weighted_pipeline = sum(opp['amount']\
+            \ * (opp['probability'] / 100) for opp in quarter_pipeline)\n    \n  \
+            \  # Apply historical conversion rates\n    expected_conversion = 0\n\
+            \    for opp in quarter_pipeline:\n      stage = opp['stage']\n      tier\
+            \ = opp.get('account_tier', 'standard')\n      \n      # Find matching\
+            \ historical conversion rate\n      conv_rate = 0.3  # default fallback\n\
+            \      for conv in conversions:\n        if conv['stage'] == stage and\
+            \ conv.get('account_tier') == tier:\n          conv_rate = conv['conversion_rate']\n\
+            \          break\n      \n      expected_conversion += opp['amount'] *\
+            \ conv_rate\n    \n    # Calculate gap\n    coverage_ratio = expected_conversion\
+            \ / target if target > 0 else 0\n    gap_amount = max(0, target - expected_conversion)\n\
+            \    \n    # Determine gap severity\n    if coverage_ratio >= 3.0:\n \
+            \     gap_severity = \"EXCELLENT\"\n    elif coverage_ratio >= 2.0:\n\
+            \      gap_severity = \"HEALTHY\"\n    elif coverage_ratio >= 1.5:\n \
+            \     gap_severity = \"MODERATE\"\n    elif coverage_ratio >= 1.0:\n \
+            \     gap_severity = \"CONCERNING\"\n    else:\n      gap_severity = \"\
+            CRITICAL\"\n    \n    gaps.append({\n      'quarter': quarter,\n     \
+            \ 'target': target,\n      'weighted_pipeline': weighted_pipeline,\n \
+            \     'expected_conversion': expected_conversion,\n      'coverage_ratio':\
+            \ coverage_ratio,\n      'gap_amount': gap_amount,\n      'gap_severity':\
+            \ gap_severity,\n      'pipeline_needed': gap_amount * 2.5,  # Assuming\
+            \ 40% win rate target\n      'opportunities_needed': int(gap_amount /\
+            \ 50000) if gap_amount > 0 else 0  # Avg deal size assumption\n    })\n\
+            \  \n  return {\n    'quarterly_gaps': gaps,\n    'total_gap_amount':\
+            \ sum(g['gap_amount'] for g in gaps),\n    'critical_quarters': [g['quarter']\
+            \ for g in gaps if g['gap_severity'] in ['CRITICAL', 'CONCERNING']],\n\
+            \    'overall_health': 'HEALTHY' if all(g['coverage_ratio'] >= 2.0 for\
+            \ g in gaps) else 'AT_RISK'\n  }\n\nreturn calculate_coverage_gaps(\n\
+            \  {{ steps.fetch_quota_targets.output }},\n  {{ steps.calculate_current_pipeline.output\
+            \ }},\n  {{ steps.analyze_historical_conversion.output }}\n)\n"
+          metadata_capture:
+            business_context: Pipeline coverage gap analysis with severity assessment
+            knowledge_tags:
+            - gap_analysis
+            - coverage_ratios
+            - pipeline_requirements
+      when_false:
+      - id: no_quota_data
+        type: notify
+        params:
+          message: No quota data found for coverage analysis
+          level: warning
+- id: identify_coverage_opportunities
+  type: query
+  params:
+    data_source: postgres
+    query_type: coverage_opportunities
+    custom_sql: "WITH opportunity_analysis AS (\n  SELECT \n    a.account_id,\n  \
+      \  a.account_name,\n    a.account_tier,\n    a.territory,\n    a.annual_revenue,\n\
+      \    COUNT(o.opportunity_id) as open_opportunities,\n    SUM(o.amount) as current_pipeline_value,\n\
+      \    MAX(o.last_activity_date) as last_engagement,\n    CASE \n      WHEN COUNT(o.opportunity_id)\
+      \ = 0 THEN 'NEW_OPPORTUNITY'\n      WHEN MAX(o.last_activity_date) < CURRENT_DATE\
+      \ - INTERVAL '30 days' THEN 'RE_ENGAGE'\n      WHEN AVG(o.probability) < 30\
+      \ THEN 'ADVANCE_EXISTING'\n      ELSE 'EXPAND_EXISTING'\n    END as opportunity_type,\n\
+      \    CASE \n      WHEN a.account_tier = 'enterprise' THEN a.annual_revenue *\
+      \ 0.15\n      WHEN a.account_tier = 'mid_market' THEN a.annual_revenue * 0.10\
+      \  \n      ELSE a.annual_revenue * 0.05\n    END as estimated_potential\n  FROM\
+      \ accounts a\n  LEFT JOIN opportunities o ON a.account_id = o.account_id \n\
+      \    AND o.stage NOT IN ('Closed Won', 'Closed Lost')\n  WHERE a.territory =\
+      \ $1\n    AND a.status = 'active'\n  GROUP BY a.account_id, a.account_name,\
+      \ a.account_tier, a.territory, a.annual_revenue\n)\nSELECT \n  account_id,\n\
+      \  account_name,\n  account_tier,\n  opportunity_type,\n  estimated_potential,\n\
+      \  current_pipeline_value,\n  last_engagement,\n  (estimated_potential - COALESCE(current_pipeline_value,\
+      \ 0)) as uncaptured_potential\nFROM opportunity_analysis\nWHERE estimated_potential\
+      \ > 25000  -- Minimum deal threshold\nORDER BY uncaptured_potential DESC, estimated_potential\
+      \ DESC\nLIMIT 20\n"
+    params:
+    - '{{ context.user_territory }}'
+    metadata_capture:
+      business_context: Account opportunities for pipeline coverage improvement
+      knowledge_tags:
+      - account_opportunities
+      - uncaptured_potential
+      - engagement_status
+- id: generate_coverage_recommendations
+  type: agent_call
+  params:
+    agent_id: coverage_strategy_generator
+    task: Generate strategic recommendations for pipeline coverage improvement
+    input_data:
+      gap_analysis: '{{ steps.calculate_coverage_gaps.output }}'
+      opportunities: '{{ steps.identify_coverage_opportunities.output }}'
+      conversion_data: '{{ steps.analyze_historical_conversion.output }}'
+      user_context: '{{ context }}'
+    prompt_template: "You are a Revenue Operations strategist analyzing pipeline coverage\
+      \ gaps.\n\nGAP ANALYSIS:\n{gap_analysis}\n\nOPPORTUNITY ANALYSIS:\n{opportunities}\n\
+      \nCONVERSION DATA:\n{conversion_data}\n\nGenerate strategic recommendations\
+      \ in this JSON format:\n{{\n  \"immediate_actions\": [\n    {{\n      \"action\"\
+      : \"action_description\",\n      \"target_accounts\": [\"account1\", \"account2\"\
+      ],\n      \"expected_impact\": \"dollar_amount\",\n      \"timeline\": \"weeks\"\
+      ,\n      \"priority\": \"HIGH|MEDIUM|LOW\"\n    }}\n  ],\n  \"strategic_initiatives\"\
+      : [\n    {{\n      \"initiative\": \"initiative_description\", \n      \"timeline\"\
+      : \"timeline\",\n      \"resource_requirements\": \"requirements\",\n      \"\
+      expected_outcome\": \"outcome\"\n    }}\n  ],\n  \"risk_mitigation\": [\n  \
+      \  {{\n      \"risk\": \"risk_description\",\n      \"mitigation\": \"mitigation_strategy\"\
+      ,\n      \"probability\": \"percentage\"\n    }}\n  ],\n  \"quarterly_focus\"\
+      : {{\n    \"Q1\": [\"focus1\", \"focus2\"],\n    \"Q2\": [\"focus1\", \"focus2\"\
+      ],\n    \"Q3\": [\"focus1\", \"focus2\"],\n    \"Q4\": [\"focus1\", \"focus2\"\
+      ]\n  }},\n  \"success_metrics\": [\"metric1\", \"metric2\", \"metric3\"],\n\
+      \  \"executive_summary\": \"2-sentence summary for leadership\"\n}}\n"
+    metadata_capture:
+      business_context: AI-generated strategic recommendations for pipeline coverage
+      knowledge_tags:
+      - strategic_recommendations
+      - action_plans
+      - risk_assessment
+- id: create_action_plan
+  type: query
+  params:
+    data_source: postgres
+    query_type: create_coverage_action_plan
+    operation: insert
+    table: pipeline_action_plans
+    data:
+      user_id: '{{ context.user_id }}'
+      plan_id: '{{ uuid() }}'
+      created_at: '{{ now() }}'
+      gap_analysis: '{{ steps.calculate_coverage_gaps.output }}'
+      recommendations: '{{ steps.generate_coverage_recommendations.output }}'
+      target_accounts: '{{ steps.identify_coverage_opportunities.output }}'
+      quarterly_targets: '{{ steps.fetch_quota_targets.output }}'
+      plan_status: active
+      review_date: '{{ now() | add_days(30) }}'
+    metadata_capture:
+      business_context: Created actionable coverage improvement plan
+      knowledge_tags:
+      - action_plan
+      - quarterly_planning
+      - account_targeting
+- id: capture_coverage_evidence
+  type: governance
+  params:
+    policy_id: pipeline_coverage_policy
+    evidence_required: true
+    action: capture_evidence
+    evidence_data:
+      quota_targets: '{{ steps.fetch_quota_targets.output }}'
+      pipeline_analysis: '{{ steps.calculate_current_pipeline.output }}'
+      gap_analysis: '{{ steps.calculate_coverage_gaps.output }}'
+      opportunities: '{{ steps.identify_coverage_opportunities.output }}'
+      recommendations: '{{ steps.generate_coverage_recommendations.output }}'
+      action_plan: '{{ steps.create_action_plan.output }}'
+      analysis_timestamp: '{{ now() }}'
+      user_context: '{{ context }}'
+    retention_days: 1095
+    metadata_capture:
+      business_context: Complete evidence package for pipeline coverage analysis
+      knowledge_tags:
+      - coverage_evidence
+      - strategic_planning
+      - quota_analysis
+- id: schedule_follow_up_actions
+  type: query
+  params:
+    data_source: postgres
+    query_type: schedule_follow_up
+    operation: insert
+    table: scheduled_tasks
+    data:
+    - task_type: account_outreach
+      target_accounts: '{{ steps.identify_coverage_opportunities.output | slice(0,
+        5) | map(attribute=''account_id'') }}'
+      due_date: '{{ now() | add_days(7) }}'
+      assigned_to: '{{ context.user_id }}'
+      priority: high
+      created_by_workflow: pipeline_coverage_rba
+    - task_type: pipeline_review
+      description: Review pipeline coverage progress
+      due_date: '{{ now() | add_days(30) }}'
+      assigned_to: '{{ context.user_id }}'
+      priority: medium
+      created_by_workflow: pipeline_coverage_rba
+    metadata_capture:
+      business_context: Scheduled follow-up actions for coverage improvement
+      knowledge_tags:
+      - task_scheduling
+      - follow_up_actions
+      - accountability
+- id: notify_coverage_results
+  type: notify
+  params:
+    notification_type: pipeline_coverage_analysis
+    channels:
+    - email
+    - slack
+    - dashboard
+    recipients:
+    - '{{ context.user_email }}'
+    - '{{ context.manager_email }}'
+    template: pipeline_coverage_report
+    data:
+      user_name: '{{ context.user_name }}'
+      territory: '{{ context.user_territory }}'
+      overall_health: '{{ steps.calculate_coverage_gaps.output.overall_health }}'
+      total_gap: '{{ steps.calculate_coverage_gaps.output.total_gap_amount | currency
+        }}'
+      critical_quarters: '{{ steps.calculate_coverage_gaps.output.critical_quarters
+        }}'
+      top_opportunities: '{{ steps.identify_coverage_opportunities.output | slice(0,
+        3) }}'
+      immediate_actions: '{{ steps.generate_coverage_recommendations.output.immediate_actions
+        | slice(0, 3) }}'
+      next_review_date: '{{ now() | add_days(30) | date }}'
+    attachments:
+    - type: json
+      name: detailed_coverage_analysis.json
+      data: '{{ steps.calculate_coverage_gaps.output }}'
+    metadata_capture:
+      business_context: Coverage analysis results shared with stakeholders
+      knowledge_tags:
+      - results_communication
+      - stakeholder_updates
+- id: finalize_coverage_analysis
+  type: governance
+  params:
+    policy_id: pipeline_coverage_policy
+    evidence_required: true
+    action: workflow_complete
+    final_state:
+      status: completed
+      coverage_analyzed: true
+      action_plan_created: true
+      stakeholders_notified: true
+      follow_up_scheduled: true
+    metadata_capture:
+      business_context: Pipeline coverage analysis workflow completion
+      knowledge_tags:
+      - workflow_completion
+      - coverage_analysis_done

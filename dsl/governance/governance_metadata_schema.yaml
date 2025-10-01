@@ -1,0 +1,313 @@
+# DSL Governance Metadata Schema
+# ===============================
+# Task 7.1.3: Configure mandatory metadata fields (tenant_id, region_id, SLA, policy_pack)
+# Modular, configuration-driven governance metadata system
+
+governance_metadata_schema:
+  version: "1.0.0"
+  description: "Mandatory governance metadata fields for all DSL workflows"
+  
+  # =========================================
+  # MANDATORY GOVERNANCE FIELDS
+  # =========================================
+  mandatory_fields:
+    # Multi-tenant isolation (Task 9.4.2)
+    tenant_id:
+      type: "integer"
+      description: "Tenant identifier for multi-tenant isolation"
+      validation:
+        required: true
+        min: 1
+      enforcement: "fail_closed"  # Block execution if missing
+      rls_enforcement: true
+      
+    # Geographic residency enforcement (Task 7.1.9)
+    region_id:
+      type: "string"
+      description: "Geographic region for data residency compliance"
+      validation:
+        required: true
+        enum: ["US", "EU", "IN", "APAC", "CA", "UK", "AU"]
+      enforcement: "fail_closed"
+      compliance_frameworks: ["GDPR", "DPDP", "CCPA"]
+      
+    # SLA tier enforcement (Task 7.1.10)
+    sla_tier:
+      type: "string"
+      description: "Service Level Agreement tier"
+      validation:
+        required: true
+        enum: ["T0", "T1", "T2"]  # T0=real-time, T1=near-real-time, T2=batch
+      enforcement: "fail_closed"
+      performance_implications:
+        T0:
+          max_latency_ms: 1000
+          max_memory_mb: 256
+          priority: "high"
+        T1:
+          max_latency_ms: 5000
+          max_memory_mb: 512
+          priority: "medium"
+        T2:
+          max_latency_ms: 30000
+          max_memory_mb: 1024
+          priority: "low"
+          
+    # Policy pack governance (Task 16.1)
+    policy_pack_id:
+      type: "uuid"
+      description: "Applied policy pack for compliance enforcement"
+      validation:
+        required: true
+        foreign_key: "dsl_policy_packs.policy_pack_id"
+      enforcement: "fail_closed"
+      compliance_validation: true
+      
+    # Trust score requirement (Task 7.1.10)
+    trust_score_threshold:
+      type: "float"
+      description: "Minimum trust score required for execution"
+      validation:
+        required: true
+        min: 0.0
+        max: 1.0
+        default: 0.7
+      enforcement: "warn_and_log"  # Log but allow execution
+      escalation_threshold: 0.5  # Below this, require approval
+      
+  # =========================================
+  # CONDITIONAL MANDATORY FIELDS
+  # =========================================
+  conditional_fields:
+    # GDPR/DPDP consent requirement
+    consent_id:
+      type: "uuid"
+      description: "Consent identifier for privacy compliance"
+      validation:
+        required_when:
+          - field: "region_id"
+            values: ["EU", "IN", "UK"]
+          - field: "policy_pack_type"
+            values: ["GDPR", "DPDP"]
+        foreign_key: "consent_records.consent_id"
+      enforcement: "fail_closed"
+      compliance_frameworks: ["GDPR", "DPDP"]
+      
+    # Evidence pack requirement for regulated tenants
+    evidence_pack_required:
+      type: "boolean"
+      description: "Whether evidence pack generation is required"
+      validation:
+        required_when:
+          - field: "tenant_type"
+            values: ["regulated", "banking", "insurance"]
+          - field: "compliance_requirements"
+            contains: ["SOX", "HIPAA", "RBI", "NAIC"]
+        default: false
+      enforcement: "fail_closed"
+      
+    # Override approval requirement
+    override_approval_required:
+      type: "boolean"
+      description: "Whether manual overrides require approval"
+      validation:
+        required_when:
+          - field: "sla_tier"
+            values: ["T0"]
+          - field: "workflow_type"
+            values: ["AALA"]
+        default: true
+      enforcement: "fail_closed"
+      
+  # =========================================
+  # INDUSTRY OVERLAY REQUIREMENTS
+  # =========================================
+  industry_overlays:
+    SaaS:
+      additional_fields:
+        arr_impact_threshold:
+          type: "currency"
+          description: "ARR impact threshold requiring approval"
+          default: 100000
+          enforcement: "warn_and_log"
+        customer_tier:
+          type: "string"
+          enum: ["enterprise", "mid_market", "smb"]
+          enforcement: "optional"
+          
+    BANK:
+      additional_fields:
+        regulatory_approval_required:
+          type: "boolean"
+          description: "RBI regulatory approval requirement"
+          default: true
+          enforcement: "fail_closed"
+        aml_check_required:
+          type: "boolean"
+          description: "Anti-money laundering check requirement"
+          default: true
+          enforcement: "fail_closed"
+        loan_amount_threshold:
+          type: "currency"
+          description: "Loan amount requiring additional oversight"
+          default: 1000000
+          enforcement: "fail_closed"
+          
+    INSUR:
+      additional_fields:
+        claim_amount_threshold:
+          type: "currency"
+          description: "Claim amount requiring regulatory oversight"
+          default: 500000
+          enforcement: "fail_closed"
+        actuarial_approval_required:
+          type: "boolean"
+          description: "Actuarial approval for high-value claims"
+          default: true
+          enforcement: "fail_closed"
+          
+  # =========================================
+  # AUTOMATION TYPE REQUIREMENTS
+  # =========================================
+  automation_type_requirements:
+    RBA:
+      mandatory_additional:
+        - "deterministic_validation"
+        - "audit_trail_required"
+      trust_score_threshold: 0.9
+      evidence_pack_required: true
+      
+    RBIA:
+      mandatory_additional:
+        - "ml_model_version"
+        - "confidence_threshold"
+        - "fallback_to_rba"
+      trust_score_threshold: 0.8
+      evidence_pack_required: true
+      
+    AALA:
+      mandatory_additional:
+        - "agent_runtime_version"
+        - "reasoning_trace_required"
+        - "human_oversight_required"
+      trust_score_threshold: 0.7
+      evidence_pack_required: true
+      override_approval_required: true
+      
+  # =========================================
+  # ENFORCEMENT CONFIGURATION
+  # =========================================
+  enforcement_config:
+    validation_modes:
+      strict:
+        description: "Fail execution on any validation error"
+        fail_on_missing_mandatory: true
+        fail_on_invalid_values: true
+        fail_on_policy_violations: true
+        
+      permissive:
+        description: "Log warnings but allow execution"
+        fail_on_missing_mandatory: false
+        fail_on_invalid_values: false
+        fail_on_policy_violations: false
+        
+      compliance:
+        description: "Strict for regulated fields, permissive for others"
+        fail_on_missing_mandatory: true
+        fail_on_invalid_values: true
+        fail_on_policy_violations: true
+        allow_override_with_approval: true
+        
+    default_mode: "compliance"
+    
+    # Escalation rules
+    escalation_rules:
+      trust_score_below_threshold:
+        action: "require_approval"
+        approver_roles: ["manager", "compliance_officer"]
+        notification_channels: ["slack", "email"]
+        
+      policy_violation:
+        action: "block_execution"
+        notification_channels: ["slack", "email", "incident_management"]
+        escalate_to: ["compliance_team", "legal_team"]
+        
+      consent_missing:
+        action: "block_execution"
+        notification_channels: ["privacy_team"]
+        auto_remediation: "request_consent"
+        
+  # =========================================
+  # AUDIT AND LINEAGE REQUIREMENTS
+  # =========================================
+  audit_requirements:
+    mandatory_audit_fields:
+      - "created_by_user_id"
+      - "created_at"
+      - "last_modified_by"
+      - "last_modified_at"
+      - "approval_chain"
+      - "policy_evaluations"
+      
+    retention_policies:
+      standard_retention: "2555"  # 7 years in days
+      regulated_retention: "3650"  # 10 years for regulated industries
+      gdpr_retention: "2190"      # 6 years for GDPR compliance
+      
+    lineage_requirements:
+      capture_data_lineage: true
+      capture_decision_lineage: true
+      capture_approval_lineage: true
+      link_to_knowledge_graph: true
+      
+  # =========================================
+  # VALIDATION RULES ENGINE
+  # =========================================
+  validation_rules:
+    cross_field_validations:
+      - name: "region_consent_validation"
+        description: "EU/IN regions must have consent_id"
+        rule: "if region_id in ['EU', 'IN', 'UK'] then consent_id is required"
+        enforcement: "fail_closed"
+        
+      - name: "sla_trust_alignment"
+        description: "T0 SLA requires higher trust score"
+        rule: "if sla_tier == 'T0' then trust_score_threshold >= 0.8"
+        enforcement: "fail_closed"
+        
+      - name: "regulated_evidence_requirement"
+        description: "Regulated tenants must generate evidence packs"
+        rule: "if tenant_type == 'regulated' then evidence_pack_required == true"
+        enforcement: "fail_closed"
+        
+    dynamic_validations:
+      - name: "policy_pack_compatibility"
+        description: "Policy pack must be compatible with region and industry"
+        validation_function: "validate_policy_pack_compatibility"
+        enforcement: "fail_closed"
+        
+      - name: "consent_validity_check"
+        description: "Consent must be valid and not expired"
+        validation_function: "validate_consent_status"
+        enforcement: "fail_closed"
+        
+  # =========================================
+  # INTEGRATION HOOKS
+  # =========================================
+  integration_hooks:
+    pre_validation:
+      - "tenant_metadata_enrichment"
+      - "policy_pack_resolution"
+      - "consent_status_check"
+      
+    post_validation:
+      - "evidence_pack_initialization"
+      - "audit_log_creation"
+      - "knowledge_graph_linking"
+      
+    on_violation:
+      - "incident_creation"
+      - "notification_dispatch"
+      - "compliance_escalation"
+
+

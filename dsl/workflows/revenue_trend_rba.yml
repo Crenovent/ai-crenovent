@@ -1,0 +1,572 @@
+workflow_id: unknown_workflow
+name: Unknown Workflow
+module: Unknown
+automation_type: RBA
+version: 1.0.0
+metadata:
+  description: Analyzes revenue patterns, identifies emerging trends, and provides
+    forward-looking revenue projections with strategic insights
+  industry_focus:
+  - SaaS
+  persona_tags:
+  - CFO
+  - CRO
+  - VP Sales
+  - Revenue Operations
+  - Finance
+  - Executive Team
+  business_value: Provides 90-day forward revenue visibility with 85%+ accuracy, enabling
+    proactive strategic adjustments and investor confidence
+  customer_impact: Delivers executive-grade revenue intelligence with trend analysis,
+    scenario modeling, and strategic recommendations for growth optimization
+  estimated_time_minutes: 7
+  sla_tier: T0
+  compliance_tags:
+  - Revenue Recognition
+  - Financial Reporting
+  - Investor Relations
+  - Strategic Planning
+steps:
+- id: initialize_trend_analysis
+  type: governance
+  params:
+    policy_id: revenue_trend_analysis_policy
+    evidence_required: true
+    action: workflow_start
+    description: Initialize revenue trend analysis with executive governance validation
+- id: fetch_revenue_data
+  type: query
+  params:
+    data_source: postgres
+    query_type: comprehensive_revenue_data
+    custom_sql: "WITH monthly_revenue AS (\n  SELECT \n    DATE_TRUNC('month', close_date)\
+      \ as revenue_month,\n    SUM(CASE WHEN stage = 'Closed Won' THEN amount ELSE\
+      \ 0 END) as closed_won_revenue,\n    COUNT(CASE WHEN stage = 'Closed Won' THEN\
+      \ 1 END) as deals_won,\n    AVG(CASE WHEN stage = 'Closed Won' THEN amount ELSE\
+      \ NULL END) as avg_deal_size,\n    SUM(CASE WHEN stage = 'Closed Won' AND account_type\
+      \ = 'new_business' THEN amount ELSE 0 END) as new_business_revenue,\n    SUM(CASE\
+      \ WHEN stage = 'Closed Won' AND account_type = 'expansion' THEN amount ELSE\
+      \ 0 END) as expansion_revenue,\n    SUM(CASE WHEN stage = 'Closed Won' AND account_type\
+      \ = 'renewal' THEN amount ELSE 0 END) as renewal_revenue,\n    COUNT(DISTINCT\
+      \ CASE WHEN stage = 'Closed Won' THEN account_id END) as unique_accounts\n \
+      \ FROM opportunities\n  WHERE close_date >= CURRENT_DATE - INTERVAL '24 months'\n\
+      \    AND close_date < CURRENT_DATE + INTERVAL '6 months'  -- Include future\
+      \ for trend projection\n    AND ({{ context.user_territory and \"territory =\
+      \ '\" + context.user_territory + \"'\" or \"1=1\" }})\n  GROUP BY DATE_TRUNC('month',\
+      \ close_date)\n),\nquarterly_revenue AS (\n  SELECT \n    DATE_TRUNC('quarter',\
+      \ close_date) as revenue_quarter,\n    SUM(CASE WHEN stage = 'Closed Won' THEN\
+      \ amount ELSE 0 END) as quarterly_revenue,\n    COUNT(CASE WHEN stage = 'Closed\
+      \ Won' THEN 1 END) as quarterly_deals,\n    AVG(CASE WHEN stage = 'Closed Won'\
+      \ THEN amount ELSE NULL END) as quarterly_avg_deal_size\n  FROM opportunities\n\
+      \  WHERE close_date >= CURRENT_DATE - INTERVAL '24 months'\n    AND close_date\
+      \ < CURRENT_DATE + INTERVAL '6 months'\n    AND ({{ context.user_territory and\
+      \ \"territory = '\" + context.user_territory + \"'\" or \"1=1\" }})\n  GROUP\
+      \ BY DATE_TRUNC('quarter', close_date)\n),\nsegment_performance AS (\n  SELECT\
+      \ \n    segment,\n    account_tier,\n    DATE_TRUNC('quarter', close_date) as\
+      \ quarter,\n    SUM(CASE WHEN stage = 'Closed Won' THEN amount ELSE 0 END) as\
+      \ segment_revenue,\n    COUNT(CASE WHEN stage = 'Closed Won' THEN 1 END) as\
+      \ segment_deals\n  FROM opportunities o\n  JOIN accounts a ON o.account_id =\
+      \ a.account_id\n  WHERE close_date >= CURRENT_DATE - INTERVAL '12 months'\n\
+      \    AND stage = 'Closed Won'\n  GROUP BY segment, account_tier, DATE_TRUNC('quarter',\
+      \ close_date)\n)\nSELECT \n  'monthly' as data_type,\n  revenue_month as period,\n\
+      \  closed_won_revenue as total_revenue,\n  deals_won as deal_count,\n  avg_deal_size,\n\
+      \  new_business_revenue,\n  expansion_revenue,\n  renewal_revenue,\n  unique_accounts\n\
+      FROM monthly_revenue\nWHERE revenue_month <= CURRENT_DATE\n\nUNION ALL\n\nSELECT\
+      \ \n  'quarterly' as data_type,\n  revenue_quarter as period,\n  quarterly_revenue\
+      \ as total_revenue,\n  quarterly_deals as deal_count,\n  quarterly_avg_deal_size\
+      \ as avg_deal_size,\n  NULL as new_business_revenue,\n  NULL as expansion_revenue,\n\
+      \  NULL as renewal_revenue,\n  NULL as unique_accounts\nFROM quarterly_revenue\n\
+      \nUNION ALL\n\nSELECT \n  'segment_' || segment || '_' || account_tier as data_type,\n\
+      \  quarter as period,\n  segment_revenue as total_revenue,\n  segment_deals\
+      \ as deal_count,\n  segment_revenue / NULLIF(segment_deals, 0) as avg_deal_size,\n\
+      \  NULL as new_business_revenue,\n  NULL as expansion_revenue,\n  NULL as renewal_revenue,\n\
+      \  NULL as unique_accounts\nFROM segment_performance\n\nORDER BY data_type,\
+      \ period DESC\n"
+    metadata_capture:
+      business_context: Comprehensive revenue data across multiple time horizons and
+        segments
+      knowledge_tags:
+      - revenue_baseline
+      - historical_performance
+      - segment_analysis
+- id: calculate_trend_metrics
+  type: query
+  params:
+    data_source: internal
+    query_type: trend_calculation
+    algorithm: "def calculate_revenue_trends(revenue_data):\n  from datetime import\
+      \ datetime, timedelta\n  import statistics\n  \n  # Separate data types\n  monthly_data\
+      \ = [r for r in revenue_data if r['data_type'] == 'monthly']\n  quarterly_data\
+      \ = [r for r in revenue_data if r['data_type'] == 'quarterly']\n  \n  trends\
+      \ = {}\n  \n  # Monthly trend analysis\n  if len(monthly_data) >= 6:\n    monthly_revenues\
+      \ = [r['total_revenue'] for r in monthly_data[:12]]  # Last 12 months\n    monthly_deals\
+      \ = [r['deal_count'] for r in monthly_data[:12]]\n    \n    # Calculate month-over-month\
+      \ growth\n    mom_growth_rates = []\n    for i in range(1, min(12, len(monthly_revenues))):\n\
+      \      if monthly_revenues[i] > 0:\n        growth = (monthly_revenues[i-1]\
+      \ - monthly_revenues[i]) / monthly_revenues[i] * 100\n        mom_growth_rates.append(growth)\n\
+      \    \n    # Calculate trend statistics\n    avg_monthly_revenue = statistics.mean(monthly_revenues)\
+      \ if monthly_revenues else 0\n    revenue_volatility = statistics.stdev(monthly_revenues)\
+      \ if len(monthly_revenues) > 1 else 0\n    avg_mom_growth = statistics.mean(mom_growth_rates)\
+      \ if mom_growth_rates else 0\n    \n    # Trend direction\n    recent_3m = monthly_revenues[:3]\n\
+      \    older_3m = monthly_revenues[3:6] if len(monthly_revenues) >= 6 else monthly_revenues[3:]\n\
+      \    \n    if recent_3m and older_3m:\n      recent_avg = statistics.mean(recent_3m)\n\
+      \      older_avg = statistics.mean(older_3m)\n      trend_direction = \"GROWING\"\
+      \ if recent_avg > older_avg * 1.05 else \"DECLINING\" if recent_avg < older_avg\
+      \ * 0.95 else \"STABLE\"\n      trend_strength = abs(recent_avg - older_avg)\
+      \ / older_avg * 100 if older_avg > 0 else 0\n    else:\n      trend_direction\
+      \ = \"INSUFFICIENT_DATA\"\n      trend_strength = 0\n    \n    trends['monthly']\
+      \ = {\n      'avg_revenue': round(avg_monthly_revenue, 2),\n      'volatility':\
+      \ round(revenue_volatility, 2),\n      'mom_growth_rate': round(avg_mom_growth,\
+      \ 2),\n      'trend_direction': trend_direction,\n      'trend_strength': round(trend_strength,\
+      \ 2),\n      'data_points': len(monthly_revenues)\n    }\n  \n  # Quarterly\
+      \ trend analysis\n  if len(quarterly_data) >= 4:\n    quarterly_revenues = [r['total_revenue']\
+      \ for r in quarterly_data[:8]]  # Last 8 quarters\n    \n    # Calculate quarter-over-quarter\
+      \ growth\n    qoq_growth_rates = []\n    for i in range(1, min(8, len(quarterly_revenues))):\n\
+      \      if quarterly_revenues[i] > 0:\n        growth = (quarterly_revenues[i-1]\
+      \ - quarterly_revenues[i]) / quarterly_revenues[i] * 100\n        qoq_growth_rates.append(growth)\n\
+      \    \n    # Year-over-year analysis\n    yoy_growth_rates = []\n    for i in\
+      \ range(4, min(8, len(quarterly_revenues))):\n      if quarterly_revenues[i]\
+      \ > 0:\n        yoy_growth = (quarterly_revenues[i-4] - quarterly_revenues[i])\
+      \ / quarterly_revenues[i] * 100\n        yoy_growth_rates.append(yoy_growth)\n\
+      \    \n    trends['quarterly'] = {\n      'avg_revenue': round(statistics.mean(quarterly_revenues),\
+      \ 2) if quarterly_revenues else 0,\n      'qoq_growth_rate': round(statistics.mean(qoq_growth_rates),\
+      \ 2) if qoq_growth_rates else 0,\n      'yoy_growth_rate': round(statistics.mean(yoy_growth_rates),\
+      \ 2) if yoy_growth_rates else 0,\n      'data_points': len(quarterly_revenues)\n\
+      \    }\n  \n  # Revenue composition analysis\n  monthly_comp = monthly_data[:12]\
+      \ if len(monthly_data) >= 12 else monthly_data\n  if monthly_comp:\n    total_new_business\
+      \ = sum(r.get('new_business_revenue', 0) for r in monthly_comp)\n    total_expansion\
+      \ = sum(r.get('expansion_revenue', 0) for r in monthly_comp)\n    total_renewal\
+      \ = sum(r.get('renewal_revenue', 0) for r in monthly_comp)\n    total_revenue\
+      \ = total_new_business + total_expansion + total_renewal\n    \n    if total_revenue\
+      \ > 0:\n      trends['composition'] = {\n        'new_business_pct': round(total_new_business\
+      \ / total_revenue * 100, 1),\n        'expansion_pct': round(total_expansion\
+      \ / total_revenue * 100, 1),\n        'renewal_pct': round(total_renewal / total_revenue\
+      \ * 100, 1),\n        'composition_health': 'HEALTHY' if total_new_business\
+      \ / total_revenue >= 0.3 else 'CONCERNING'\n      }\n  \n  # Deal size trends\n\
+      \  monthly_deal_sizes = [r['avg_deal_size'] for r in monthly_data[:12] if r.get('avg_deal_size')]\n\
+      \  if len(monthly_deal_sizes) >= 6:\n    recent_deal_size = statistics.mean(monthly_deal_sizes[:3])\n\
+      \    older_deal_size = statistics.mean(monthly_deal_sizes[6:9]) if len(monthly_deal_sizes)\
+      \ >= 9 else statistics.mean(monthly_deal_sizes[3:6])\n    \n    deal_size_trend\
+      \ = (recent_deal_size - older_deal_size) / older_deal_size * 100 if older_deal_size\
+      \ > 0 else 0\n    \n    trends['deal_size'] = {\n      'current_avg': round(recent_deal_size,\
+      \ 2),\n      'trend_percentage': round(deal_size_trend, 2),\n      'trend_direction':\
+      \ 'INCREASING' if deal_size_trend > 5 else 'DECREASING' if deal_size_trend <\
+      \ -5 else 'STABLE'\n    }\n  \n  return trends\n\nreturn calculate_revenue_trends({{\
+      \ steps.fetch_revenue_data.output }})\n"
+    metadata_capture:
+      business_context: Statistical trend analysis across multiple revenue dimensions
+      knowledge_tags:
+      - trend_metrics
+      - growth_analysis
+      - revenue_patterns
+- id: perform_seasonality_analysis
+  type: query
+  params:
+    data_source: internal
+    query_type: seasonality_detection
+    algorithm: "def analyze_seasonality(revenue_data):\n  monthly_data = [r for r\
+      \ in revenue_data if r['data_type'] == 'monthly']\n  \n  if len(monthly_data)\
+      \ < 12:\n    return {\"error\": \"Insufficient data for seasonality analysis\"\
+      }\n  \n  # Group by month across years\n  month_performance = {}\n  for data\
+      \ in monthly_data:\n    month = data['period'].month if hasattr(data['period'],\
+      \ 'month') else int(str(data['period']).split('-')[1])\n    revenue = data['total_revenue']\n\
+      \    \n    if month not in month_performance:\n      month_performance[month]\
+      \ = []\n    month_performance[month].append(revenue)\n  \n  # Calculate monthly\
+      \ averages and patterns\n  monthly_stats = {}\n  annual_avg = sum(sum(revenues)\
+      \ for revenues in month_performance.values()) / sum(len(revenues) for revenues\
+      \ in month_performance.values())\n  \n  for month, revenues in month_performance.items():\n\
+      \    if revenues:\n      avg_revenue = sum(revenues) / len(revenues)\n     \
+      \ seasonal_index = (avg_revenue / annual_avg) if annual_avg > 0 else 1\n   \
+      \   \n      monthly_stats[month] = {\n        'avg_revenue': round(avg_revenue,\
+      \ 2),\n        'seasonal_index': round(seasonal_index, 3),\n        'sample_size':\
+      \ len(revenues),\n        'volatility': round(statistics.stdev(revenues), 2)\
+      \ if len(revenues) > 1 else 0\n      }\n  \n  # Identify seasonal patterns\n\
+      \  month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',\
+      \ 'Oct', 'Nov', 'Dec']\n  \n  # Find peak and trough months\n  if monthly_stats:\n\
+      \    peak_month = max(monthly_stats.items(), key=lambda x: x[1]['seasonal_index'])\n\
+      \    trough_month = min(monthly_stats.items(), key=lambda x: x[1]['seasonal_index'])\n\
+      \    \n    seasonal_variation = peak_month[1]['seasonal_index'] - trough_month[1]['seasonal_index']\n\
+      \    \n    # Quarterly patterns\n    q1_months = [1, 2, 3]\n    q2_months =\
+      \ [4, 5, 6]\n    q3_months = [7, 8, 9]\n    q4_months = [10, 11, 12]\n    \n\
+      \    quarterly_patterns = {}\n    for quarter, months in [('Q1', q1_months),\
+      \ ('Q2', q2_months), ('Q3', q3_months), ('Q4', q4_months)]:\n      quarter_indices\
+      \ = [monthly_stats[m]['seasonal_index'] for m in months if m in monthly_stats]\n\
+      \      if quarter_indices:\n        quarterly_patterns[quarter] = {\n      \
+      \    'avg_index': round(sum(quarter_indices) / len(quarter_indices), 3),\n \
+      \         'strength': 'STRONG' if max(quarter_indices) - min(quarter_indices)\
+      \ > 0.3 else 'MODERATE' if max(quarter_indices) - min(quarter_indices) > 0.1\
+      \ else 'WEAK'\n        }\n    \n    return {\n      'seasonal_variation': round(seasonal_variation,\
+      \ 3),\n      'peak_month': {\n        'month': month_names[peak_month[0] - 1],\n\
+      \        'index': peak_month[1]['seasonal_index']\n      },\n      'trough_month':\
+      \ {\n        'month': month_names[trough_month[0] - 1],\n        'index': trough_month[1]['seasonal_index']\n\
+      \      },\n      'monthly_patterns': {month_names[k-1]: v for k, v in monthly_stats.items()},\n\
+      \      'quarterly_patterns': quarterly_patterns,\n      'seasonality_strength':\
+      \ 'HIGH' if seasonal_variation > 0.5 else 'MODERATE' if seasonal_variation >\
+      \ 0.2 else 'LOW',\n      'predictability': 'HIGH' if all(s['sample_size'] >=\
+      \ 2 for s in monthly_stats.values()) else 'MODERATE'\n    }\n  \n  return {\"\
+      error\": \"Unable to calculate seasonality patterns\"}\n\nreturn analyze_seasonality({{\
+      \ steps.fetch_revenue_data.output }})\n"
+    metadata_capture:
+      business_context: Seasonal pattern detection for revenue forecasting
+      knowledge_tags:
+      - seasonality
+      - monthly_patterns
+      - quarterly_cycles
+- id: generate_revenue_projections
+  type: query
+  params:
+    data_source: internal
+    query_type: revenue_projection
+    algorithm: "def generate_projections(revenue_data, trends, seasonality):\n  from\
+      \ datetime import datetime, timedelta\n  import calendar\n  \n  monthly_data\
+      \ = [r for r in revenue_data if r['data_type'] == 'monthly' and r['period']\
+      \ <= datetime.now()]\n  \n  if len(monthly_data) < 6:\n    return {\"error\"\
+      : \"Insufficient historical data for projections\"}\n  \n  # Base projection\
+      \ using trend analysis\n  recent_6m_avg = sum(r['total_revenue'] for r in monthly_data[:6])\
+      \ / 6\n  mom_growth = trends.get('monthly', {}).get('mom_growth_rate', 0) /\
+      \ 100\n  \n  projections = {}\n  \n  # Generate next 6 months projections\n\
+      \  projection_months = []\n  current_date = datetime.now().replace(day=1)\n\
+      \  \n  for i in range(6):\n    next_month = current_date + timedelta(days=32)\n\
+      \    next_month = next_month.replace(day=1)\n    projection_months.append(next_month)\n\
+      \    current_date = next_month\n  \n  monthly_projections = []\n  base_revenue\
+      \ = recent_6m_avg\n  \n  for i, month_date in enumerate(projection_months):\n\
+      \    # Apply trend growth\n    trend_adjusted = base_revenue * (1 + mom_growth)\
+      \ ** (i + 1)\n    \n    # Apply seasonal adjustment if available\n    seasonal_multiplier\
+      \ = 1.0\n    if seasonality and 'monthly_patterns' in seasonality:\n      month_name\
+      \ = calendar.month_abbr[month_date.month]\n      monthly_pattern = next((v for\
+      \ k, v in seasonality['monthly_patterns'].items() if k == month_name), None)\n\
+      \      if monthly_pattern:\n        seasonal_multiplier = monthly_pattern['seasonal_index']\n\
+      \    \n    projected_revenue = trend_adjusted * seasonal_multiplier\n    \n\
+      \    # Calculate confidence based on data quality and trend stability\n    trend_confidence\
+      \ = max(0.5, min(0.95, 0.8 - abs(mom_growth) * 0.1))  # Lower confidence for\
+      \ high volatility\n    seasonal_confidence = 0.9 if seasonality and seasonality.get('predictability')\
+      \ == 'HIGH' else 0.7\n    \n    overall_confidence = (trend_confidence + seasonal_confidence)\
+      \ / 2\n    \n    monthly_projections.append({\n      'month': month_date.strftime('%Y-%m'),\n\
+      \      'projected_revenue': round(projected_revenue, 2),\n      'confidence_score':\
+      \ round(overall_confidence, 3),\n      'trend_component': round(trend_adjusted,\
+      \ 2),\n      'seasonal_adjustment': round(seasonal_multiplier, 3)\n    })\n\
+      \  \n  # Quarterly aggregations\n  quarterly_projections = []\n  quarters =\
+      \ [\n    ('Q1', [1, 2, 3]),\n    ('Q2', [4, 5, 6]), \n    ('Q3', [7, 8, 9]),\n\
+      \    ('Q4', [10, 11, 12])\n  ]\n  \n  current_quarter = (datetime.now().month\
+      \ - 1) // 3\n  for i in range(2):  # Next 2 quarters\n    quarter_idx = (current_quarter\
+      \ + i + 1) % 4\n    quarter_name = quarters[quarter_idx][0]\n    quarter_months\
+      \ = quarters[quarter_idx][1]\n    \n    quarter_revenue = sum(\n      p['projected_revenue']\
+      \ for p in monthly_projections \n      if datetime.strptime(p['month'], '%Y-%m').month\
+      \ in quarter_months\n    )\n    \n    quarter_confidence = sum(\n      p['confidence_score']\
+      \ for p in monthly_projections \n      if datetime.strptime(p['month'], '%Y-%m').month\
+      \ in quarter_months\n    ) / 3 if quarter_revenue > 0 else 0\n    \n    quarterly_projections.append({\n\
+      \      'quarter': quarter_name,\n      'projected_revenue': round(quarter_revenue,\
+      \ 2),\n      'confidence_score': round(quarter_confidence, 3)\n    })\n  \n\
+      \  # Scenario modeling\n  scenarios = {\n    'conservative': {\n      'description':\
+      \ 'Conservative estimate (10th percentile)',\n      'monthly_multiplier': 0.85,\n\
+      \      'quarterly_multiplier': 0.85\n    },\n    'base': {\n      'description':\
+      \ 'Most likely scenario (50th percentile)',\n      'monthly_multiplier': 1.0,\n\
+      \      'quarterly_multiplier': 1.0\n    },\n    'optimistic': {\n      'description':\
+      \ 'Optimistic estimate (90th percentile)',\n      'monthly_multiplier': 1.2,\n\
+      \      'quarterly_multiplier': 1.2\n    }\n  }\n  \n  scenario_projections =\
+      \ {}\n  for scenario, params in scenarios.items():\n    scenario_projections[scenario]\
+      \ = {\n      'monthly': [\n        {**p, 'projected_revenue': round(p['projected_revenue']\
+      \ * params['monthly_multiplier'], 2)}\n        for p in monthly_projections\n\
+      \      ],\n      'quarterly': [\n        {**p, 'projected_revenue': round(p['projected_revenue']\
+      \ * params['quarterly_multiplier'], 2)}\n        for p in quarterly_projections\n\
+      \      ]\n    }\n  \n  return {\n    'base_projections': {\n      'monthly':\
+      \ monthly_projections,\n      'quarterly': quarterly_projections\n    },\n \
+      \   'scenario_modeling': scenario_projections,\n    'projection_metadata': {\n\
+      \      'base_data_months': len(monthly_data),\n      'trend_growth_rate': round(mom_growth\
+      \ * 100, 2),\n      'seasonality_applied': seasonality and 'monthly_patterns'\
+      \ in seasonality,\n      'projection_horizon': '6_months',\n      'model_confidence':\
+      \ round(sum(p['confidence_score'] for p in monthly_projections) / len(monthly_projections),\
+      \ 3)\n    }\n  }\n\nreturn generate_projections(\n  {{ steps.fetch_revenue_data.output\
+      \ }},\n  {{ steps.calculate_trend_metrics.output }},\n  {{ steps.perform_seasonality_analysis.output\
+      \ }}\n)\n"
+    metadata_capture:
+      business_context: Statistical revenue projections with scenario modeling
+      knowledge_tags:
+      - revenue_projections
+      - scenario_analysis
+      - confidence_scoring
+- id: identify_growth_opportunities
+  type: query
+  params:
+    data_source: postgres
+    query_type: growth_opportunity_analysis
+    custom_sql: "WITH segment_performance AS (\n  SELECT \n    segment,\n    account_tier,\n\
+      \    COUNT(DISTINCT account_id) as total_accounts,\n    COUNT(DISTINCT CASE\
+      \ WHEN last_purchase_date >= CURRENT_DATE - INTERVAL '12 months' THEN account_id\
+      \ END) as active_accounts,\n    AVG(CASE WHEN last_purchase_date >= CURRENT_DATE\
+      \ - INTERVAL '12 months' THEN annual_spending ELSE 0 END) as avg_annual_spending,\n\
+      \    SUM(CASE WHEN last_purchase_date >= CURRENT_DATE - INTERVAL '12 months'\
+      \ THEN annual_spending ELSE 0 END) as segment_revenue,\n    PERCENTILE_CONT(0.9)\
+      \ WITHIN GROUP (ORDER BY annual_spending) as top_decile_spending\n  FROM accounts\n\
+      \  WHERE status = 'active'\n  GROUP BY segment, account_tier\n),\nexpansion_opportunities\
+      \ AS (\n  SELECT \n    account_id,\n    account_name,\n    segment,\n    account_tier,\n\
+      \    annual_spending,\n    last_purchase_date,\n    CASE \n      WHEN annual_spending\
+      \ < sp.avg_annual_spending * 0.5 THEN 'HIGH_EXPANSION_POTENTIAL'\n      WHEN\
+      \ annual_spending < sp.avg_annual_spending * 0.8 THEN 'MODERATE_EXPANSION_POTENTIAL'\n\
+      \      ELSE 'LIMITED_EXPANSION_POTENTIAL'\n    END as expansion_potential,\n\
+      \    (sp.avg_annual_spending - annual_spending) as revenue_gap\n  FROM accounts\
+      \ a\n  JOIN segment_performance sp ON a.segment = sp.segment AND a.account_tier\
+      \ = sp.account_tier\n  WHERE a.status = 'active'\n    AND a.last_purchase_date\
+      \ >= CURRENT_DATE - INTERVAL '12 months'\n),\nmarket_trends AS (\n  SELECT \n\
+      \    segment,\n    EXTRACT(QUARTER FROM close_date) as quarter,\n    SUM(amount)\
+      \ as quarterly_revenue,\n    COUNT(*) as deal_count,\n    LAG(SUM(amount)) OVER\
+      \ (PARTITION BY segment ORDER BY EXTRACT(QUARTER FROM close_date)) as prev_quarter_revenue\n\
+      \  FROM opportunities o\n  JOIN accounts a ON o.account_id = a.account_id\n\
+      \  WHERE o.stage = 'Closed Won'\n    AND o.close_date >= CURRENT_DATE - INTERVAL\
+      \ '18 months'\n  GROUP BY segment, EXTRACT(QUARTER FROM close_date)\n)\nSELECT\
+      \ \n  'segment_performance' as analysis_type,\n  segment,\n  account_tier,\n\
+      \  total_accounts,\n  active_accounts,\n  round(avg_annual_spending, 2) as avg_annual_spending,\n\
+      \  round(segment_revenue, 2) as segment_revenue,\n  round((active_accounts::float\
+      \ / total_accounts * 100), 1) as activation_rate\nFROM segment_performance\n\
+      \nUNION ALL\n\nSELECT \n  'expansion_opportunity' as analysis_type,\n  eo.segment\
+      \ as segment,\n  eo.account_tier as account_tier,\n  NULL as total_accounts,\n\
+      \  NULL as active_accounts,\n  round(eo.revenue_gap, 2) as avg_annual_spending,\n\
+      \  round(SUM(eo.revenue_gap), 2) as segment_revenue,\n  COUNT(*) as activation_rate\n\
+      FROM expansion_opportunities eo\nWHERE eo.expansion_potential = 'HIGH_EXPANSION_POTENTIAL'\n\
+      GROUP BY eo.segment, eo.account_tier\n\nUNION ALL\n\nSELECT \n  'market_trend'\
+      \ as analysis_type,\n  segment,\n  'Q' || quarter::text as account_tier,\n \
+      \ NULL as total_accounts,\n  NULL as active_accounts,\n  round(quarterly_revenue,\
+      \ 2) as avg_annual_spending,\n  round(((quarterly_revenue - prev_quarter_revenue)\
+      \ / NULLIF(prev_quarter_revenue, 0) * 100), 2) as segment_revenue,\n  deal_count\
+      \ as activation_rate\nFROM market_trends\nWHERE prev_quarter_revenue IS NOT\
+      \ NULL\n\nORDER BY analysis_type, segment, account_tier\n"
+    metadata_capture:
+      business_context: Growth opportunity identification across segments and market
+        trends
+      knowledge_tags:
+      - growth_opportunities
+      - expansion_potential
+      - market_analysis
+- id: generate_strategic_insights
+  type: agent_call
+  params:
+    agent_id: revenue_strategy_advisor
+    task: Generate executive-level strategic insights from revenue trend analysis
+    input_data:
+      revenue_data: '{{ steps.fetch_revenue_data.output }}'
+      trend_metrics: '{{ steps.calculate_trend_metrics.output }}'
+      seasonality: '{{ steps.perform_seasonality_analysis.output }}'
+      projections: '{{ steps.generate_revenue_projections.output }}'
+      growth_opportunities: '{{ steps.identify_growth_opportunities.output }}'
+      user_context: '{{ context }}'
+    prompt_template: "You are a Chief Revenue Officer analyzing comprehensive revenue\
+      \ intelligence for strategic decision-making.\n\nREVENUE DATA:\n{revenue_data}\n\
+      \nTREND ANALYSIS:\n{trend_metrics}\n\nSEASONALITY PATTERNS:\n{seasonality}\n\
+      \nREVENUE PROJECTIONS:\n{projections}\n\nGROWTH OPPORTUNITIES:\n{growth_opportunities}\n\
+      \nGenerate executive-grade strategic insights in this JSON format:\n{{\n  \"\
+      executive_summary\": {{\n    \"revenue_health_grade\": \"A|B|C|D|F\",\n    \"\
+      growth_trajectory\": \"ACCELERATING|STEADY|SLOWING|DECLINING\",\n    \"key_insight\"\
+      : \"primary_strategic_finding\",\n    \"confidence_level\": \"HIGH|MEDIUM|LOW\"\
+      ,\n    \"urgency_flag\": \"CRITICAL|HIGH|MEDIUM|LOW\"\n  }},\n  \"strategic_findings\"\
+      : {{\n    \"revenue_momentum\": {{\n      \"current_trend\": \"trend_description\"\
+      ,\n      \"momentum_indicators\": [\"indicator1\", \"indicator2\"],\n      \"\
+      risk_factors\": [\"risk1\", \"risk2\"],\n      \"competitive_position\": \"\
+      market_position_assessment\"\n    }},\n    \"growth_drivers\": {{\n      \"\
+      primary_drivers\": [\"driver1\", \"driver2\"],\n      \"emerging_opportunities\"\
+      : [\"opportunity1\", \"opportunity2\"],\n      \"expansion_potential\": \"expansion_assessment\"\
+      ,\n      \"market_dynamics\": \"market_forces_analysis\"\n    }},\n    \"operational_insights\"\
+      : {{\n      \"deal_size_trends\": \"trend_analysis\",\n      \"velocity_patterns\"\
+      : \"velocity_assessment\",\n      \"conversion_efficiency\": \"efficiency_analysis\"\
+      ,\n      \"pipeline_health\": \"pipeline_assessment\"\n    }}\n  }},\n  \"financial_projections\"\
+      : {{\n    \"next_quarter_outlook\": {{\n      \"revenue_range\": \"min_max_projection\"\
+      ,\n      \"confidence_interval\": \"percentage\",\n      \"key_assumptions\"\
+      : [\"assumption1\", \"assumption2\"],\n      \"risk_scenarios\": [\"scenario1\"\
+      , \"scenario2\"]\n    }},\n    \"annual_trajectory\": {{\n      \"growth_rate_projection\"\
+      : \"percentage\",\n      \"revenue_target_feasibility\": \"assessment\",\n \
+      \     \"seasonal_considerations\": [\"consideration1\", \"consideration2\"],\n\
+      \      \"investment_implications\": \"investment_needs\"\n    }}\n  }},\n  \"\
+      strategic_recommendations\": {{\n    \"immediate_actions\": [\n      {{\n  \
+      \      \"action\": \"action_description\",\n        \"timeline\": \"timeframe\"\
+      ,\n        \"expected_impact\": \"impact_description\",\n        \"resource_requirements\"\
+      : \"requirements\",\n        \"success_metrics\": [\"metric1\", \"metric2\"\
+      ]\n      }}\n    ],\n    \"strategic_initiatives\": [\n      {{\n        \"\
+      initiative\": \"initiative_description\",\n        \"timeline\": \"quarters\"\
+      ,\n        \"investment_required\": \"investment_level\",\n        \"expected_roi\"\
+      : \"roi_projection\",\n        \"risk_assessment\": \"risk_level\"\n      }}\n\
+      \    ],\n    \"market_positioning\": {{\n      \"competitive_strategy\": \"\
+      strategy_recommendation\",\n      \"pricing_considerations\": \"pricing_insights\"\
+      ,\n      \"product_market_fit\": \"fit_assessment\",\n      \"expansion_strategy\"\
+      : \"expansion_recommendations\"\n    }}\n  }},\n  \"investor_narrative\": {{\n\
+      \    \"growth_story\": \"compelling_growth_narrative\",\n    \"key_metrics_highlight\"\
+      : [\"metric1\", \"metric2\", \"metric3\"],\n    \"competitive_advantages\":\
+      \ [\"advantage1\", \"advantage2\"],\n    \"market_opportunity\": \"market_size_and_opportunity\"\
+      ,\n    \"execution_confidence\": \"execution_track_record\"\n  }},\n  \"board_presentation_points\"\
+      : [\n    \"key_point_1\",\n    \"key_point_2\", \n    \"key_point_3\",\n   \
+      \ \"key_point_4\",\n    \"key_point_5\"\n  ]\n}}\n"
+    metadata_capture:
+      business_context: AI-generated executive-level strategic insights from revenue
+        analysis
+      knowledge_tags:
+      - strategic_insights
+      - executive_intelligence
+      - revenue_strategy
+- id: create_revenue_dashboard
+  type: query
+  params:
+    data_source: postgres
+    query_type: create_dashboard_data
+    operation: upsert
+    table: revenue_trend_dashboards
+    data:
+      dashboard_id: '{{ uuid() }}'
+      user_id: '{{ context.user_id }}'
+      territory: '{{ context.user_territory }}'
+      created_at: '{{ now() }}'
+      trend_metrics: '{{ steps.calculate_trend_metrics.output }}'
+      seasonality_analysis: '{{ steps.perform_seasonality_analysis.output }}'
+      revenue_projections: '{{ steps.generate_revenue_projections.output }}'
+      growth_opportunities: '{{ steps.identify_growth_opportunities.output }}'
+      strategic_insights: '{{ steps.generate_strategic_insights.output }}'
+      dashboard_config:
+        widgets:
+        - revenue_trend_chart
+        - projection_scenarios
+        - seasonality_heatmap
+        - growth_opportunities_table
+        - executive_summary_card
+        refresh_frequency: daily
+        stakeholder_access:
+        - '{{ context.user_id }}'
+        - '{{ context.manager_id }}'
+        - finance_team
+    metadata_capture:
+      business_context: Created executive revenue dashboard with trend intelligence
+      knowledge_tags:
+      - dashboard_creation
+      - executive_reporting
+      - trend_visualization
+- id: capture_trend_evidence
+  type: governance
+  params:
+    policy_id: revenue_trend_analysis_policy
+    evidence_required: true
+    action: capture_evidence
+    evidence_data:
+      revenue_data: '{{ steps.fetch_revenue_data.output }}'
+      trend_metrics: '{{ steps.calculate_trend_metrics.output }}'
+      seasonality_analysis: '{{ steps.perform_seasonality_analysis.output }}'
+      revenue_projections: '{{ steps.generate_revenue_projections.output }}'
+      growth_opportunities: '{{ steps.identify_growth_opportunities.output }}'
+      strategic_insights: '{{ steps.generate_strategic_insights.output }}'
+      dashboard_data: '{{ steps.create_revenue_dashboard.output }}'
+      analysis_timestamp: '{{ now() }}'
+      user_context: '{{ context }}'
+    retention_days: 2555
+    metadata_capture:
+      business_context: Complete evidence package for revenue trend analysis and strategic
+        insights
+      knowledge_tags:
+      - trend_evidence
+      - strategic_intelligence
+      - financial_compliance
+- id: schedule_trend_monitoring
+  type: query
+  params:
+    data_source: postgres
+    query_type: schedule_monitoring
+    operation: insert
+    table: scheduled_tasks
+    data:
+    - task_type: revenue_trend_analysis
+      description: Weekly revenue trend monitoring and updates
+      due_date: '{{ now() | add_days(7) }}'
+      assigned_to: '{{ context.user_id }}'
+      priority: high
+      recurring: true
+      recurrence_pattern: weekly
+      created_by_workflow: revenue_trend_rba
+    - task_type: executive_trend_briefing
+      description: Monthly executive briefing on revenue trends and projections
+      due_date: '{{ now() | add_days(30) }}'
+      assigned_to: '{{ context.user_id }}'
+      priority: high
+      recurring: true
+      recurrence_pattern: monthly
+      created_by_workflow: revenue_trend_rba
+    metadata_capture:
+      business_context: Scheduled recurring revenue trend monitoring and executive
+        briefings
+      knowledge_tags:
+      - trend_monitoring
+      - executive_briefings
+      - continuous_intelligence
+- id: notify_trend_insights
+  type: notify
+  params:
+    notification_type: revenue_trend_analysis
+    channels:
+    - email
+    - slack
+    - dashboard
+    - mobile_executive
+    recipients:
+    - '{{ context.user_email }}'
+    - cfo@company.com
+    - cro@company.com
+    - finance_team@company.com
+    - executive_team@company.com
+    template: executive_revenue_intelligence
+    data:
+      territory: '{{ context.user_territory }}'
+      revenue_health_grade: '{{ steps.generate_strategic_insights.output.executive_summary.revenue_health_grade
+        }}'
+      growth_trajectory: '{{ steps.generate_strategic_insights.output.executive_summary.growth_trajectory
+        }}'
+      key_insight: '{{ steps.generate_strategic_insights.output.executive_summary.key_insight
+        }}'
+      trend_direction: '{{ steps.calculate_trend_metrics.output.monthly.trend_direction
+        }}'
+      mom_growth: '{{ steps.calculate_trend_metrics.output.monthly.mom_growth_rate
+        }}%'
+      next_quarter_projection: '{{ steps.generate_revenue_projections.output.base_projections.quarterly[0]
+        }}'
+      confidence_level: '{{ steps.generate_strategic_insights.output.executive_summary.confidence_level
+        }}'
+      board_points: '{{ steps.generate_strategic_insights.output.board_presentation_points
+        | slice(0, 3) }}'
+      strategic_actions: '{{ steps.generate_strategic_insights.output.strategic_recommendations.immediate_actions
+        | slice(0, 2) }}'
+      dashboard_link: /revenue-trends/{{ steps.create_revenue_dashboard.output.dashboard_id
+        }}
+    priority_escalation:
+    - condition: '{{ steps.generate_strategic_insights.output.executive_summary.urgency_flag
+        == ''CRITICAL'' }}'
+      escalation_level: board_immediate
+      message: Critical revenue trend requiring immediate board attention
+    - condition: '{{ steps.generate_strategic_insights.output.executive_summary.revenue_health_grade
+        in [''D'', ''F''] }}'
+      escalation_level: ceo_urgent
+      message: Revenue health grade requires urgent executive intervention
+    attachments:
+    - type: json
+      name: revenue_intelligence_executive_summary.json
+      data: '{{ steps.generate_strategic_insights.output }}'
+    - type: csv
+      name: revenue_projections_scenarios.csv
+      data: '{{ steps.generate_revenue_projections.output }}'
+    metadata_capture:
+      business_context: Executive revenue intelligence shared with C-suite and board
+      knowledge_tags:
+      - executive_communication
+      - strategic_intelligence
+      - board_reporting
+- id: finalize_trend_analysis
+  type: governance
+  params:
+    policy_id: revenue_trend_analysis_policy
+    evidence_required: true
+    action: workflow_complete
+    final_state:
+      status: completed
+      revenue_periods_analyzed: '{{ steps.fetch_revenue_data.output | length }}'
+      projection_horizon: 6_months
+      strategic_insights_generated: true
+      executive_dashboard_created: true
+      stakeholders_notified: true
+      monitoring_scheduled: true
+    metadata_capture:
+      business_context: Revenue trend analysis workflow completion with full strategic
+        intelligence
+      knowledge_tags:
+      - workflow_completion
+      - strategic_analysis_done

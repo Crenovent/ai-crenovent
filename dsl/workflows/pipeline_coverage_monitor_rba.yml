@@ -1,0 +1,262 @@
+workflow_id: pipeline_coverage_monitor_rba
+name: "Pipeline Coverage Monitor (RBA)"
+description: "Automated pipeline coverage analysis with territory-specific alerts and quota tracking"
+version: "1.0"
+automation_type: "RBA"
+module: "Pipeline"
+industry: "SaaS"
+created_by: "system"
+tags: ["pipeline", "coverage", "quota", "territory", "sales_management"]
+
+# Governance Configuration
+governance:
+  policy_pack_id: "sales_operations_compliance"
+  evidence_capture: true
+  trust_threshold: 0.95
+  requires_approval: false
+  compliance_tags: ["sales_ops", "territory_management"]
+
+# Input Schema
+input_schema:
+  type: "object"
+  required: ["territory_id", "quota_period", "tenant_id", "user_id"]
+  properties:
+    territory_id:
+      type: "string"
+      description: "Territory identifier for coverage analysis"
+    quota_period:
+      type: "string"
+      description: "Quota period (e.g., Q4-2024)"
+    tenant_id:
+      type: "string"
+      description: "Tenant identifier"
+    user_id:
+      type: "string"
+      description: "User requesting the analysis"
+    coverage_threshold:
+      type: "number"
+      default: 3.0
+      description: "Required coverage ratio (default 3x)"
+
+# Workflow Steps
+steps:
+  - id: "fetch_territory_quota"
+    type: "policy_query"
+    params:
+      query_type: "territory_quota"
+      endpoint: "/api/territories/quota-analysis"
+      method: "POST"
+      data:
+        territory_id: "{{ input.territory_id }}"
+        quota_period: "{{ input.quota_period }}"
+        tenant_id: "{{ input.tenant_id }}"
+        user_id: "{{ input.user_id }}"
+        include_rep_details: true
+        apply_territory_policies: true
+      expected_fields: ["quota_amount", "quota_currency", "rep_count", "manager_id", "territory_name", "quota_adjustments"]
+    governance:
+      policy_id: "quota_data_access"
+      evidence_capture: true
+
+  - id: "fetch_pipeline_data"
+    type: "policy_query"
+    params:
+      query_type: "pipeline_opportunities"
+      endpoint: "/api/pipeline/coverage-analysis"
+      method: "POST"
+      data:
+        territory_id: "{{ input.territory_id }}"
+        close_date_period: "{{ input.quota_period }}"
+        tenant_id: "{{ input.tenant_id }}"
+        user_id: "{{ input.user_id }}"
+        include_stages: ["qualified", "proposal", "negotiation", "commit"]
+        apply_pipeline_policies: true
+        include_analytics: true
+      expected_fields: ["total_pipeline_value", "opportunity_count", "stage_distribution", "avg_deal_size", "top_deals", "risk_factors"]
+    governance:
+      policy_id: "pipeline_data_access"
+      evidence_capture: true
+
+  - id: "calculate_coverage"
+    type: "decision"
+    params:
+      condition_type: "coverage_analysis"
+      calculations:
+        coverage_ratio: "{{ steps.fetch_pipeline_data.result.total_pipeline_value / steps.fetch_territory_quota.result.quota_amount }}"
+        coverage_gap: "{{ (input.coverage_threshold * steps.fetch_territory_quota.result.quota_amount) - steps.fetch_pipeline_data.result.total_pipeline_value }}"
+        deals_needed: "{{ steps.calculate_coverage.calculations.coverage_gap / steps.fetch_pipeline_data.result.avg_deal_size }}"
+      rules:
+        - condition: "coverage_ratio >= {{ input.coverage_threshold | default(3.0) }}"
+          action: "coverage_healthy"
+          metadata:
+            status: "green"
+            urgency: "low"
+        - condition: "coverage_ratio >= 2.0 and coverage_ratio < {{ input.coverage_threshold | default(3.0) }}"
+          action: "coverage_warning"
+          metadata:
+            status: "yellow"
+            urgency: "medium"
+        - condition: "coverage_ratio < 2.0"
+          action: "coverage_critical"
+          metadata:
+            status: "red"
+            urgency: "high"
+    governance:
+      policy_id: "coverage_calculation_rules"
+      evidence_capture: true
+
+  - id: "identify_territory_team"
+    type: "query"
+    params:
+      query_type: "policy_aware_query"
+      endpoint: "territory_team"
+      filters:
+        territory_id: "{{ input.territory_id }}"
+        tenant_id: "{{ input.tenant_id }}"
+      projections: ["sales_reps", "manager_id", "director_id", "vp_sales_id"]
+    governance:
+      policy_id: "team_hierarchy_access"
+      evidence_capture: true
+
+  - id: "critical_coverage_alert"
+    type: "notify"
+    params:
+      notification_type: "critical_pipeline_alert"
+      recipients: 
+        - "{{ steps.identify_territory_team.result.manager_id }}"
+        - "{{ steps.identify_territory_team.result.director_id }}"
+      channel: "email_and_slack"
+      template: "pipeline_coverage_critical"
+      data:
+        territory_name: "{{ steps.fetch_territory_quota.result.territory_name }}"
+        quota_period: "{{ input.quota_period }}"
+        quota_amount: "{{ steps.fetch_territory_quota.result.quota_amount }}"
+        pipeline_value: "{{ steps.fetch_pipeline_data.result.total_pipeline_value }}"
+        coverage_ratio: "{{ steps.calculate_coverage.calculations.coverage_ratio }}"
+        coverage_gap: "{{ steps.calculate_coverage.calculations.coverage_gap }}"
+        deals_needed: "{{ steps.calculate_coverage.calculations.deals_needed }}"
+        urgency: "{{ steps.calculate_coverage.result.metadata.urgency }}"
+        action_required: true
+    condition: "{{ steps.calculate_coverage.result.action == 'coverage_critical' }}"
+    governance:
+      policy_id: "critical_alert_notification"
+      evidence_capture: true
+
+  - id: "warning_coverage_notification"
+    type: "notify"
+    params:
+      notification_type: "pipeline_warning"
+      recipients: ["{{ steps.identify_territory_team.result.manager_id }}"]
+      channel: "slack"
+      template: "pipeline_coverage_warning"
+      data:
+        territory_name: "{{ steps.fetch_territory_quota.result.territory_name }}"
+        coverage_ratio: "{{ steps.calculate_coverage.calculations.coverage_ratio }}"
+        coverage_gap: "{{ steps.calculate_coverage.calculations.coverage_gap }}"
+        recommendation: "Focus on pipeline generation activities"
+    condition: "{{ steps.calculate_coverage.result.action == 'coverage_warning' }}"
+    governance:
+      policy_id: "warning_notification"
+      evidence_capture: true
+
+  - id: "generate_action_plan"
+    type: "decision"
+    params:
+      condition_type: "action_planning"
+      rules:
+        - condition: "{{ steps.calculate_coverage.result.action == 'coverage_critical' }}"
+          action: "create_urgent_action_plan"
+          data:
+            priority_actions:
+              - "Immediate pipeline review meeting"
+              - "Accelerate qualification of prospects"
+              - "Review territory coverage model"
+              - "Consider quota adjustment if market conditions changed"
+            timeline: "immediate"
+        - condition: "{{ steps.calculate_coverage.result.action == 'coverage_warning' }}"
+          action: "create_standard_action_plan"
+          data:
+            priority_actions:
+              - "Increase prospecting activity"
+              - "Review pipeline quality"
+              - "Focus on larger deal sizes"
+            timeline: "within_week"
+    condition: "{{ steps.calculate_coverage.result.action in ['coverage_critical', 'coverage_warning'] }}"
+    governance:
+      policy_id: "action_plan_generation"
+      evidence_capture: true
+
+  - id: "update_coverage_tracking"
+    type: "query"
+    params:
+      query_type: "policy_aware_insert"
+      endpoint: "pipeline_coverage_log"
+      data:
+        territory_id: "{{ input.territory_id }}"
+        quota_period: "{{ input.quota_period }}"
+        quota_amount: "{{ steps.fetch_territory_quota.result.quota_amount }}"
+        pipeline_value: "{{ steps.fetch_pipeline_data.result.total_pipeline_value }}"
+        coverage_ratio: "{{ steps.calculate_coverage.calculations.coverage_ratio }}"
+        coverage_status: "{{ steps.calculate_coverage.result.metadata.status }}"
+        urgency_level: "{{ steps.calculate_coverage.result.metadata.urgency }}"
+        alerts_sent: "{{ steps.critical_coverage_alert.success or steps.warning_coverage_notification.success }}"
+        action_plan_created: "{{ steps.generate_action_plan.success or false }}"
+        analyzed_at: "{{ workflow.execution_time }}"
+        tenant_id: "{{ input.tenant_id }}"
+    governance:
+      policy_id: "coverage_audit_trail"
+      evidence_capture: true
+
+  - id: "sales_operations_evidence"
+    type: "governance"
+    params:
+      evidence_type: "pipeline_coverage_analysis"
+      compliance_pack: "sales_operations"
+      evidence_data:
+        workflow_id: "{{ workflow.id }}"
+        execution_id: "{{ workflow.execution_id }}"
+        territory_analyzed: "{{ input.territory_id }}"
+        coverage_threshold: "{{ input.coverage_threshold }}"
+        coverage_calculated: "{{ steps.calculate_coverage.calculations.coverage_ratio }}"
+        status_determined: "{{ steps.calculate_coverage.result.metadata.status }}"
+        notifications_sent:
+          critical_alert: "{{ steps.critical_coverage_alert.success or false }}"
+          warning_notification: "{{ steps.warning_coverage_notification.success or false }}"
+        action_plan: "{{ steps.generate_action_plan.result.data or 'none_required' }}"
+        compliance_status: "compliant"
+        data_retention: "3_years"
+    governance:
+      policy_id: "sales_ops_evidence_creation"
+      evidence_capture: true
+
+# Success Criteria
+success_criteria:
+  - "Coverage ratio calculated accurately"
+  - "Appropriate alerts sent based on coverage status"
+  - "Action plans generated for coverage gaps"
+  - "Audit trail maintained for sales operations"
+
+# Error Handling
+error_handling:
+  - step: "fetch_territory_quota"
+    on_error: "quota_data_unavailable"
+    action: "notify_sales_ops_admin"
+  - step: "fetch_pipeline_data"
+    on_error: "pipeline_data_unavailable"
+    action: "retry_with_fallback_query"
+  - step: "critical_coverage_alert"
+    on_error: "notification_failed"
+    action: "escalate_to_backup_notification"
+
+# Performance Metrics
+performance_metrics:
+  max_execution_time: "45s"
+  expected_accuracy: "99.8%"
+  sla_tier: "T1"
+
+# Business Impact
+business_impact:
+  revenue_protection: "Early detection prevents quota misses"
+  sales_efficiency: "Automated coverage monitoring saves manager time"
+  predictability: "Proactive pipeline management improves forecast accuracy"
+  team_performance: "Data-driven action plans improve territory results"

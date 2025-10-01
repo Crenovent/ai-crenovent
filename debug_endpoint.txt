@@ -1,0 +1,499 @@
+=== DEBUG START ===
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: hubspot_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: dynamics365_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: dynamics365_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_segment_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_segment_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment": true, "enable_segment_assignment": true, "enable_smart_location_mapping": true, "region_distribution_strategy": "smart_location"}
+file.filename: test.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: dynamics365_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: dynamics365_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: dynamics365_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: dynamics365_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: dynamics365_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: dynamics365_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: dynamics365_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: dynamics365_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: dynamics365_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: smb_growthcorp_3level.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: hubspot_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: dynamics365_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: hubspot_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: hubspot_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: hubspot_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: hubspot_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: hubspot_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: startup_techflow_flat.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: enterprise_globaltech_5level.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: manufacturing_promanuf_operational.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: hubspot_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1300
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1342
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1342
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1342
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1342
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1342
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1342
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1342
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1342
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1342
+execution_mode: sync
+workflow_config: {"enable_module_assignment": true, "industry": "saas"}
+file.filename: test_users.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1342
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1342
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1342
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1342
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1342
+execution_mode: sync
+workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
+file.filename: salesforce_user_hierarchy.csv
+==================================================

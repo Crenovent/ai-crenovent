@@ -1,0 +1,52 @@
+metadata:
+  name: "Business Function Mapping"
+  description: "Maps departments/teams to Crenovent Business Functions"
+  version: "1.0"
+  last_updated: "2024-09-24"
+
+# Default Business Function if no match is found
+default_business_function: "BF2 America"
+
+# Mapping rules from department/team keywords to Business Functions
+business_function_rules:
+  - keywords: ["executive", "c-level", "leadership", "board", "ceo", "president"]
+    business_function: "BF1 Global"
+    priority: 100
+  
+  - keywords: ["global", "international", "worldwide", "emea", "apac", "latam"]
+    business_function: "BF1 Global"
+    priority: 95
+  
+  - keywords: ["america", "americas", "north america", "us", "usa", "united states", "canada"]
+    business_function: "BF2 America"
+    priority: 90
+  
+  - keywords: ["europe", "emea", "uk", "germany", "france", "netherlands", "spain"]
+    business_function: "BF3 EMEA"
+    priority: 90
+  
+  - keywords: ["asia", "apac", "japan", "singapore", "australia", "india", "china"]
+    business_function: "BF4 APAC"
+    priority: 90
+
+# Role Function to Business Function mapping (secondary rules)
+role_function_mapping:
+  "TOP FUNCTION": "BF1 Global"
+  "Sales": "BF2 America"
+  "Marketing": "BF2 America"
+  "Customer Success": "BF2 America"
+  "Revenue Operations": "BF2 America"
+  "Product": "BF1 Global"
+  "Engineering": "BF1 Global"
+  "Finance": "BF1 Global"
+  "Human Resources": "BF1 Global"
+  "Legal": "BF1 Global"
+
+# Configuration for matching
+matching_config:
+  case_sensitive: false
+  partial_match: true
+  minimum_keyword_length: 2
+  
+# Priority order: department keywords > role function mapping > default
+

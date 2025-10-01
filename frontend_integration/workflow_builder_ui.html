@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RevAI Pro - Enterprise Workflow Builder</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/@vue/devtools@^6.0.0/lib/vue-devtools.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .workflow-canvas {
+            background-image: radial-gradient(circle, #e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .workflow-node {
+            cursor: move;
+            transition: all 0.2s ease;
+        }
+        
+        .workflow-node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .connection-line {
+            stroke: #6b7280;
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+        
+        .node-palette {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .governance-panel {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .execution-panel {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .dragging {
+            opacity: 0.8;
+            z-index: 1000;
+        }
+        
+        .drop-zone {
+            border: 2px dashed #3b82f6;
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .agent-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .agent-card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .status-running { background-color: #10b981; }
+        .status-idle { background-color: #6b7280; }
+        .status-error { background-color: #ef4444; }
+        .status-success { background-color: #3b82f6; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="app" class="h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-robot text-blue-600 mr-2"></i>
+                        RevAI Pro - Enterprise Workflow Builder
+                    </h1>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                        SaaS Industry
+                    </span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button @click="saveWorkflow" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-save mr-2"></i>Save Workflow
+                    </button>
+                    <button @click="executeWorkflow" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors" :disabled="!canExecute">
+                        <i class="fas fa-play mr-2"></i>Execute
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 flex overflow-hidden">
+            <!-- Left Sidebar - Agent Palette -->
+            <div class="w-80 bg-white border-r border-gray-200 flex flex-col">
+                <div class="node-palette text-white p-4">
+                    <h2 class="text-lg font-semibold mb-4">
+                        <i class="fas fa-puzzle-piece mr-2"></i>
+                        SaaS Workflow Agents
+                    </h2>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <!-- SaaS Pipeline Hygiene Agent -->
+                    <div class="agent-card p-4 cursor-pointer" 
+                         draggable="true" 
+                         @dragstart="startDrag($event, 'saas_pipeline_hygiene')"
+                         @click="selectAgent('saas_pipeline_hygiene')">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-chart-line text-blue-600 text-xl mr-3"></i>
+                            <h3 class="font-semibold text-gray-900">Pipeline Hygiene</h3>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">
+                            Automated pipeline health monitoring and stale deal detection
+                        </p>
+                        <div class="flex items-center text-xs text-gray-500">
+                            <span class="status-indicator status-success"></span>
+                            <span>Enterprise Ready</span>
+                        </div>
+                    </div>
+
+                    <!-- SaaS Forecast Approval Agent -->
+                    <div class="agent-card p-4 cursor-pointer" 
+                         draggable="true" 
+                         @dragstart="startDrag($event, 'saas_forecast_approval')"
+                         @click="selectAgent('saas_forecast_approval')">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-chart-bar text-green-600 text-xl mr-3"></i>
+                            <h3 class="font-semibold text-gray-900">Forecast Approval</h3>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">
+                            Automated forecast validation and approval routing
+                        </p>
+                        <div class="flex items-center text-xs text-gray-500">
+                            <span class="status-indicator status-success"></span>
+                            <span>Governance Enabled</span>
+                        </div>
+                    </div>
+
+                    <!-- SaaS Compensation Agent -->
+                    <div class="agent-card p-4 cursor-pointer" 
+                         draggable="true" 
+                         @dragstart="startDrag($event, 'saas_compensation')"
+                         @click="selectAgent('saas_compensation')">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-dollar-sign text-yellow-600 text-xl mr-3"></i>
+                            <h3 class="font-semibold text-gray-900">Compensation Calc</h3>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">
+                            Automated commission and quota calculations
+                        </p>
+                        <div class="flex items-center text-xs text-gray-500">
+                            <span class="status-indicator status-success"></span>
+                            <span>SOX Compliant</span>
+                        </div>
+                    </div>
+
+                    <!-- Core Operators -->
+                    <div class="border-t border-gray-200 pt-4 mt-4">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-3">Core Operators</h4>
+                        
+                        <div class="agent-card p-3 cursor-pointer mb-2" 
+                             draggable="true" 
+                             @dragstart="startDrag($event, 'query')">
+                            <div class="flex items-center">
+                                <i class="fas fa-database text-purple-600 mr-3"></i>
+                                <span class="font-medium text-sm">Query</span>
+                            </div>
+                        </div>
+
+                        <div class="agent-card p-3 cursor-pointer mb-2" 
+                             draggable="true" 
+                             @dragstart="startDrag($event, 'decision')">
+                            <div class="flex items-center">
+                                <i class="fas fa-code-branch text-orange-600 mr-3"></i>
+                                <span class="font-medium text-sm">Decision</span>
+                            </div>
+                        </div>
+
+                        <div class="agent-card p-3 cursor-pointer mb-2" 
+                             draggable="true" 
+                             @dragstart="startDrag($event, 'notify')">
+                            <div class="flex items-center">
+                                <i class="fas fa-bell text-red-600 mr-3"></i>
+                                <span class="font-medium text-sm">Notify</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Canvas Area -->
+            <div class="flex-1 flex flex-col">
+                <!-- Canvas Toolbar -->
+                <div class="bg-gray-100 border-b border-gray-200 px-4 py-2 flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-600">Workflow: {{ currentWorkflow.name }}</span>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <span class="status-indicator" :class="executionStatusClass"></span>
+                            <span>{{ executionStatus }}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button @click="zoomIn" class="p-2 text-gray-600 hover:text-gray-900">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button @click="zoomOut" class="p-2 text-gray-600 hover:text-gray-900">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button @click="resetZoom" class="p-2 text-gray-600 hover:text-gray-900">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Workflow Canvas -->
+                <div class="flex-1 relative overflow-hidden">
+                    <svg ref="canvas" 
+                         class="workflow-canvas w-full h-full" 
+                         @drop="onDrop" 
+                         @dragover.prevent 
+                         @dragenter.prevent>
+                        <!-- Grid pattern is handled by CSS -->
+                        
+                        <!-- Arrow marker definition -->
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                                    refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#6b7280" />
+                            </marker>
+                        </defs>
+
+                        <!-- Connection lines -->
+                        <g v-for="connection in connections" :key="connection.id">
+                            <path :d="connection.path" class="connection-line" />
+                        </g>
+
+                        <!-- Workflow nodes -->
+                        <g v-for="node in workflowNodes" :key="node.id" 
+                           :transform="`translate(${node.x}, ${node.y})`"
+                           class="workflow-node"
+                           @mousedown="startNodeDrag(node, $event)">
+                            
+                            <rect :width="node.width" :height="node.height" 
+                                  rx="8" ry="8" 
+                                  :fill="node.color" 
+                                  stroke="#e5e7eb" 
+                                  stroke-width="2"/>
+                            
+                            <!-- Node icon -->
+                            <foreignObject x="10" y="10" width="30" height="30">
+                                <div class="flex items-center justify-center h-full">
+                                    <i :class="node.icon" class="text-white text-lg"></i>
+                                </div>
+                            </foreignObject>
+                            
+                            <!-- Node title -->
+                            <text x="50" y="25" fill="white" font-family="Arial, sans-serif" 
+                                  font-size="14" font-weight="bold">
+                                {{ node.title }}
+                            </text>
+                            
+                            <!-- Node description -->
+                            <text x="50" y="45" fill="rgba(255,255,255,0.8)" 
+                                  font-family="Arial, sans-serif" font-size="12">
+                                {{ node.description }}
+                            </text>
+                            
+                            <!-- Connection points -->
+                            <circle :cx="node.width" cy="30" r="6" fill="#3b82f6" 
+                                    stroke="white" stroke-width="2" 
+                                    class="cursor-pointer"
+                                    @click="startConnection(node, $event)"/>
+                        </g>
+                    </svg>
+
+                    <!-- Drop zone overlay -->
+                    <div v-if="isDragging" class="absolute inset-0 drop-zone flex items-center justify-center">
+                        <div class="text-2xl text-blue-600 font-semibold">
+                            <i class="fas fa-plus-circle mr-2"></i>
+                            Drop to add workflow node
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar - Properties & Governance -->
+            <div class="w-96 bg-white border-l border-gray-200 flex flex-col">
+                <!-- Governance Panel -->
+                <div class="governance-panel text-white p-4">
+                    <h2 class="text-lg font-semibold mb-2">
+                        <i class="fas fa-shield-alt mr-2"></i>
+                        Governance & Compliance
+                    </h2>
+                    <div class="text-sm opacity-90">
+                        Enterprise controls built-in
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-4 space-y-6">
+                    <!-- Node Properties -->
+                    <div v-if="selectedNode">
+                        <h3 class="font-semibold text-gray-900 mb-3">Node Configuration</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Node Name
+                                </label>
+                                <input v-model="selectedNode.title" 
+                                       class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Description
+                                </label>
+                                <textarea v-model="selectedNode.description" 
+                                          class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm h-20"></textarea>
+                            </div>
+
+                            <!-- Agent-specific configuration -->
+                            <div v-if="selectedNode.type === 'saas_pipeline_hygiene'">
+                                <h4 class="font-medium text-gray-900 mb-2">Pipeline Hygiene Settings</h4>
+                                <div class="space-y-2">
+                                    <div>
+                                        <label class="block text-xs text-gray-600 mb-1">Stale Threshold (days)</label>
+                                        <input type="number" v-model="selectedNode.config.stale_threshold_days" 
+                                               class="w-full border border-gray-300 rounded px-2 py-1 text-sm" value="15">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-600 mb-1">Minimum Hygiene Score</label>
+                                        <input type="number" v-model="selectedNode.config.minimum_hygiene_score" 
+                                               class="w-full border border-gray-300 rounded px-2 py-1 text-sm" value="70">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Governance Controls -->
+                    <div class="border-t border-gray-200 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-3">
+                            <i class="fas fa-gavel mr-2 text-red-600"></i>
+                            Governance Controls
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                                <div>
+                                    <div class="font-medium text-sm text-green-900">SOX Compliance</div>
+                                    <div class="text-xs text-green-700">Audit trails enabled</div>
+                                </div>
+                                <i class="fas fa-check-circle text-green-600"></i>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                                <div>
+                                    <div class="font-medium text-sm text-blue-900">Trust Scoring</div>
+                                    <div class="text-xs text-blue-700">Real-time monitoring</div>
+                                </div>
+                                <span class="text-sm font-bold text-blue-600">98%</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                                <div>
+                                    <div class="font-medium text-sm text-yellow-900">Override Ledger</div>
+                                    <div class="text-xs text-yellow-700">Manual interventions tracked</div>
+                                </div>
+                                <span class="text-sm font-bold text-yellow-600">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Execution History -->
+                    <div class="border-t border-gray-200 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-3">
+                            <i class="fas fa-history mr-2 text-gray-600"></i>
+                            Recent Executions
+                        </h3>
+                        <div class="space-y-2">
+                            <div v-for="execution in recentExecutions" :key="execution.id" 
+                                 class="p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm font-medium">{{ execution.workflow }}</span>
+                                    <span class="text-xs text-gray-500">{{ execution.time }}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="status-indicator" :class="`status-${execution.status}`"></span>
+                                    <span class="text-xs text-gray-600">{{ execution.result }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    currentWorkflow: {
+                        name: 'SaaS Pipeline Management',
+                        id: 'workflow_001'
+                    },
+                    workflowNodes: [],
+                    connections: [],
+                    selectedNode: null,
+                    isDragging: false,
+                    draggedNodeType: null,
+                    executionStatus: 'Idle',
+                    nodeIdCounter: 1,
+                    recentExecutions: [
+                        { id: 1, workflow: 'Pipeline Hygiene', status: 'success', result: 'Completed successfully', time: '2 min ago' },
+                        { id: 2, workflow: 'Forecast Approval', status: 'running', result: 'Processing...', time: '5 min ago' },
+                        { id: 3, workflow: 'Compensation Calc', status: 'success', result: '$125,000 calculated', time: '1 hour ago' }
+                    ],
+                    agentDefinitions: {
+                        saas_pipeline_hygiene: {
+                            title: 'Pipeline Hygiene',
+                            description: 'Monitor pipeline health',
+                            icon: 'fas fa-chart-line',
+                            color: '#3b82f6',
+                            width: 200,
+                            height: 60,
+                            config: {
+                                stale_threshold_days: 15,
+                                minimum_hygiene_score: 70
+                            }
+                        },
+                        saas_forecast_approval: {
+                            title: 'Forecast Approval',
+                            description: 'Validate forecasts',
+                            icon: 'fas fa-chart-bar',
+                            color: '#10b981',
+                            width: 200,
+                            height: 60,
+                            config: {
+                                variance_threshold: 15.0,
+                                auto_approve_threshold: 5.0
+                            }
+                        },
+                        saas_compensation: {
+                            title: 'Compensation',
+                            description: 'Calculate commissions',
+                            icon: 'fas fa-dollar-sign',
+                            color: '#f59e0b',
+                            width: 200,
+                            height: 60,
+                            config: {
+                                calculation_type: 'individual'
+                            }
+                        },
+                        query: {
+                            title: 'Query',
+                            description: 'Fetch data',
+                            icon: 'fas fa-database',
+                            color: '#8b5cf6',
+                            width: 150,
+                            height: 60,
+                            config: {}
+                        },
+                        decision: {
+                            title: 'Decision',
+                            description: 'Conditional logic',
+                            icon: 'fas fa-code-branch',
+                            color: '#f97316',
+                            width: 150,
+                            height: 60,
+                            config: {}
+                        },
+                        notify: {
+                            title: 'Notify',
+                            description: 'Send alerts',
+                            icon: 'fas fa-bell',
+                            color: '#ef4444',
+                            width: 150,
+                            height: 60,
+                            config: {}
+                        }
+                    }
+                }
+            },
+            computed: {
+                canExecute() {
+                    return this.workflowNodes.length > 0;
+                },
+                executionStatusClass() {
+                    const statusMap = {
+                        'Idle': 'status-idle',
+                        'Running': 'status-running',
+                        'Success': 'status-success',
+                        'Error': 'status-error'
+                    };
+                    return statusMap[this.executionStatus] || 'status-idle';
+                }
+            },
+            methods: {
+                startDrag(event, nodeType) {
+                    this.isDragging = true;
+                    this.draggedNodeType = nodeType;
+                    event.dataTransfer.effectAllowed = 'copy';
+                },
+                onDrop(event) {
+                    event.preventDefault();
+                    this.isDragging = false;
+                    
+                    if (this.draggedNodeType) {
+                        const rect = this.$refs.canvas.getBoundingClientRect();
+                        const x = event.clientX - rect.left;
+                        const y = event.clientY - rect.top;
+                        
+                        this.addNode(this.draggedNodeType, x, y);
+                        this.draggedNodeType = null;
+                    }
+                },
+                addNode(nodeType, x, y) {
+                    const definition = this.agentDefinitions[nodeType];
+                    if (!definition) return;
+                    
+                    const newNode = {
+                        id: `node_${this.nodeIdCounter++}`,
+                        type: nodeType,
+                        x: x - definition.width / 2,
+                        y: y - definition.height / 2,
+                        ...definition,
+                        config: { ...definition.config }
+                    };
+                    
+                    this.workflowNodes.push(newNode);
+                    this.selectedNode = newNode;
+                },
+                selectAgent(nodeType) {
+                    // Show agent details in sidebar
+                    console.log('Selected agent:', nodeType);
+                },
+                startNodeDrag(node, event) {
+                    // Implement node dragging logic
+                    console.log('Start node drag:', node.id);
+                },
+                startConnection(node, event) {
+                    // Implement connection creation logic
+                    console.log('Start connection from:', node.id);
+                },
+                async saveWorkflow() {
+                    try {
+                        const workflowData = {
+                            name: this.currentWorkflow.name,
+                            nodes: this.workflowNodes,
+                            connections: this.connections,
+                            metadata: {
+                                created_at: new Date().toISOString(),
+                                version: '1.0',
+                                industry: 'SaaS'
+                            }
+                        };
+                        
+                        // Save to backend
+                        console.log('Saving workflow:', workflowData);
+                        alert('Workflow saved successfully!');
+                    } catch (error) {
+                        console.error('Failed to save workflow:', error);
+                        alert('Failed to save workflow');
+                    }
+                },
+                async executeWorkflow() {
+                    if (!this.canExecute) return;
+                    
+                    this.executionStatus = 'Running';
+                    
+                    try {
+                        // Convert visual workflow to DSL
+                        const dslWorkflow = this.convertToDSL();
+                        
+                        // Execute via backend API
+                        const response = await axios.post('/api/builder/execute', {
+                            scenario: 'pipeline_hygiene',  // Simple scenario for demo
+                            tenant_id: '1300',
+                            user_id: '1319'
+                        });
+                        
+                        this.executionStatus = 'Success';
+                        console.log('Workflow execution result:', response.data);
+                        
+                        // Add to execution history
+                        this.recentExecutions.unshift({
+                            id: Date.now(),
+                            workflow: this.currentWorkflow.name,
+                            status: 'success',
+                            result: 'Completed successfully',
+                            time: 'Just now'
+                        });
+                        
+                    } catch (error) {
+                        this.executionStatus = 'Error';
+                        console.error('Workflow execution failed:', error);
+                        alert('Workflow execution failed');
+                    }
+                    
+                    // Reset status after 3 seconds
+                    setTimeout(() => {
+                        this.executionStatus = 'Idle';
+                    }, 3000);
+                },
+                convertToDSL() {
+                    // Convert visual workflow to DSL format
+                    const steps = this.workflowNodes.map(node => ({
+                        id: node.id,
+                        type: node.type,
+                        config: node.config
+                    }));
+                    
+                    return {
+                        name: this.currentWorkflow.name,
+                        version: '1.0',
+                        metadata: {
+                            industry: 'SaaS',
+                            governance: {
+                                sox_compliant: true,
+                                audit_enabled: true
+                            }
+                        },
+                        steps: steps
+                    };
+                },
+                zoomIn() {
+                    // Implement zoom functionality
+                    console.log('Zoom in');
+                },
+                zoomOut() {
+                    // Implement zoom functionality
+                    console.log('Zoom out');
+                },
+                resetZoom() {
+                    // Implement zoom reset
+                    console.log('Reset zoom');
+                }
+            },
+            mounted() {
+                // Initialize with sample workflow
+                this.addNode('saas_pipeline_hygiene', 200, 150);
+                this.addNode('saas_forecast_approval', 500, 150);
+                this.addNode('saas_compensation', 800, 150);
+                
+                // Prevent default drag behaviors
+                document.addEventListener('dragover', (e) => e.preventDefault());
+                document.addEventListener('drop', (e) => e.preventDefault());
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

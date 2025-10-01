@@ -1,0 +1,132 @@
+metadata:
+  system: "salesforce"
+  version: "1.0"
+  description: "Salesforce user export field mappings"
+
+detection:
+  required_fields:
+    name: ["Full Name", "Name", "Username"]
+    email: ["Email", "Email Address"]
+    role: ["Profile", "Role", "User Role"]
+    manager: ["Manager", "Manager Email"]
+  unique_indicators:
+    - "Profile"
+    - "Username"
+    - "Territory"
+    - "User Role"
+
+fields:
+  Name:
+    patterns: ["Full Name", "Name", "Username", "User Full Name", "Display Name"]
+    required: true
+    type: "string"
+    unique_indicator: false
+  
+  Email:
+    patterns: ["Email", "Email Address", "Work Email", "User Email"]
+    required: true
+    type: "email"
+    validation: "email_format"
+  
+  Role Title:
+    patterns: ["Profile", "Role", "User Role", "Profile Name", "Title", "Job Title"]
+    required: false
+    type: "string"
+  
+  Reporting Email:
+    patterns: ["Manager Email", "Manager's Email", "Supervisor Email", "Reports To Email"]
+    required: false
+    type: "email"
+    hierarchy_priority: 1
+  
+  Reporting Manager Name:
+    patterns: ["Manager", "Manager Name", "Supervisor", "Reports To", "Manager Full Name"]
+    required: false
+    type: "string"
+    hierarchy_priority: 2
+  
+  Reporting Role Function:
+    patterns: ["Manager Role", "Supervisor Role", "Manager Profile"]
+    required: false
+    type: "string"
+  
+  Role Function:
+    patterns: ["Role Function", "Function", "Department Function", "Business Function"]
+    required: false
+    type: "string"
+  
+  Region:
+    patterns: ["Region", "Sales Region", "Territory Region", "Geographic Region"]
+    required: false
+    type: "string"
+    hierarchy_level: "region"
+  
+  Area:
+    patterns: ["Area", "Sales Area", "Territory Area", "Market Area"]
+    required: false
+    type: "string"
+    hierarchy_level: "area"
+  
+  District:
+    patterns: ["District", "Sales District", "Territory District"]
+    required: false
+    type: "string"
+    hierarchy_level: "district"
+  
+  Territory:
+    patterns: ["Territory", "Sales Territory", "User Territory", "Assigned Territory"]
+    required: false
+    type: "string"
+    hierarchy_level: "territory"
+  
+  Segment:
+    patterns: ["Segment", "Market Segment", "Business Segment", "Customer Segment"]
+    required: false
+    type: "string"
+    hierarchy_level: "segment"
+
+processing_rules:
+  name_combination:
+    enabled: true
+    fields: ["First Name", "Last Name"]
+    separator: " "
+    fallback_field: "Username"
+  
+  role_mapping:
+    "System Administrator": "system_admin"  # CSV role, not system admin
+    "CRO Role": "cro"  # Chief Revenue Officer
+    "Sales Manager": "manager"
+    "Sales User": "sales"
+    "Marketing User": "marketing"
+    "Customer Success Manager": "manager"
+    "Revenue Operations": "revenue_manager"
+  
+  hierarchy_inference:
+    use_role_hierarchy: true
+    territory_based: true
+    region_priority: ["Americas", "EMEA", "APAC"]
+  
+  geographic_inference:
+    enabled: true
+    territory_to_region:
+      "US West": "Americas"
+      "US East": "Americas"
+      "US Central": "Americas"
+      "Canada": "Americas"
+      "UK": "EMEA"
+      "Germany": "EMEA"
+      "France": "EMEA"
+      "Japan": "APAC"
+      "Australia": "APAC"
+      "Singapore": "APAC"
+
+value_mappings:
+  status:
+    "Active": "active"
+    "Inactive": "inactive"
+    "Frozen": "inactive"
+  
+  user_type:
+    "Standard": "sales"
+    "PowerPartner": "partner"
+    "CsnOnly": "customer_success"

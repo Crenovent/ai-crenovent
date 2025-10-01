@@ -1,0 +1,42 @@
+metadata:
+  name: "Region Mapping"
+  description: "Maps locations/countries to Crenovent Regions"
+  version: "1.0"
+  last_updated: "2024-09-24"
+
+# Default region if no match is found
+default_region: "America"
+
+# Region mapping rules from location keywords to Regions
+region_rules:
+  - keywords: ["america", "americas", "north america", "south america", "usa", "us", "united states", "canada", "mexico", "brazil", "argentina", "chile"]
+    region: "America"
+    priority: 90
+  
+  - keywords: ["europe", "emea", "uk", "united kingdom", "germany", "france", "spain", "italy", "netherlands", "belgium", "sweden", "norway", "denmark"]
+    region: "EMEA"
+    priority: 90
+  
+  - keywords: ["asia", "apac", "asia pacific", "japan", "singapore", "australia", "new zealand", "india", "china", "korea", "thailand", "malaysia"]
+    region: "APAC"
+    priority: 90
+  
+  # Specific countries
+  - keywords: ["new york", "california", "texas", "florida", "chicago", "boston", "seattle", "san francisco"]
+    region: "America"
+    priority: 85
+  
+  - keywords: ["london", "berlin", "paris", "madrid", "amsterdam", "dublin", "zurich", "stockholm"]
+    region: "EMEA"
+    priority: 85
+  
+  - keywords: ["tokyo", "sydney", "mumbai", "bangalore", "singapore city", "hong kong", "seoul"]
+    region: "APAC"
+    priority: 85
+
+# Configuration for matching
+matching_config:
+  case_sensitive: false
+  partial_match: true
+  minimum_keyword_length: 2
+

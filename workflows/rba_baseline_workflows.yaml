@@ -1,0 +1,342 @@
+# RBA Baseline Workflows - Task 1.1-T4 Implementation
+# SOP-driven deterministic workflows for SaaS industry
+
+# Pipeline Hygiene Workflow - Task 1.1-T4.1
+pipeline_hygiene_workflow:
+  name: "SaaS Pipeline Hygiene Check"
+  version: "1.0"
+  industry: "SaaS"
+  automation_type: "RBA"
+  
+  metadata:
+    tenant_id: "{{ tenant_id }}"
+    policy_pack: "saas_sox_policy"
+    evidence_capture: true
+    trust_score: 1.0
+    
+  governance:
+    policy_id: "saas_pipeline_policy"
+    compliance_frameworks: ["SOX", "GDPR"]
+    override_ledger_id: "pipeline_overrides"
+    evidence_retention_days: 2555  # 7 years for SOX
+    
+  steps:
+    - id: "query_opportunities"
+      type: "query"
+      config:
+        source: "salesforce"
+        resource: "Opportunity"
+        select: ["Id", "Name", "Amount", "StageName", "LastModifiedDate", "CloseDate"]
+        filters:
+          - field: "IsClosed"
+            op: "eq"
+            value: false
+          - field: "OwnerId"
+            op: "eq"
+            value: "{{ user_id }}"
+      governance:
+        policy_id: "data_access_policy"
+        evidence:
+          capture: true
+          fields: ["query", "row_count", "execution_time"]
+        
+    - id: "analyze_hygiene"
+      type: "decision"
+      config:
+        condition: "len(query_opportunities.records) > 0"
+        rules:
+          - if: "days_since_modified > 15"
+            then: "mark_as_stale"
+            action: "flag_for_followup"
+          - if: "missing_required_fields > 0"
+            then: "mark_incomplete"
+            action: "update_required"
+      governance:
+        policy_id: "business_logic_policy"
+        evidence:
+          capture: true
+          fields: ["rules_applied", "decisions_made"]
+          
+    - id: "calculate_hygiene_score"
+      type: "decision"
+      config:
+        formula: "100 - (stale_count / total_count * 50) - (incomplete_count / total_count * 30)"
+        thresholds:
+          excellent: ">= 90"
+          good: ">= 70"
+          poor: "< 70"
+      governance:
+        policy_id: "scoring_policy"
+        evidence:
+          capture: true
+          fields: ["score", "threshold_met", "calculation_method"]
+          
+    - id: "generate_recommendations"
+      type: "action"
+      config:
+        recommendations:
+          - condition: "hygiene_score < 70"
+            action: "immediate_attention_required"
+            priority: "HIGH"
+          - condition: "stale_count > 0"
+            action: "schedule_followups"
+            priority: "MEDIUM"
+      governance:
+        policy_id: "action_policy"
+        evidence:
+          capture: true
+          fields: ["recommendations", "priority_assigned"]
+          
+    - id: "notify_results"
+      type: "notify"
+      config:
+        channel: "email"
+        recipients: ["{{ user_email }}"]
+        template: "pipeline_hygiene_report"
+        data:
+          hygiene_score: "{{ calculate_hygiene_score.score }}"
+          total_opportunities: "{{ query_opportunities.count }}"
+          recommendations: "{{ generate_recommendations.actions }}"
+      governance:
+        policy_id: "notification_policy"
+        evidence:
+          capture: true
+          fields: ["recipients", "notification_sent", "delivery_status"]
+
+---
+
+# Forecast Approval Workflow - Task 1.1-T4.2  
+forecast_approval_workflow:
+  name: "SaaS Forecast Approval Process"
+  version: "1.0"
+  industry: "SaaS"
+  automation_type: "RBA"
+  
+  metadata:
+    tenant_id: "{{ tenant_id }}"
+    policy_pack: "saas_sox_policy"
+    evidence_capture: true
+    trust_score: 1.0
+    
+  governance:
+    policy_id: "forecast_governance_policy"
+    compliance_frameworks: ["SOX", "SEC"]
+    override_ledger_id: "forecast_overrides"
+    evidence_retention_days: 2555
+    
+  input_schema:
+    required:
+      - submitter_id
+      - forecast_period
+      - submitted_amount
+      - confidence_score
+    
+  steps:
+    - id: "validate_submission"
+      type: "decision"
+      config:
+        rules:
+          - field: "submitted_amount"
+            validation: "> 0"
+            error: "Forecast amount must be positive"
+          - field: "confidence_score"
+            validation: ">= 0 and <= 100"
+            error: "Confidence must be 0-100"
+          - field: "forecast_period"
+            validation: "matches('^\\d{4}-\\d{2}$')"
+            error: "Period must be YYYY-MM format"
+      governance:
+        policy_id: "input_validation_policy"
+        evidence:
+          capture: true
+          fields: ["validation_results", "errors"]
+          
+    - id: "query_pipeline_data"
+      type: "query"
+      config:
+        source: "salesforce"
+        resource: "Opportunity"
+        select: ["Amount", "Probability", "StageName"]
+        filters:
+          - field: "OwnerId"
+            op: "eq"
+            value: "{{ input.submitter_id }}"
+          - field: "CloseDate"
+            op: "between"
+            value: ["{{ input.forecast_period }}-01", "{{ input.forecast_period }}-31"]
+          - field: "IsClosed"
+            op: "eq"
+            value: false
+      governance:
+        policy_id: "data_access_policy"
+        evidence:
+          capture: true
+          fields: ["query", "row_count"]
+          
+    - id: "calculate_variance"
+      type: "decision"
+      config:
+        formula: "abs((input.submitted_amount - pipeline_total) / pipeline_total) * 100"
+        variance_thresholds:
+          low: "< 5"      # Auto-approve
+          medium: "5-15"  # Manager approval
+          high: "15-25"   # Director approval  
+          critical: "> 25" # VP approval
+      governance:
+        policy_id: "variance_calculation_policy"
+        evidence:
+          capture: true
+          fields: ["variance_percentage", "threshold_category"]
+          
+    - id: "determine_approval_level"
+      type: "decision"
+      config:
+        rules:
+          - if: "variance < 5 AND confidence_score >= 80"
+            then: "auto_approve"
+            approver: "SYSTEM"
+          - if: "variance >= 5 AND variance < 15"
+            then: "manager_approval"
+            approver: "MANAGER"
+          - if: "variance >= 15 AND variance < 25"
+            then: "director_approval"
+            approver: "DIRECTOR"  
+          - if: "variance >= 25"
+            then: "vp_approval"
+            approver: "VP"
+      governance:
+        policy_id: "approval_routing_policy"
+        evidence:
+          capture: true
+          fields: ["approval_level", "routing_decision", "approver_assigned"]
+          
+    - id: "generate_evidence_pack"
+      type: "governance"
+      config:
+        evidence_type: "forecast_approval"
+        required_fields:
+          - submission_data: "{{ input }}"
+          - pipeline_analysis: "{{ query_pipeline_data.summary }}"
+          - variance_calculation: "{{ calculate_variance.result }}"
+          - approval_routing: "{{ determine_approval_level.decision }}"
+        compliance_attestation: true
+      governance:
+        policy_id: "evidence_generation_policy"
+        evidence:
+          capture: true
+          fields: ["evidence_pack_id", "compliance_status"]
+
+---
+
+# Compensation Calculation Workflow - Task 1.1-T4.3
+compensation_calculation_workflow:
+  name: "SaaS Compensation Calculation"
+  version: "1.0"
+  industry: "SaaS"
+  automation_type: "RBA"
+  
+  metadata:
+    tenant_id: "{{ tenant_id }}"
+    policy_pack: "saas_sox_policy"
+    evidence_capture: true
+    trust_score: 1.0
+    
+  governance:
+    policy_id: "compensation_governance_policy"
+    compliance_frameworks: ["SOX", "FLSA"]
+    override_ledger_id: "compensation_overrides"
+    evidence_retention_days: 2555
+    
+  input_schema:
+    required:
+      - rep_id
+      - calculation_period
+      - calculation_type  # individual, team, bulk
+      
+  steps:
+    - id: "fetch_sales_data"
+      type: "query"
+      config:
+        source: "salesforce"
+        resource: "Opportunity"
+        select: ["Amount", "CloseDate", "IsWon"]
+        filters:
+          - field: "OwnerId"
+            op: "eq"
+            value: "{{ input.rep_id }}"
+          - field: "IsWon"
+            op: "eq"
+            value: true
+          - field: "CloseDate"
+            op: "between"
+            value: ["{{ input.calculation_period }}-01", "{{ input.calculation_period }}-31"]
+      governance:
+        policy_id: "sales_data_access_policy"
+        evidence:
+          capture: true
+          fields: ["query", "row_count", "total_amount"]
+          
+    - id: "get_compensation_plan"
+      type: "query"
+      config:
+        source: "postgres"
+        resource: "compensation_plans"
+        select: ["base_rate", "accelerator_threshold", "kicker_threshold"]
+        filters:
+          - field: "rep_id"
+            op: "eq"
+            value: "{{ input.rep_id }}"
+          - field: "effective_date"
+            op: "<="
+            value: "{{ input.calculation_period }}-01"
+      governance:
+        policy_id: "compensation_plan_access_policy"
+        evidence:
+          capture: true
+          fields: ["plan_details", "effective_date"]
+          
+    - id: "calculate_base_commission"
+      type: "decision"
+      config:
+        formula: "total_bookings * base_commission_rate"
+        variables:
+          total_bookings: "{{ fetch_sales_data.sum_amount }}"
+          base_commission_rate: "{{ get_compensation_plan.base_rate }}"
+      governance:
+        policy_id: "base_commission_calculation_policy"
+        evidence:
+          capture: true
+          fields: ["calculation_formula", "variables_used", "result"]
+          
+    - id: "calculate_accelerators"
+      type: "decision"
+      config:
+        rules:
+          - if: "quota_attainment > accelerator_threshold"
+            then: "apply_accelerator"
+            formula: "(total_bookings - quota) * accelerator_rate"
+          - if: "quota_attainment > kicker_threshold"
+            then: "apply_kicker"
+            formula: "quota * kicker_rate"
+      governance:
+        policy_id: "accelerator_calculation_policy"
+        evidence:
+          capture: true
+          fields: ["accelerator_applied", "kicker_applied", "calculations"]
+          
+    - id: "generate_payment_record"
+      type: "action"
+      config:
+        create_payment_record:
+          rep_id: "{{ input.rep_id }}"
+          period: "{{ input.calculation_period }}"
+          base_commission: "{{ calculate_base_commission.result }}"
+          accelerator_bonus: "{{ calculate_accelerators.accelerator }}"
+          kicker_bonus: "{{ calculate_accelerators.kicker }}"
+          total_compensation: "{{ sum(base_commission, accelerator_bonus, kicker_bonus) }}"
+          calculation_timestamp: "{{ now() }}"
+      governance:
+        policy_id: "payment_record_policy"
+        evidence:
+          capture: true
+          fields: ["payment_record", "approval_required"]

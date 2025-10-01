@@ -1,0 +1,411 @@
+workflow_id: unknown_workflow
+name: Unknown Workflow
+module: Unknown
+automation_type: RBA
+version: 1.0.0
+metadata:
+  description: Identifies at-risk opportunities through multi-dimensional analysis
+    and provides actionable remediation strategies to improve win rates
+  industry_focus:
+  - SaaS
+  persona_tags:
+  - Account Executive
+  - Sales Manager
+  - Customer Success
+  - Revenue Operations
+  business_value: Reduces deal slippage by 30-45% through early risk identification
+    and proactive intervention strategies
+  customer_impact: Provides real-time deal health scoring with specific remediation
+    actions to maximize revenue retention and acceleration
+  estimated_time_minutes: 5
+  sla_tier: T0
+  compliance_tags:
+  - Revenue Recognition
+  - Deal Governance
+  - Customer Risk Management
+steps:
+- id: initialize_risk_assessment
+  type: governance
+  params:
+    policy_id: deal_risk_assessment_policy
+    evidence_required: true
+    action: workflow_start
+    description: Initialize deal risk assessment with compliance governance
+- id: fetch_active_opportunities
+  type: query
+  params:
+    data_source: salesforce
+    query_type: active_opportunities
+    filters:
+      owner_id: '{{ context.user_id }}'
+      stage:
+      - Qualification
+      - Needs Analysis
+      - Proposal
+      - Negotiation
+      - Verbal Commit
+      amount_min: 10000
+    projections:
+    - opportunity_id
+    - account_name
+    - opportunity_name
+    - amount
+    - close_date
+    - stage
+    - probability
+    - created_date
+    - last_activity_date
+    - last_stage_change_date
+    - decision_maker_identified
+    - budget_confirmed
+    - technical_validation_complete
+    - champion_identified
+    - competition_identified
+    - pricing_approved
+    - contract_terms_agreed
+    metadata_capture:
+      business_context: Active opportunities for comprehensive risk assessment
+      knowledge_tags:
+      - opportunity_baseline
+      - deal_portfolio
+      - pipeline_snapshot
+- id: analyze_engagement_patterns
+  type: query
+  params:
+    data_source: salesforce
+    query_type: engagement_analysis
+    custom_sql: "WITH engagement_metrics AS (\n  SELECT \n    o.opportunity_id,\n\
+      \    COUNT(DISTINCT a.id) as total_activities,\n    COUNT(DISTINCT CASE WHEN\
+      \ a.activity_date >= CURRENT_DATE - INTERVAL '14 days' THEN a.id END) as recent_activities,\n\
+      \    COUNT(DISTINCT a.who_id) as unique_contacts_engaged,\n    MAX(a.activity_date)\
+      \ as last_activity_date,\n    AVG(CASE WHEN a.activity_type = 'call' THEN 1\
+      \ ELSE 0 END) as call_frequency,\n    AVG(CASE WHEN a.activity_type = 'email'\
+      \ THEN 1 ELSE 0 END) as email_frequency,\n    COUNT(DISTINCT CASE WHEN a.who_id\
+      \ IN (\n      SELECT contact_id FROM contacts WHERE decision_maker = true\n\
+      \    ) THEN a.who_id END) as decision_maker_engagement\n  FROM opportunities\
+      \ o\n  LEFT JOIN activities a ON o.opportunity_id = a.what_id\n  WHERE o.opportunity_id\
+      \ = ANY($1)\n    AND a.activity_date >= o.created_date\n  GROUP BY o.opportunity_id\n\
+      )\nSELECT \n  opportunity_id,\n  total_activities,\n  recent_activities,\n \
+      \ unique_contacts_engaged,\n  last_activity_date,\n  CURRENT_DATE - last_activity_date\
+      \ as days_since_last_activity,\n  call_frequency,\n  email_frequency,\n  decision_maker_engagement,\n\
+      \  CASE \n    WHEN recent_activities >= 3 AND decision_maker_engagement > 0\
+      \ THEN 'HIGH'\n    WHEN recent_activities >= 1 OR unique_contacts_engaged >=\
+      \ 2 THEN 'MEDIUM'\n    ELSE 'LOW'\n  END as engagement_level\nFROM engagement_metrics\n"
+    params:
+    - '{{ steps.fetch_active_opportunities.output | map(attribute=''opportunity_id'')
+      | list }}'
+    metadata_capture:
+      business_context: Customer engagement patterns and activity analysis
+      knowledge_tags:
+      - engagement_metrics
+      - activity_patterns
+      - stakeholder_interaction
+- id: assess_deal_progression
+  type: query
+  params:
+    data_source: postgres
+    query_type: deal_progression_analysis
+    custom_sql: "WITH stage_duration AS (\n  SELECT \n    oh.opportunity_id,\n   \
+      \ oh.stage,\n    MIN(oh.stage_entry_date) as stage_start,\n    MAX(COALESCE(oh.stage_exit_date,\
+      \ CURRENT_DATE)) as stage_end,\n    (MAX(COALESCE(oh.stage_exit_date, CURRENT_DATE))\
+      \ - MIN(oh.stage_entry_date)) as days_in_stage\n  FROM opportunity_history oh\n\
+      \  WHERE oh.opportunity_id = ANY($1)\n  GROUP BY oh.opportunity_id, oh.stage\n\
+      ),\nbenchmark_durations AS (\n  SELECT \n    stage,\n    PERCENTILE_CONT(0.5)\
+      \ WITHIN GROUP (ORDER BY days_in_stage) as median_duration,\n    PERCENTILE_CONT(0.75)\
+      \ WITHIN GROUP (ORDER BY days_in_stage) as p75_duration\n  FROM opportunity_history\n\
+      \  WHERE close_date >= CURRENT_DATE - INTERVAL '1 year'\n    AND stage_outcome\
+      \ = 'won'\n  GROUP BY stage\n)\nSELECT \n  sd.opportunity_id,\n  sd.stage,\n\
+      \  sd.days_in_stage,\n  bd.median_duration,\n  bd.p75_duration,\n  CASE \n \
+      \   WHEN sd.days_in_stage > bd.p75_duration THEN 'SLOW'\n    WHEN sd.days_in_stage\
+      \ > bd.median_duration THEN 'MODERATE'\n    ELSE 'NORMAL'\n  END as progression_speed,\n\
+      \  CASE \n    WHEN sd.days_in_stage > bd.p75_duration * 1.5 THEN 'STALLED'\n\
+      \    WHEN sd.days_in_stage > bd.p75_duration THEN 'AT_RISK'\n    ELSE 'ON_TRACK'\n\
+      \  END as progression_status\nFROM stage_duration sd\nLEFT JOIN benchmark_durations\
+      \ bd ON sd.stage = bd.stage\nORDER BY sd.opportunity_id, sd.stage\n"
+    params:
+    - '{{ steps.fetch_active_opportunities.output | map(attribute=''opportunity_id'')
+      | list }}'
+    metadata_capture:
+      business_context: Deal progression speed analysis against benchmarks
+      knowledge_tags:
+      - stage_velocity
+      - progression_benchmarks
+      - deal_momentum
+- id: evaluate_qualification_criteria
+  type: query
+  params:
+    data_source: internal
+    query_type: qualification_scoring
+    algorithm: "def calculate_qualification_score(opportunities):\n  qualification_scores\
+      \ = []\n  \n  for opp in opportunities:\n    score = 0\n    risk_factors = []\n\
+      \    \n    # BANT Scoring (Budget, Authority, Need, Timeline)\n    if opp.get('budget_confirmed',\
+      \ False):\n      score += 25\n    else:\n      risk_factors.append(\"Budget\
+      \ not confirmed\")\n    \n    if opp.get('decision_maker_identified', False):\n\
+      \      score += 20\n    else:\n      risk_factors.append(\"Decision maker not\
+      \ identified\")\n    \n    if opp.get('champion_identified', False):\n     \
+      \ score += 15\n    else:\n      risk_factors.append(\"No internal champion\"\
+      )\n    \n    # Timeline assessment\n    days_to_close = (datetime.strptime(opp['close_date'],\
+      \ '%Y-%m-%d') - datetime.now()).days\n    if days_to_close <= 30:\n      score\
+      \ += 20  # Urgent timeline\n    elif days_to_close <= 90:\n      score += 15\
+      \  # Normal timeline\n    else:\n      score += 10  # Extended timeline\n  \
+      \  \n    # Technical validation\n    if opp.get('technical_validation_complete',\
+      \ False):\n      score += 10\n    else:\n      risk_factors.append(\"Technical\
+      \ validation incomplete\")\n    \n    # Competition analysis\n    if opp.get('competition_identified',\
+      \ False):\n      score += 5  # Good to know competition\n    else:\n      risk_factors.append(\"\
+      Competitive landscape unknown\")\n    \n    # Commercial readiness\n    if opp.get('pricing_approved',\
+      \ False):\n      score += 5\n    else:\n      risk_factors.append(\"Pricing\
+      \ not approved\")\n    \n    # Determine qualification tier\n    if score >=\
+      \ 80:\n      qual_tier = \"WELL_QUALIFIED\"\n    elif score >= 60:\n      qual_tier\
+      \ = \"QUALIFIED\"\n    elif score >= 40:\n      qual_tier = \"PARTIALLY_QUALIFIED\"\
+      \n    else:\n      qual_tier = \"UNDER_QUALIFIED\"\n    \n    qualification_scores.append({\n\
+      \      'opportunity_id': opp['opportunity_id'],\n      'qualification_score':\
+      \ score,\n      'qualification_tier': qual_tier,\n      'risk_factors': risk_factors,\n\
+      \      'days_to_close': days_to_close\n    })\n  \n  return qualification_scores\n\
+      \nreturn calculate_qualification_score({{ steps.fetch_active_opportunities.output\
+      \ }})\n"
+    metadata_capture:
+      business_context: BANT qualification scoring for risk assessment
+      knowledge_tags:
+      - qualification_scores
+      - bant_analysis
+      - deal_readiness
+- id: calculate_risk_scores
+  type: decision
+  params:
+    condition: '{{ steps.fetch_active_opportunities.output | length > 0 }}'
+    actions:
+      when_true:
+      - id: perform_risk_calculation
+        type: query
+        params:
+          data_source: internal
+          query_type: comprehensive_risk_scoring
+          algorithm: "def calculate_comprehensive_risk(opportunities, engagement,\
+            \ progression, qualification):\n  risk_assessments = []\n  \n  for opp\
+            \ in opportunities:\n    opp_id = opp['opportunity_id']\n    \n    # Get\
+            \ supporting data\n    eng_data = next((e for e in engagement if e['opportunity_id']\
+            \ == opp_id), {})\n    prog_data = next((p for p in progression if p['opportunity_id']\
+            \ == opp_id), {})\n    qual_data = next((q for q in qualification if q['opportunity_id']\
+            \ == opp_id), {})\n    \n    # Risk scoring algorithm (100 = no risk,\
+            \ 0 = maximum risk)\n    risk_score = 100\n    risk_factors = []\n   \
+            \ \n    # Engagement Risk (30% weight)\n    engagement_level = eng_data.get('engagement_level',\
+            \ 'LOW')\n    if engagement_level == 'LOW':\n      risk_score -= 25\n\
+            \      risk_factors.append(\"Low customer engagement\")\n    elif engagement_level\
+            \ == 'MEDIUM':\n      risk_score -= 10\n    \n    days_since_activity\
+            \ = eng_data.get('days_since_last_activity', 999)\n    if days_since_activity\
+            \ > 14:\n      risk_score -= 15\n      risk_factors.append(f\"No activity\
+            \ for {days_since_activity} days\")\n    \n    # Progression Risk (25%\
+            \ weight)\n    progression_status = prog_data.get('progression_status',\
+            \ 'STALLED')\n    if progression_status == 'STALLED':\n      risk_score\
+            \ -= 20\n      risk_factors.append(\"Deal progression stalled\")\n   \
+            \ elif progression_status == 'AT_RISK':\n      risk_score -= 10\n    \
+            \  risk_factors.append(\"Slow deal progression\")\n    \n    # Qualification\
+            \ Risk (25% weight)\n    qual_tier = qual_data.get('qualification_tier',\
+            \ 'UNDER_QUALIFIED')\n    qual_score = qual_data.get('qualification_score',\
+            \ 0)\n    if qual_tier == 'UNDER_QUALIFIED':\n      risk_score -= 20\n\
+            \      risk_factors.extend(qual_data.get('risk_factors', []))\n    elif\
+            \ qual_tier == 'PARTIALLY_QUALIFIED':\n      risk_score -= 10\n    \n\
+            \    # Timeline Risk (20% weight)\n    days_to_close = qual_data.get('days_to_close',\
+            \ 365)\n    if days_to_close < 7:\n      risk_score -= 15  # Too little\
+            \ time for proper close\n      risk_factors.append(\"Insufficient time\
+            \ to close\")\n    elif days_to_close > 180:\n      risk_score -= 10 \
+            \ # Deal too far out\n    \n    # Amount-based risk adjustment\n    amount\
+            \ = opp.get('amount', 0)\n    if amount > 100000:  # High-value deals\
+            \ need extra scrutiny\n      if len(risk_factors) > 2:\n        risk_score\
+            \ -= 5\n    \n    # Final risk categorization\n    risk_score = max(0,\
+            \ min(100, risk_score))\n    \n    if risk_score >= 80:\n      risk_category\
+            \ = \"LOW_RISK\"\n      intervention_urgency = \"MONITOR\"\n    elif risk_score\
+            \ >= 60:\n      risk_category = \"MODERATE_RISK\"\n      intervention_urgency\
+            \ = \"REVIEW\"\n    elif risk_score >= 40:\n      risk_category = \"HIGH_RISK\"\
+            \n      intervention_urgency = \"IMMEDIATE\"\n    else:\n      risk_category\
+            \ = \"CRITICAL_RISK\"\n      intervention_urgency = \"URGENT\"\n    \n\
+            \    risk_assessments.append({\n      'opportunity_id': opp_id,\n    \
+            \  'opportunity_name': opp.get('opportunity_name'),\n      'account_name':\
+            \ opp.get('account_name'),\n      'amount': amount,\n      'close_date':\
+            \ opp.get('close_date'),\n      'stage': opp.get('stage'),\n      'risk_score':\
+            \ risk_score,\n      'risk_category': risk_category,\n      'intervention_urgency':\
+            \ intervention_urgency,\n      'risk_factors': risk_factors,\n      'engagement_level':\
+            \ engagement_level,\n      'progression_status': progression_status,\n\
+            \      'qualification_tier': qual_tier\n    })\n  \n  return {\n    'deal_assessments':\
+            \ sorted(risk_assessments, key=lambda x: x['risk_score']),\n    'high_risk_count':\
+            \ len([r for r in risk_assessments if r['risk_category'] in ['HIGH_RISK',\
+            \ 'CRITICAL_RISK']]),\n    'total_at_risk_value': sum(r['amount'] for\
+            \ r in risk_assessments if r['risk_category'] in ['HIGH_RISK', 'CRITICAL_RISK']),\n\
+            \    'urgent_interventions': [r for r in risk_assessments if r['intervention_urgency']\
+            \ == 'URGENT']\n  }\n\nreturn calculate_comprehensive_risk(\n  {{ steps.fetch_active_opportunities.output\
+            \ }},\n  {{ steps.analyze_engagement_patterns.output }},\n  {{ steps.assess_deal_progression.output\
+            \ }},\n  {{ steps.evaluate_qualification_criteria.output }}\n)\n"
+          metadata_capture:
+            business_context: Comprehensive multi-factor risk scoring for all deals
+            knowledge_tags:
+            - risk_scoring
+            - deal_health
+            - intervention_priorities
+      when_false:
+      - id: no_opportunities_found
+        type: notify
+        params:
+          message: No active opportunities found for risk assessment
+          level: info
+- id: generate_remediation_strategies
+  type: agent_call
+  params:
+    agent_id: risk_remediation_strategist
+    task: Generate specific remediation strategies for at-risk deals
+    input_data:
+      risk_assessments: '{{ steps.calculate_risk_scores.output.deal_assessments }}'
+      high_risk_deals: '{{ steps.calculate_risk_scores.output.urgent_interventions
+        }}'
+      user_context: '{{ context }}'
+    prompt_template: "You are a Sales Excellence coach analyzing at-risk deals and\
+      \ creating remediation strategies.\n\nRISK ASSESSMENTS:\n{risk_assessments}\n\
+      \nHIGH RISK DEALS NEEDING URGENT INTERVENTION:\n{high_risk_deals}\n\nFor each\
+      \ high-risk deal, provide specific remediation strategies in this JSON format:\n\
+      {{\n  \"deal_strategies\": [\n    {{\n      \"opportunity_id\": \"opp_id\",\n\
+      \      \"opportunity_name\": \"deal_name\",\n      \"risk_score\": number,\n\
+      \      \"priority_actions\": [\n        {{\n          \"action\": \"specific_action_description\"\
+      ,\n          \"timeline\": \"timeframe\",\n          \"owner\": \"role_responsible\"\
+      ,\n          \"success_criteria\": \"measurable_outcome\",\n          \"risk_mitigation\"\
+      : \"risk_addressed\"\n        }}\n      ],\n      \"stakeholder_engagement\"\
+      : {{\n        \"primary_contacts\": [\"contact_role1\", \"contact_role2\"],\n\
+      \        \"engagement_strategy\": \"strategy_description\",\n        \"meeting_objectives\"\
+      : [\"objective1\", \"objective2\"]\n      }},\n      \"competitive_positioning\"\
+      : {{\n        \"key_differentiators\": [\"diff1\", \"diff2\"],\n        \"objection_handling\"\
+      : [\"objection_response1\", \"objection_response2\"]\n      }},\n      \"timeline_optimization\"\
+      : {{\n        \"critical_milestones\": [\"milestone1\", \"milestone2\"],\n \
+      \       \"acceleration_tactics\": [\"tactic1\", \"tactic2\"]\n      }}\n   \
+      \ }}\n  ],\n  \"portfolio_recommendations\": {{\n    \"focus_priorities\": [\"\
+      priority1\", \"priority2\", \"priority3\"],\n    \"resource_allocation\": \"\
+      allocation_strategy\",\n    \"escalation_triggers\": [\"trigger1\", \"trigger2\"\
+      ]\n  }},\n  \"success_metrics\": [\"metric1\", \"metric2\", \"metric3\"],\n\
+      \  \"review_schedule\": \"suggested_review_frequency\"\n}}\n"
+    metadata_capture:
+      business_context: AI-generated remediation strategies for at-risk deals
+      knowledge_tags:
+      - remediation_strategies
+      - action_plans
+      - risk_mitigation
+- id: create_intervention_tasks
+  type: query
+  params:
+    data_source: postgres
+    query_type: create_intervention_tasks
+    operation: insert
+    table: deal_intervention_tasks
+    data_template: "{% for strategy in steps.generate_remediation_strategies.output.deal_strategies\
+      \ %}\n{% for action in strategy.priority_actions %}\n{\n  \"task_id\": \"{{\
+      \ uuid() }}\",\n  \"opportunity_id\": \"{{ strategy.opportunity_id }}\",\n \
+      \ \"task_type\": \"risk_intervention\",\n  \"action_description\": \"{{ action.action\
+      \ }}\",\n  \"assigned_to\": \"{{ context.user_id }}\",\n  \"due_date\": \"{{\
+      \ now() | add_days(action.timeline | days_from_timeline) }}\",\n  \"priority\"\
+      : \"{{ strategy.risk_score < 40 and 'urgent' or 'high' }}\",\n  \"success_criteria\"\
+      : \"{{ action.success_criteria }}\",\n  \"created_by_workflow\": \"deal_risk_assessment_rba\"\
+      ,\n  \"created_at\": \"{{ now() }}\",\n  \"status\": \"pending\"\n}{% if not\
+      \ loop.last %},{% endif %}\n{% endfor %}\n{% if not loop.last %},{% endif %}\n\
+      {% endfor %}\n"
+    metadata_capture:
+      business_context: Created specific intervention tasks for at-risk deals
+      knowledge_tags:
+      - intervention_tasks
+      - action_items
+      - risk_response
+- id: capture_risk_evidence
+  type: governance
+  params:
+    policy_id: deal_risk_assessment_policy
+    evidence_required: true
+    action: capture_evidence
+    evidence_data:
+      opportunities_analyzed: '{{ steps.fetch_active_opportunities.output }}'
+      engagement_analysis: '{{ steps.analyze_engagement_patterns.output }}'
+      progression_analysis: '{{ steps.assess_deal_progression.output }}'
+      qualification_scores: '{{ steps.evaluate_qualification_criteria.output }}'
+      risk_assessments: '{{ steps.calculate_risk_scores.output }}'
+      remediation_strategies: '{{ steps.generate_remediation_strategies.output }}'
+      intervention_tasks: '{{ steps.create_intervention_tasks.output }}'
+      assessment_timestamp: '{{ now() }}'
+      user_context: '{{ context }}'
+    retention_days: 2555
+    metadata_capture:
+      business_context: Complete evidence package for deal risk assessment and governance
+      knowledge_tags:
+      - risk_evidence
+      - deal_governance
+      - intervention_tracking
+- id: update_opportunity_risk_scores
+  type: query
+  params:
+    data_source: salesforce
+    query_type: update_risk_scores
+    operation: bulk_update
+    table: opportunities
+    update_data_template: "{% for assessment in steps.calculate_risk_scores.output.deal_assessments\
+      \ %}\n{\n  \"opportunity_id\": \"{{ assessment.opportunity_id }}\",\n  \"risk_score__c\"\
+      : {{ assessment.risk_score }},\n  \"risk_category__c\": \"{{ assessment.risk_category\
+      \ }}\",\n  \"intervention_urgency__c\": \"{{ assessment.intervention_urgency\
+      \ }}\",\n  \"last_risk_assessment__c\": \"{{ now() }}\",\n  \"risk_factors__c\"\
+      : \"{{ assessment.risk_factors | join('; ') }}\"\n}{% if not loop.last %},{%\
+      \ endif %}\n{% endfor %}\n"
+    metadata_capture:
+      business_context: Updated Salesforce opportunities with risk scores
+      knowledge_tags:
+      - crm_updates
+      - risk_tracking
+      - data_sync
+- id: notify_risk_alerts
+  type: notify
+  params:
+    notification_type: deal_risk_assessment
+    channels:
+    - email
+    - slack
+    - mobile_push
+    recipients:
+    - '{{ context.user_email }}'
+    - '{{ context.manager_email }}'
+    template: deal_risk_alert
+    data:
+      user_name: '{{ context.user_name }}'
+      territory: '{{ context.user_territory }}'
+      high_risk_count: '{{ steps.calculate_risk_scores.output.high_risk_count }}'
+      total_at_risk_value: '{{ steps.calculate_risk_scores.output.total_at_risk_value
+        | currency }}'
+      urgent_deals: '{{ steps.calculate_risk_scores.output.urgent_interventions |
+        slice(0, 3) }}'
+      top_risk_factors: '{{ steps.calculate_risk_scores.output.deal_assessments |
+        map(attribute=''risk_factors'') | flatten | unique | slice(0, 5) }}'
+      remediation_summary: '{{ steps.generate_remediation_strategies.output.portfolio_recommendations
+        }}'
+    conditional_alerts:
+    - condition: '{{ steps.calculate_risk_scores.output.high_risk_count > 3 }}'
+      escalation_level: manager
+      message: Multiple high-risk deals requiring immediate attention
+    - condition: '{{ steps.calculate_risk_scores.output.total_at_risk_value > 500000
+        }}'
+      escalation_level: executive
+      message: Significant revenue at risk requiring executive review
+    metadata_capture:
+      business_context: Risk alerts and escalations sent to stakeholders
+      knowledge_tags:
+      - risk_alerts
+      - escalations
+      - stakeholder_notifications
+- id: finalize_risk_assessment
+  type: governance
+  params:
+    policy_id: deal_risk_assessment_policy
+    evidence_required: true
+    action: workflow_complete
+    final_state:
+      status: completed
+      deals_assessed: '{{ steps.fetch_active_opportunities.output | length }}'
+      high_risk_identified: '{{ steps.calculate_risk_scores.output.high_risk_count
+        }}'
+      interventions_created: '{{ steps.create_intervention_tasks.output | length }}'
+      stakeholders_notified: true
+      crm_updated: true
+    metadata_capture:
+      business_context: Deal risk assessment workflow completion with full governance
+      knowledge_tags:
+      - workflow_completion
+      - risk_assessment_done

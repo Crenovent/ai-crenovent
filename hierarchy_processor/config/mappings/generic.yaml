@@ -1,0 +1,191 @@
+metadata:
+  system: "generic"
+  version: "1.0"
+  description: "Generic fallback configuration for unknown HRMS/CRM systems"
+
+detection:
+  required_fields:
+    name: ["name", "full name", "employee name", "user name"]
+    email: ["email", "email address", "work email"]
+    role: ["title", "job title", "role", "position"]
+  unique_indicators: []
+
+fields:
+  Name:
+    patterns: 
+      - "name"
+      - "full name"
+      - "employee name"
+      - "user name"
+      - "display name"
+      - "contact name"
+      - "person name"
+    required: true
+    type: "string"
+  
+  Email:
+    patterns:
+      - "email"
+      - "email address"
+      - "work email"
+      - "business email"
+      - "official email"
+      - "primary email"
+    required: true
+    type: "email"
+  
+  Role Title:
+    patterns:
+      - "title"
+      - "job title"
+      - "role"
+      - "position"
+      - "designation"
+      - "job role"
+    required: false
+    type: "string"
+  
+  Reporting Email:
+    patterns:
+      - "manager email"
+      - "supervisor email"
+      - "reporting email"
+      - "reports to email"
+      - "line manager email"
+      - "boss email"
+    required: false
+    type: "email"
+    hierarchy_priority: 1
+  
+  Reporting Manager Name:
+    patterns:
+      - "manager"
+      - "supervisor"
+      - "reporting manager"
+      - "reports to"
+      - "line manager"
+      - "boss"
+      - "manager name"
+    required: false
+    type: "string"
+    hierarchy_priority: 2
+  
+  Reporting Role Function:
+    patterns:
+      - "manager role"
+      - "supervisor role"
+      - "manager title"
+      - "reporting role"
+    required: false
+    type: "string"
+  
+  Role Function:
+    patterns:
+      - "department"
+      - "function"
+      - "team"
+      - "division"
+      - "business unit"
+      - "group"
+    required: false
+    type: "string"
+  
+  Region:
+    patterns:
+      - "region"
+      - "geographic region"
+      - "sales region"
+      - "market region"
+      - "territory region"
+    required: false
+    type: "string"
+    hierarchy_level: "region"
+  
+  Area:
+    patterns:
+      - "area"
+      - "market area"
+      - "sales area"
+      - "business area"
+      - "zone"
+    required: false
+    type: "string"
+    hierarchy_level: "area"
+  
+  District:
+    patterns:
+      - "district"
+      - "sales district"
+      - "market district"
+    required: false
+    type: "string"
+    hierarchy_level: "district"
+  
+  Territory:
+    patterns:
+      - "territory"
+      - "sales territory"
+      - "market territory"
+      - "assigned territory"
+    required: false
+    type: "string"
+    hierarchy_level: "territory"
+  
+  Segment:
+    patterns:
+      - "segment"
+      - "market segment"
+      - "business segment"
+      - "customer segment"
+    required: false
+    type: "string"
+    hierarchy_level: "segment"
+
+processing_rules:
+  name_combination:
+    enabled: true
+    fields: ["first name", "last name"]
+    separator: " "
+    fallback_patterns:
+      - "given name"
+      - "family name"
+      - "surname"
+  
+  role_mapping:
+    "administrator": "admin"
+    "admin": "admin"
+    "manager": "manager"
+    "supervisor": "manager"
+    "team lead": "manager"
+    "director": "director"
+    "vice president": "vp"
+    "vp": "vp"
+    "president": "executive"
+    "ceo": "executive"
+    "cto": "executive"
+    "cfo": "executive"
+    "coo": "executive"
+    "sales rep": "sales"
+    "sales representative": "sales"
+    "account executive": "sales"
+    "sales person": "sales"
+    "marketer": "marketing"
+    "marketing specialist": "marketing"
+  
+  generic_inference:
+    enabled: true
+    email_domain_mapping:
+      "salesforce.com": "salesforce"
+      "hubspot.com": "hubspot"
+      "zoho.com": "zoho"
+    
+value_mappings:
+  status:
+    "active": "active"
+    "inactive": "inactive"
+    "enabled": "active"
+    "disabled": "inactive"
+    "true": "active"
+    "false": "inactive"
+    "yes": "active"
+    "no": "inactive"

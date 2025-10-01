@@ -1,0 +1,461 @@
+workflow_id: unknown_workflow
+name: Unknown Workflow
+module: Unknown
+automation_type: RBA
+version: 1.0.0
+metadata:
+  description: Continuously tracks and analyzes forecast accuracy patterns to identify
+    improvement opportunities and enhance prediction reliability
+  industry_focus:
+  - SaaS
+  persona_tags:
+  - VP Sales
+  - Sales Manager
+  - Revenue Operations
+  - Finance
+  - CRO
+  business_value: Improves forecast accuracy by 20-30% through systematic analysis
+    of prediction patterns and bias correction
+  customer_impact: Provides data-driven insights for more reliable revenue predictions
+    and improved business planning confidence
+  estimated_time_minutes: 6
+  sla_tier: T1
+  compliance_tags:
+  - Revenue Recognition
+  - Financial Reporting
+  - Forecast Governance
+steps:
+- id: initialize_accuracy_analysis
+  type: governance
+  params:
+    policy_id: forecast_accuracy_policy
+    evidence_required: true
+    action: workflow_start
+    description: Initialize forecast accuracy analysis with financial governance validation
+- id: fetch_historical_forecasts
+  type: query
+  params:
+    data_source: postgres
+    query_type: historical_forecast_data
+    custom_sql: "WITH forecast_submissions AS (\n  SELECT \n    fs.user_id,\n    fs.quarter,\n\
+      \    fs.year,\n    fs.submission_date,\n    fs.forecasted_amount,\n    fs.confidence_level,\n\
+      \    fs.forecast_category,\n    fs.submission_type,\n    ROW_NUMBER() OVER (PARTITION\
+      \ BY fs.user_id, fs.quarter, fs.year ORDER BY fs.submission_date DESC) as latest_rank\n\
+      \  FROM forecast_submissions fs\n  WHERE fs.user_id = $1\n    AND fs.year >=\
+      \ EXTRACT(YEAR FROM CURRENT_DATE) - 2\n),\nactual_results AS (\n  SELECT \n\
+      \    owner_id as user_id,\n    EXTRACT(QUARTER FROM close_date) as quarter,\n\
+      \    EXTRACT(YEAR FROM close_date) as year,\n    SUM(CASE WHEN stage = 'Closed\
+      \ Won' THEN amount ELSE 0 END) as actual_closed_won,\n    COUNT(CASE WHEN stage\
+      \ = 'Closed Won' THEN 1 END) as deals_won,\n    COUNT(*) as total_deals,\n \
+      \   AVG(amount) as avg_deal_size\n  FROM opportunities\n  WHERE owner_id = $1\n\
+      \    AND close_date >= DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '2 years'\n\
+      \    AND close_date < CURRENT_DATE\n    AND stage IN ('Closed Won', 'Closed\
+      \ Lost')\n  GROUP BY owner_id, EXTRACT(QUARTER FROM close_date), EXTRACT(YEAR\
+      \ FROM close_date)\n)\nSELECT \n  fs.user_id,\n  fs.quarter,\n  fs.year,\n \
+      \ fs.submission_date,\n  fs.forecasted_amount,\n  fs.confidence_level,\n  fs.forecast_category,\n\
+      \  ar.actual_closed_won,\n  ar.deals_won,\n  ar.total_deals,\n  ar.avg_deal_size,\n\
+      \  CASE \n    WHEN ar.actual_closed_won > 0 THEN \n      ABS(fs.forecasted_amount\
+      \ - ar.actual_closed_won) / ar.actual_closed_won * 100\n    ELSE 100\n  END\
+      \ as accuracy_error_percentage,\n  CASE \n    WHEN fs.forecasted_amount > ar.actual_closed_won\
+      \ THEN 'OVER_FORECAST'\n    WHEN fs.forecasted_amount < ar.actual_closed_won\
+      \ THEN 'UNDER_FORECAST'\n    ELSE 'ACCURATE'\n  END as forecast_bias,\n  (fs.forecasted_amount\
+      \ - ar.actual_closed_won) as variance_amount\nFROM forecast_submissions fs\n\
+      LEFT JOIN actual_results ar ON fs.user_id = ar.user_id \n  AND fs.quarter =\
+      \ ar.quarter \n  AND fs.year = ar.year\nWHERE fs.latest_rank = 1\n  AND ar.actual_closed_won\
+      \ IS NOT NULL\nORDER BY fs.year DESC, fs.quarter DESC\n"
+    params:
+    - '{{ context.user_id }}'
+    metadata_capture:
+      business_context: Historical forecast vs actual performance for accuracy analysis
+      knowledge_tags:
+      - forecast_history
+      - accuracy_baseline
+      - performance_tracking
+- id: calculate_accuracy_metrics
+  type: query
+  params:
+    data_source: internal
+    query_type: accuracy_calculation
+    algorithm: "def calculate_forecast_accuracy_metrics(historical_data):\n  if not\
+      \ historical_data:\n    return {\"error\": \"No historical forecast data available\"\
+      }\n  \n  # Basic accuracy metrics\n  total_forecasts = len(historical_data)\n\
+      \  accuracy_errors = [h['accuracy_error_percentage'] for h in historical_data\
+      \ if h['accuracy_error_percentage'] is not None]\n  \n  if not accuracy_errors:\n\
+      \    return {\"error\": \"No accuracy data to analyze\"}\n  \n  # Statistical\
+      \ measures\n  mean_accuracy_error = sum(accuracy_errors) / len(accuracy_errors)\n\
+      \  median_accuracy_error = sorted(accuracy_errors)[len(accuracy_errors) // 2]\n\
+      \  \n  # Bias analysis\n  over_forecasts = len([h for h in historical_data if\
+      \ h['forecast_bias'] == 'OVER_FORECAST'])\n  under_forecasts = len([h for h\
+      \ in historical_data if h['forecast_bias'] == 'UNDER_FORECAST'])\n  accurate_forecasts\
+      \ = len([h for h in historical_data if h['forecast_bias'] == 'ACCURATE'])\n\
+      \  \n  # Trend analysis (last 4 quarters vs previous 4)\n  recent_data = historical_data[:4]\
+      \ if len(historical_data) >= 4 else historical_data\n  older_data = historical_data[4:8]\
+      \ if len(historical_data) >= 8 else []\n  \n  recent_avg_error = sum(h['accuracy_error_percentage']\
+      \ for h in recent_data) / len(recent_data) if recent_data else 0\n  older_avg_error\
+      \ = sum(h['accuracy_error_percentage'] for h in older_data) / len(older_data)\
+      \ if older_data else recent_avg_error\n  \n  improvement_trend = older_avg_error\
+      \ - recent_avg_error  # Positive = improving\n  \n  # Accuracy tier classification\n\
+      \  if mean_accuracy_error <= 10:\n    accuracy_tier = \"EXCELLENT\"\n  elif\
+      \ mean_accuracy_error <= 20:\n    accuracy_tier = \"GOOD\"\n  elif mean_accuracy_error\
+      \ <= 35:\n    accuracy_tier = \"FAIR\"\n  else:\n    accuracy_tier = \"POOR\"\
+      \n  \n  # Confidence correlation analysis\n  confidence_correlation = 0\n  if\
+      \ len([h for h in historical_data if h.get('confidence_level')]) > 3:\n    high_conf\
+      \ = [h for h in historical_data if h.get('confidence_level', 0) >= 80]\n   \
+      \ low_conf = [h for h in historical_data if h.get('confidence_level', 0) < 80]\n\
+      \    \n    if high_conf and low_conf:\n      high_conf_avg_error = sum(h['accuracy_error_percentage']\
+      \ for h in high_conf) / len(high_conf)\n      low_conf_avg_error = sum(h['accuracy_error_percentage']\
+      \ for h in low_conf) / len(low_conf)\n      confidence_correlation = low_conf_avg_error\
+      \ - high_conf_avg_error  # Positive = confidence helps\n  \n  # Seasonal pattern\
+      \ detection\n  q1_data = [h for h in historical_data if h['quarter'] == 1]\n\
+      \  q2_data = [h for h in historical_data if h['quarter'] == 2]\n  q3_data =\
+      \ [h for h in historical_data if h['quarter'] == 3]\n  q4_data = [h for h in\
+      \ historical_data if h['quarter'] == 4]\n  \n  seasonal_patterns = {}\n  for\
+      \ q, data in [(\"Q1\", q1_data), (\"Q2\", q2_data), (\"Q3\", q3_data), (\"Q4\"\
+      , q4_data)]:\n    if data:\n      avg_error = sum(d['accuracy_error_percentage']\
+      \ for d in data) / len(data)\n      bias_pattern = max(set([d['forecast_bias']\
+      \ for d in data]), key=[d['forecast_bias'] for d in data].count)\n      seasonal_patterns[q]\
+      \ = {\n        \"avg_error\": avg_error,\n        \"dominant_bias\": bias_pattern,\n\
+      \        \"sample_size\": len(data)\n      }\n  \n  return {\n    \"overall_metrics\"\
+      : {\n      \"total_forecasts_analyzed\": total_forecasts,\n      \"mean_accuracy_error\"\
+      : round(mean_accuracy_error, 2),\n      \"median_accuracy_error\": round(median_accuracy_error,\
+      \ 2),\n      \"accuracy_tier\": accuracy_tier,\n      \"improvement_trend\"\
+      : round(improvement_trend, 2)\n    },\n    \"bias_analysis\": {\n      \"over_forecast_rate\"\
+      : round(over_forecasts / total_forecasts * 100, 1),\n      \"under_forecast_rate\"\
+      : round(under_forecasts / total_forecasts * 100, 1),\n      \"accurate_forecast_rate\"\
+      : round(accurate_forecasts / total_forecasts * 100, 1),\n      \"dominant_bias\"\
+      : \"OVER_FORECAST\" if over_forecasts > under_forecasts else \"UNDER_FORECAST\"\
+      \ if under_forecasts > over_forecasts else \"BALANCED\"\n    },\n    \"confidence_analysis\"\
+      : {\n      \"confidence_correlation\": round(confidence_correlation, 2),\n \
+      \     \"confidence_helps_accuracy\": confidence_correlation > 5\n    },\n  \
+      \  \"seasonal_patterns\": seasonal_patterns,\n    \"recent_performance\": {\n\
+      \      \"recent_avg_error\": round(recent_avg_error, 2),\n      \"is_improving\"\
+      : improvement_trend > 0,\n      \"quarters_analyzed\": len(recent_data)\n  \
+      \  }\n  }\n\nreturn calculate_forecast_accuracy_metrics({{ steps.fetch_historical_forecasts.output\
+      \ }})\n"
+    metadata_capture:
+      business_context: Comprehensive accuracy metrics and pattern analysis
+      knowledge_tags:
+      - accuracy_metrics
+      - bias_patterns
+      - trend_analysis
+- id:  _against_peers
+  type: query
+  params:
+    data_source: postgres
+    query_type: peer_benchmarking
+    custom_sql: "WITH user_segment AS (\n  SELECT segment, territory, role_function\n\
+      \  FROM users \n  WHERE user_id = $1\n),\npeer_accuracy AS (\n  SELECT \n  \
+      \  u.user_id,\n    u.segment,\n    u.territory,\n    u.role_function,\n    AVG(CASE\
+      \ \n      WHEN ar.actual_closed_won > 0 THEN \n        ABS(fs.forecasted_amount\
+      \ - ar.actual_closed_won) / ar.actual_closed_won * 100\n      ELSE NULL \n \
+      \   END) as avg_accuracy_error\n  FROM users u\n  JOIN forecast_submissions\
+      \ fs ON u.user_id = fs.user_id\n  JOIN (\n    SELECT \n      owner_id as user_id,\n\
+      \      EXTRACT(QUARTER FROM close_date) as quarter,\n      EXTRACT(YEAR FROM\
+      \ close_date) as year,\n      SUM(CASE WHEN stage = 'Closed Won' THEN amount\
+      \ ELSE 0 END) as actual_closed_won\n    FROM opportunities\n    WHERE close_date\
+      \ >= CURRENT_DATE - INTERVAL '1 year'\n      AND stage IN ('Closed Won', 'Closed\
+      \ Lost')\n    GROUP BY owner_id, EXTRACT(QUARTER FROM close_date), EXTRACT(YEAR\
+      \ FROM close_date)\n  ) ar ON fs.user_id = ar.user_id AND fs.quarter = ar.quarter\
+      \ AND fs.year = ar.year\n  WHERE fs.submission_date >= CURRENT_DATE - INTERVAL\
+      \ '1 year'\n    AND ar.actual_closed_won > 0\n  GROUP BY u.user_id, u.segment,\
+      \ u.territory, u.role_function\n  HAVING COUNT(*) >= 2  -- Minimum forecasts\
+      \ for valid comparison\n),\nbenchmarks AS (\n  SELECT \n    'same_segment' as\
+      \ benchmark_type,\n    AVG(avg_accuracy_error) as benchmark_avg_error,\n   \
+      \ PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY avg_accuracy_error) as p25_error,\n\
+      \    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY avg_accuracy_error) as p50_error,\n\
+      \    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY avg_accuracy_error) as p75_error,\n\
+      \    COUNT(*) as peer_count\n  FROM peer_accuracy pa\n  JOIN user_segment us\
+      \ ON pa.segment = us.segment\n  WHERE pa.user_id != $1\n  \n  UNION ALL\n  \n\
+      \  SELECT \n    'same_territory' as benchmark_type,\n    AVG(avg_accuracy_error)\
+      \ as benchmark_avg_error,\n    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY\
+      \ avg_accuracy_error) as p25_error,\n    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER\
+      \ BY avg_accuracy_error) as p50_error,\n    PERCENTILE_CONT(0.75) WITHIN GROUP\
+      \ (ORDER BY avg_accuracy_error) as p75_error,\n    COUNT(*) as peer_count\n\
+      \  FROM peer_accuracy pa\n  JOIN user_segment us ON pa.territory = us.territory\n\
+      \  WHERE pa.user_id != $1\n  \n  UNION ALL\n  \n  SELECT \n    'same_role' as\
+      \ benchmark_type,\n    AVG(avg_accuracy_error) as benchmark_avg_error,\n   \
+      \ PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY avg_accuracy_error) as p25_error,\n\
+      \    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY avg_accuracy_error) as p50_error,\n\
+      \    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY avg_accuracy_error) as p75_error,\n\
+      \    COUNT(*) as peer_count\n  FROM peer_accuracy pa\n  JOIN user_segment us\
+      \ ON pa.role_function = us.role_function\n  WHERE pa.user_id != $1\n)\nSELECT\
+      \ * FROM benchmarks\n"
+    params:
+    - '{{ context.user_id }}'
+    metadata_capture:
+      business_context: Peer benchmarking analysis for forecast accuracy comparison
+      knowledge_tags:
+      - peer_benchmarks
+      - competitive_analysis
+      - performance_ranking
+- id: identify_accuracy_patterns
+  type: query
+  params:
+    data_source: internal
+    query_type: pattern_identification
+    algorithm: "def identify_forecast_patterns(historical_data, accuracy_metrics,\
+      \ benchmarks):\n  patterns = []\n  recommendations = []\n  \n  # Pattern 1:\
+      \ Consistent bias direction\n  bias_analysis = accuracy_metrics.get('bias_analysis',\
+      \ {})\n  dominant_bias = bias_analysis.get('dominant_bias', 'BALANCED')\n  \n\
+      \  if dominant_bias != 'BALANCED':\n    bias_rate = bias_analysis.get('over_forecast_rate',\
+      \ 0) if dominant_bias == 'OVER_FORECAST' else bias_analysis.get('under_forecast_rate',\
+      \ 0)\n    if bias_rate > 60:\n      patterns.append({\n        \"pattern_type\"\
+      : \"SYSTEMATIC_BIAS\",\n        \"description\": f\"Consistent {dominant_bias.lower().replace('_',\
+      \ ' ')} pattern ({bias_rate}% of forecasts)\",\n        \"severity\": \"HIGH\"\
+      \ if bias_rate > 75 else \"MEDIUM\",\n        \"business_impact\": \"Predictable\
+      \ forecast errors affecting business planning\"\n      })\n      recommendations.append({\n\
+      \        \"recommendation\": f\"Apply systematic {'-10%' if dominant_bias ==\
+      \ 'OVER_FORECAST' else '+10%'} adjustment to future forecasts\",\n        \"\
+      priority\": \"HIGH\",\n        \"implementation\": \"immediate\"\n      })\n\
+      \  \n  # Pattern 2: Seasonal accuracy variations\n  seasonal_patterns = accuracy_metrics.get('seasonal_patterns',\
+      \ {})\n  if len(seasonal_patterns) >= 3:\n    errors_by_quarter = [(q, data['avg_error'])\
+      \ for q, data in seasonal_patterns.items() if data.get('sample_size', 0) >=\
+      \ 2]\n    if errors_by_quarter:\n      worst_quarter = max(errors_by_quarter,\
+      \ key=lambda x: x[1])\n      best_quarter = min(errors_by_quarter, key=lambda\
+      \ x: x[1])\n      \n      if worst_quarter[1] - best_quarter[1] > 15:  # 15%\
+      \ difference\n        patterns.append({\n          \"pattern_type\": \"SEASONAL_VARIATION\"\
+      ,\n          \"description\": f\"{worst_quarter[0]} consistently {worst_quarter[1]:.1f}%\
+      \ error vs {best_quarter[0]} at {best_quarter[1]:.1f}%\",\n          \"severity\"\
+      : \"MEDIUM\",\n          \"business_impact\": \"Seasonal forecast reliability\
+      \ issues\"\n        })\n        recommendations.append({\n          \"recommendation\"\
+      : f\"Implement quarter-specific forecasting adjustments, especially for {worst_quarter[0]}\"\
+      ,\n          \"priority\": \"MEDIUM\",\n          \"implementation\": \"next_quarter\"\
+      \n        })\n  \n  # Pattern 3: Accuracy trend analysis\n  recent_performance\
+      \ = accuracy_metrics.get('recent_performance', {})\n  is_improving = recent_performance.get('is_improving',\
+      \ False)\n  improvement_trend = accuracy_metrics.get('overall_metrics', {}).get('improvement_trend',\
+      \ 0)\n  \n  if abs(improvement_trend) > 5:  # Significant trend\n    if is_improving:\n\
+      \      patterns.append({\n        \"pattern_type\": \"IMPROVING_ACCURACY\",\n\
+      \        \"description\": f\"Accuracy improving by {improvement_trend:.1f}%\
+      \ over recent quarters\",\n        \"severity\": \"POSITIVE\",\n        \"business_impact\"\
+      : \"Increasing forecast reliability\"\n      })\n    else:\n      patterns.append({\n\
+      \        \"pattern_type\": \"DECLINING_ACCURACY\",\n        \"description\"\
+      : f\"Accuracy declining by {abs(improvement_trend):.1f}% over recent quarters\"\
+      ,\n        \"severity\": \"HIGH\",\n        \"business_impact\": \"Decreasing\
+      \ forecast reliability affecting business confidence\"\n      })\n      recommendations.append({\n\
+      \        \"recommendation\": \"Immediate review of forecasting methodology and\
+      \ process\",\n        \"priority\": \"URGENT\",\n        \"implementation\"\
+      : \"immediate\"\n      })\n  \n  # Pattern 4: Confidence calibration\n  confidence_analysis\
+      \ = accuracy_metrics.get('confidence_analysis', {})\n  confidence_helps = confidence_analysis.get('confidence_helps_accuracy',\
+      \ False)\n  confidence_correlation = confidence_analysis.get('confidence_correlation',\
+      \ 0)\n  \n  if abs(confidence_correlation) > 5:\n    if confidence_helps:\n\
+      \      patterns.append({\n        \"pattern_type\": \"GOOD_CONFIDENCE_CALIBRATION\"\
+      ,\n        \"description\": f\"Higher confidence correlates with {confidence_correlation:.1f}%\
+      \ better accuracy\",\n        \"severity\": \"POSITIVE\",\n        \"business_impact\"\
+      : \"Reliable confidence assessment\"\n      })\n    else:\n      patterns.append({\n\
+      \        \"pattern_type\": \"POOR_CONFIDENCE_CALIBRATION\",\n        \"description\"\
+      : f\"Confidence levels not predictive of accuracy\",\n        \"severity\":\
+      \ \"MEDIUM\",\n        \"business_impact\": \"Overconfidence in unreliable forecasts\"\
+      \n      })\n      recommendations.append({\n        \"recommendation\": \"Recalibrate\
+      \ confidence assessment criteria and training\",\n        \"priority\": \"MEDIUM\"\
+      ,\n        \"implementation\": \"next_month\"\n      })\n  \n  # Pattern 5:\
+      \ Peer comparison insights\n  segment_benchmark = next((b for b in benchmarks\
+      \ if b['benchmark_type'] == 'same_segment'), {})\n  user_accuracy = accuracy_metrics.get('overall_metrics',\
+      \ {}).get('mean_accuracy_error', 100)\n  \n  if segment_benchmark:\n    peer_median\
+      \ = segment_benchmark.get('p50_error', user_accuracy)\n    if user_accuracy\
+      \ > peer_median * 1.2:  # 20% worse than peers\n      patterns.append({\n  \
+      \      \"pattern_type\": \"BELOW_PEER_PERFORMANCE\",\n        \"description\"\
+      : f\"Accuracy {((user_accuracy - peer_median) / peer_median * 100):.1f}% worse\
+      \ than segment peers\",\n        \"severity\": \"HIGH\",\n        \"business_impact\"\
+      : \"Underperforming relative to comparable sellers\"\n      })\n      recommendations.append({\n\
+      \        \"recommendation\": \"Analyze best practices from top-performing peers\
+      \ in segment\",\n        \"priority\": \"HIGH\",\n        \"implementation\"\
+      : \"next_month\"\n      })\n    elif user_accuracy < peer_median * 0.8:  # 20%\
+      \ better than peers\n      patterns.append({\n        \"pattern_type\": \"ABOVE_PEER_PERFORMANCE\"\
+      ,\n        \"description\": f\"Accuracy {((peer_median - user_accuracy) / peer_median\
+      \ * 100):.1f}% better than segment peers\",\n        \"severity\": \"POSITIVE\"\
+      ,\n        \"business_impact\": \"Strong forecasting performance for knowledge\
+      \ sharing\"\n      })\n  \n  return {\n    \"identified_patterns\": patterns,\n\
+      \    \"recommendations\": recommendations,\n    \"pattern_count\": len(patterns),\n\
+      \    \"critical_issues\": len([p for p in patterns if p['severity'] == 'HIGH']),\n\
+      \    \"positive_patterns\": len([p for p in patterns if p['severity'] == 'POSITIVE'])\n\
+      \  }\n\nreturn identify_forecast_patterns(\n  {{ steps.fetch_historical_forecasts.output\
+      \ }},\n  {{ steps.calculate_accuracy_metrics.output }},\n  {{ steps.benchmark_against_peers.output\
+      \ }}\n)\n"
+    metadata_capture:
+      business_context: Pattern identification and improvement recommendations
+      knowledge_tags:
+      - pattern_analysis
+      - improvement_opportunities
+      - best_practices
+- id: generate_accuracy_insights
+  type: agent_call
+  params:
+    agent_id: forecast_accuracy_advisor
+    task: Generate strategic insights for forecast accuracy improvement
+    input_data:
+      historical_data: '{{ steps.fetch_historical_forecasts.output }}'
+      accuracy_metrics: '{{ steps.calculate_accuracy_metrics.output }}'
+      benchmarks: '{{ steps.benchmark_against_peers.output }}'
+      patterns: '{{ steps.identify_accuracy_patterns.output }}'
+      user_context: '{{ context }}'
+    prompt_template: "You are a Revenue Operations expert specializing in forecast\
+      \ accuracy optimization.\n\nHISTORICAL PERFORMANCE:\n{historical_data}\n\nACCURACY\
+      \ METRICS:\n{accuracy_metrics}\n\nPEER BENCHMARKS:\n{benchmarks}\n\nIDENTIFIED\
+      \ PATTERNS:\n{patterns}\n\nGenerate comprehensive insights in this JSON format:\n\
+      {{\n  \"executive_summary\": {{\n    \"current_accuracy_grade\": \"A|B|C|D|F\"\
+      ,\n    \"key_finding\": \"primary_insight\",\n    \"urgency_level\": \"LOW|MEDIUM|HIGH|CRITICAL\"\
+      ,\n    \"improvement_potential\": \"percentage_improvement_possible\"\n  }},\n\
+      \  \"detailed_analysis\": {{\n    \"strengths\": [\"strength1\", \"strength2\"\
+      ],\n    \"weaknesses\": [\"weakness1\", \"weakness2\"],\n    \"root_causes\"\
+      : [\"cause1\", \"cause2\"],\n    \"business_impact\": \"impact_description\"\
+      \n  }},\n  \"improvement_roadmap\": {{\n    \"immediate_actions\": [\n     \
+      \ {{\n        \"action\": \"action_description\",\n        \"timeline\": \"\
+      days/weeks\",\n        \"expected_impact\": \"percentage\",\n        \"difficulty\"\
+      : \"LOW|MEDIUM|HIGH\"\n      }}\n    ],\n    \"strategic_initiatives\": [\n\
+      \      {{\n        \"initiative\": \"initiative_description\",\n        \"timeline\"\
+      : \"months\",\n        \"expected_impact\": \"percentage\",\n        \"resource_requirements\"\
+      : \"requirements\"\n      }}\n    ]\n  }},\n  \"best_practices\": {{\n    \"\
+      process_improvements\": [\"improvement1\", \"improvement2\"],\n    \"tool_recommendations\"\
+      : [\"tool1\", \"tool2\"],\n    \"training_needs\": [\"training1\", \"training2\"\
+      ]\n  }},\n  \"success_metrics\": {{\n    \"target_accuracy_improvement\": \"\
+      percentage\",\n    \"measurement_frequency\": \"frequency\",\n    \"leading_indicators\"\
+      : [\"indicator1\", \"indicator2\"]\n  }},\n  \"quarterly_goals\": {{\n    \"\
+      Q1\": \"goal_description\",\n    \"Q2\": \"goal_description\", \n    \"Q3\"\
+      : \"goal_description\",\n    \"Q4\": \"goal_description\"\n  }}\n}}\n"
+    metadata_capture:
+      business_context: AI-generated strategic insights for forecast accuracy improvement
+      knowledge_tags:
+      - strategic_insights
+      - improvement_roadmap
+      - best_practices
+- id: create_accuracy_improvement_plan
+  type: query
+  params:
+    data_source: postgres
+    query_type: create_improvement_plan
+    operation: insert
+    table: forecast_improvement_plans
+    data:
+      user_id: '{{ context.user_id }}'
+      plan_id: '{{ uuid() }}'
+      created_at: '{{ now() }}'
+      current_accuracy_metrics: '{{ steps.calculate_accuracy_metrics.output }}'
+      identified_patterns: '{{ steps.identify_accuracy_patterns.output }}'
+      peer_benchmarks: '{{ steps.benchmark_against_peers.output }}'
+      improvement_insights: '{{ steps.generate_accuracy_insights.output }}'
+      plan_status: active
+      target_accuracy_improvement: '{{ steps.generate_accuracy_insights.output.success_metrics.target_accuracy_improvement
+        }}'
+      review_date: '{{ now() | add_days(90) }}'
+    metadata_capture:
+      business_context: Created structured accuracy improvement plan
+      knowledge_tags:
+      - improvement_plan
+      - accuracy_targets
+      - action_tracking
+- id: capture_accuracy_evidence
+  type: governance
+  params:
+    policy_id: forecast_accuracy_policy
+    evidence_required: true
+    action: capture_evidence
+    evidence_data:
+      historical_forecasts: '{{ steps.fetch_historical_forecasts.output }}'
+      accuracy_metrics: '{{ steps.calculate_accuracy_metrics.output }}'
+      peer_benchmarks: '{{ steps.benchmark_against_peers.output }}'
+      pattern_analysis: '{{ steps.identify_accuracy_patterns.output }}'
+      strategic_insights: '{{ steps.generate_accuracy_insights.output }}'
+      improvement_plan: '{{ steps.create_accuracy_improvement_plan.output }}'
+      analysis_timestamp: '{{ now() }}'
+      user_context: '{{ context }}'
+    retention_days: 2555
+    metadata_capture:
+      business_context: Complete evidence package for forecast accuracy analysis
+      knowledge_tags:
+      - accuracy_evidence
+      - financial_compliance
+      - performance_tracking
+- id: schedule_accuracy_reviews
+  type: query
+  params:
+    data_source: postgres
+    query_type: schedule_reviews
+    operation: insert
+    table: scheduled_tasks
+    data:
+    - task_type: forecast_accuracy_review
+      description: Monthly forecast accuracy review and calibration
+      due_date: '{{ now() | add_days(30) }}'
+      assigned_to: '{{ context.user_id }}'
+      priority: medium
+      recurring: true
+      recurrence_pattern: monthly
+      created_by_workflow: forecast_accuracy_rba
+    - task_type: peer_benchmark_analysis
+      description: Quarterly peer benchmark comparison
+      due_date: '{{ now() | add_days(90) }}'
+      assigned_to: '{{ context.user_id }}'
+      priority: medium
+      recurring: true
+      recurrence_pattern: quarterly
+      created_by_workflow: forecast_accuracy_rba
+    metadata_capture:
+      business_context: Scheduled recurring accuracy review activities
+      knowledge_tags:
+      - review_scheduling
+      - continuous_improvement
+      - performance_monitoring
+- id: notify_accuracy_results
+  type: notify
+  params:
+    notification_type: forecast_accuracy_analysis
+    channels:
+    - email
+    - dashboard
+    - slack
+    recipients:
+    - '{{ context.user_email }}'
+    - '{{ context.manager_email }}'
+    - finance_team@company.com
+    template: forecast_accuracy_report
+    data:
+      user_name: '{{ context.user_name }}'
+      accuracy_grade: '{{ steps.generate_accuracy_insights.output.executive_summary.current_accuracy_grade
+        }}'
+      accuracy_tier: '{{ steps.calculate_accuracy_metrics.output.overall_metrics.accuracy_tier
+        }}'
+      mean_error: '{{ steps.calculate_accuracy_metrics.output.overall_metrics.mean_accuracy_error
+        }}%'
+      improvement_trend: '{{ steps.calculate_accuracy_metrics.output.overall_metrics.improvement_trend
+        }}%'
+      dominant_bias: '{{ steps.calculate_accuracy_metrics.output.bias_analysis.dominant_bias
+        }}'
+      peer_comparison: '{{ steps.benchmark_against_peers.output }}'
+      key_patterns: '{{ steps.identify_accuracy_patterns.output.identified_patterns
+        | slice(0, 3) }}'
+      top_recommendations: '{{ steps.generate_accuracy_insights.output.improvement_roadmap.immediate_actions
+        | slice(0, 3) }}'
+      next_review: '{{ now() | add_days(30) | date }}'
+    attachments:
+    - type: json
+      name: detailed_accuracy_analysis.json
+      data: '{{ steps.calculate_accuracy_metrics.output }}'
+    - type: csv
+      name: historical_forecast_data.csv
+      data: '{{ steps.fetch_historical_forecasts.output }}'
+    metadata_capture:
+      business_context: Accuracy analysis results shared with stakeholders
+      knowledge_tags:
+      - results_sharing
+      - stakeholder_communication
+- id: finalize_accuracy_analysis
+  type: governance
+  params:
+    policy_id: forecast_accuracy_policy
+    evidence_required: true
+    action: workflow_complete
+    final_state:
+      status: completed
+      forecasts_analyzed: '{{ steps.fetch_historical_forecasts.output | length }}'
+      accuracy_tier: '{{ steps.calculate_accuracy_metrics.output.overall_metrics.accuracy_tier
+        }}'
+      patterns_identified: '{{ steps.identify_accuracy_patterns.output.pattern_count
+        }}'
+      improvement_plan_created: true
+      stakeholders_notified: true
+      reviews_scheduled: true
+    metadata_capture:
+      business_context: Forecast accuracy analysis workflow completion
+      knowledge_tags:
+      - workflow_completion
+      - accuracy_analysis_done

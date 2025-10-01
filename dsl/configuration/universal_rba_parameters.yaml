@@ -1,0 +1,769 @@
+# Universal RBA Parameter System
+# =============================
+# Comprehensive parameter set covering ALL RBA agents with 100+ configurable factors
+# Each agent selectively uses relevant parameters based on its workflow requirements
+
+universal_rba_parameters:
+  version: "1.0.0"
+  description: "Universal parameter system for all RBA agents - each agent uses relevant subset"
+  
+  # ===========================================
+  # SECTION 1: DEAL VALUE & FINANCIAL METRICS
+  # ===========================================
+  deal_value_parameters:
+    # Core value thresholds
+    high_value_threshold:
+      type: "currency"
+      default: 250000
+      min: 10000
+      description: "Minimum amount for high-value deal classification"
+      ui_component: "currency_input"
+      relevant_agents: ["sandbagging_detection", "deal_risk_scoring", "deals_at_risk", "forecast_alignment"]
+      
+    mega_deal_threshold:
+      type: "currency" 
+      default: 1000000
+      min: 100000
+      description: "Threshold for mega deals requiring special attention"
+      ui_component: "currency_input"
+      relevant_agents: ["sandbagging_detection", "deal_risk_scoring", "quarter_end_dumping"]
+      
+    low_value_threshold:
+      type: "currency"
+      default: 10000
+      min: 1000
+      description: "Minimum viable deal value"
+      ui_component: "currency_input"
+      relevant_agents: ["duplicate_detection", "stale_deals", "ownerless_deals"]
+      
+    enterprise_deal_threshold:
+      type: "currency"
+      default: 500000
+      min: 50000
+      description: "Enterprise deal classification threshold"
+      ui_component: "currency_input"
+      relevant_agents: ["sandbagging_detection", "stage_velocity", "coverage_analysis"]
+      
+    smb_deal_threshold:
+      type: "currency"
+      default: 50000
+      min: 5000
+      description: "SMB deal classification threshold"
+      ui_component: "currency_input"
+      relevant_agents: ["stage_velocity", "conversion_rate", "activity_tracking"]
+
+  # ===========================================
+  # SECTION 2: PROBABILITY & CONFIDENCE METRICS
+  # ===========================================
+  probability_parameters:
+    # Core probability thresholds
+    low_probability_threshold:
+      type: "percentage"
+      default: 35
+      min: 0
+      description: "Threshold for low probability deals"
+      ui_component: "slider"
+      relevant_agents: ["sandbagging_detection", "forecast_alignment", "deals_at_risk"]
+      
+    high_probability_threshold:
+      type: "percentage"
+      default: 80
+      min: 50
+      description: "Threshold for high confidence deals"
+      ui_component: "slider"
+      relevant_agents: ["forecast_alignment", "quarter_end_dumping", "conversion_rate"]
+      
+    confidence_threshold:
+      type: "percentage"
+      default: 70
+      min: 0
+      description: "Minimum confidence for flagging issues"
+      ui_component: "slider"
+      relevant_agents: ["sandbagging_detection", "deal_risk_scoring", "duplicate_detection"]
+      
+    sandbagging_threshold:
+      type: "percentage"
+      default: 65
+      min: 0
+      description: "Threshold for sandbagging detection scoring"
+      ui_component: "slider"
+      relevant_agents: ["sandbagging_detection"]
+      
+    forecast_accuracy_threshold:
+      type: "percentage"
+      default: 85
+      min: 60
+      description: "Expected forecast accuracy baseline"
+      ui_component: "slider"
+      relevant_agents: ["forecast_alignment", "health_overview"]
+
+  # ===========================================
+  # SECTION 3: TIME & VELOCITY PARAMETERS
+  # ===========================================
+  time_parameters:
+    # Stage velocity thresholds (days)
+    prospecting_stage_days:
+      type: "int"
+      default: 14
+      min: 1
+      description: "Expected days in prospecting stage"
+      ui_component: "input"
+      relevant_agents: ["stage_velocity", "stale_deals", "activity_tracking"]
+      
+    qualification_stage_days:
+      type: "int"
+      default: 21
+      min: 1
+      description: "Expected days in qualification stage"
+      ui_component: "input"
+      relevant_agents: ["stage_velocity", "stale_deals"]
+      
+    discovery_stage_days:
+      type: "int"
+      default: 30
+      min: 1
+      description: "Expected days in discovery/needs analysis stage"
+      ui_component: "input"
+      relevant_agents: ["stage_velocity", "stale_deals"]
+      
+    proposal_stage_days:
+      type: "int"
+      default: 21
+      min: 1
+      description: "Expected days in proposal/quote stage"
+      ui_component: "input"
+      relevant_agents: ["stage_velocity", "stale_deals", "quarter_end_dumping"]
+      
+    negotiation_stage_days:
+      type: "int"
+      default: 14
+      min: 1
+      description: "Expected days in negotiation stage"
+      ui_component: "input"
+      relevant_agents: ["stage_velocity", "deals_at_risk"]
+      
+    contract_stage_days:
+      type: "int"
+      default: 7
+      min: 1
+      description: "Expected days in contract/closing stage"
+      ui_component: "input"
+      relevant_agents: ["stage_velocity", "quarter_end_dumping"]
+      
+    # Staleness thresholds
+    stale_deal_threshold:
+      type: "int"
+      default: 90
+      min: 30
+      description: "Days without activity to consider deal stale"
+      ui_component: "input"
+      relevant_agents: ["stale_deals", "activity_tracking", "deals_at_risk"]
+      
+    inactive_deal_threshold:
+      type: "int"
+      default: 180
+      min: 60
+      description: "Days to consider deal completely inactive"
+      ui_component: "input"
+      relevant_agents: ["stale_deals", "health_overview"]
+      
+    # Velocity multipliers
+    slow_velocity_multiplier:
+      type: "float"
+      default: 1.5
+      min: 1.1
+      description: "Multiplier to identify slow-moving deals"
+      ui_component: "slider"
+      relevant_agents: ["stage_velocity", "deals_at_risk"]
+      
+    fast_velocity_multiplier:
+      type: "float"
+      default: 0.7
+      min: 0.1
+      description: "Multiplier to identify fast-moving deals"
+      ui_component: "slider"
+      relevant_agents: ["stage_velocity", "quarter_end_dumping"]
+
+  # ===========================================
+  # SECTION 4: DATA QUALITY PARAMETERS
+  # ===========================================
+  data_quality_parameters:
+    # Compliance thresholds
+    compliance_threshold:
+      type: "percentage"
+      default: 95
+      min: 80
+      description: "Minimum data quality compliance rate"
+      ui_component: "slider"
+      relevant_agents: ["missing_fields", "data_quality", "ownerless_deals"]
+      
+    critical_compliance_threshold:
+      type: "percentage"
+      default: 98
+      min: 90
+      description: "Critical fields compliance requirement"
+      ui_component: "slider"
+      relevant_agents: ["missing_fields", "data_quality"]
+      
+    # Required fields configuration
+    required_fields_count:
+      type: "int"
+      default: 8
+      min: 3
+      description: "Minimum number of required fields"
+      ui_component: "input"
+      relevant_agents: ["missing_fields", "data_quality"]
+      
+    critical_fields_count:
+      type: "int"
+      default: 5
+      min: 2
+      description: "Number of critical fields that must be populated"
+      ui_component: "input"
+      relevant_agents: ["missing_fields", "data_quality"]
+
+  # ===========================================
+  # SECTION 5: ACTIVITY & ENGAGEMENT PARAMETERS
+  # ===========================================
+  activity_parameters:
+    # Activity frequency requirements
+    minimum_activities_per_week:
+      type: "int"
+      default: 2
+      min: 1
+      description: "Minimum activities per week for active deals"
+      ui_component: "input"
+      relevant_agents: ["activity_tracking", "stale_deals", "deals_at_risk"]
+      
+    high_touch_activities_per_week:
+      type: "int"
+      default: 5
+      min: 2
+      description: "Activities per week for high-value deals"
+      ui_component: "input"
+      relevant_agents: ["activity_tracking", "sandbagging_detection"]
+      
+    # Activity types weighting
+    call_activity_weight:
+      type: "float"
+      default: 1.0
+      min: 0.1
+      description: "Weight for call activities in scoring"
+      ui_component: "slider"
+      relevant_agents: ["activity_tracking", "deals_at_risk"]
+      
+    meeting_activity_weight:
+      type: "float"
+      default: 2.0
+      min: 0.5
+      description: "Weight for meeting activities in scoring"
+      ui_component: "slider"
+      relevant_agents: ["activity_tracking", "stage_velocity"]
+      
+    email_activity_weight:
+      type: "float"
+      default: 0.5
+      min: 0.1
+      description: "Weight for email activities in scoring"
+      ui_component: "slider"
+      relevant_agents: ["activity_tracking"]
+      
+    demo_activity_weight:
+      type: "float"
+      default: 3.0
+      min: 1.0
+      description: "Weight for demo/presentation activities"
+      ui_component: "slider"
+      relevant_agents: ["activity_tracking", "stage_velocity"]
+
+  # ===========================================
+  # SECTION 6: RISK ASSESSMENT PARAMETERS
+  # ===========================================
+  risk_parameters:
+    # Risk scoring thresholds
+    high_risk_threshold:
+      type: "percentage"
+      default: 75
+      min: 50
+      description: "Threshold for high-risk deal classification"
+      ui_component: "slider"
+      relevant_agents: ["deal_risk_scoring", "deals_at_risk", "sandbagging_detection"]
+      
+    medium_risk_threshold:
+      type: "percentage"
+      default: 50
+      min: 25
+      description: "Threshold for medium-risk deal classification"
+      ui_component: "slider"
+      relevant_agents: ["deal_risk_scoring", "deals_at_risk"]
+      
+    low_risk_threshold:
+      type: "percentage"
+      default: 25
+      min: 0
+      description: "Threshold for low-risk deal classification"
+      ui_component: "slider"
+      relevant_agents: ["deal_risk_scoring"]
+      
+    # Risk factor weights
+    stage_risk_weight:
+      type: "float"
+      default: 0.3
+      min: 0.0
+      description: "Weight of stage progression in risk scoring"
+      ui_component: "slider"
+      relevant_agents: ["deal_risk_scoring", "stage_velocity"]
+      
+    activity_risk_weight:
+      type: "float"
+      default: 0.25
+      min: 0.0
+      description: "Weight of activity patterns in risk scoring"
+      ui_component: "slider"
+      relevant_agents: ["deal_risk_scoring", "activity_tracking"]
+      
+    timeline_risk_weight:
+      type: "float"
+      default: 0.25
+      min: 0.0
+      description: "Weight of timeline factors in risk scoring"
+      ui_component: "slider"
+      relevant_agents: ["deal_risk_scoring", "quarter_end_dumping"]
+      
+    value_risk_weight:
+      type: "float"
+      default: 0.2
+      min: 0.0
+      description: "Weight of deal value in risk scoring"
+      ui_component: "slider"
+      relevant_agents: ["deal_risk_scoring", "sandbagging_detection"]
+
+  # ===========================================
+  # SECTION 7: FORECAST & COVERAGE PARAMETERS
+  # ===========================================
+  forecast_parameters:
+    # Coverage ratios
+    pipeline_coverage_ratio:
+      type: "float"
+      default: 3.0
+      min: 1.5
+      description: "Required pipeline coverage ratio"
+      ui_component: "slider"
+      relevant_agents: ["coverage_analysis", "forecast_alignment", "health_overview"]
+      
+    commit_coverage_ratio:
+      type: "float"
+      default: 1.2
+      min: 1.0
+      description: "Required coverage for committed forecast"
+      ui_component: "slider"
+      relevant_agents: ["coverage_analysis", "forecast_alignment"]
+      
+    best_case_coverage_ratio:
+      type: "float"
+      default: 0.8
+      min: 0.5
+      description: "Coverage ratio for best case scenarios"
+      ui_component: "slider"
+      relevant_agents: ["coverage_analysis", "forecast_alignment"]
+      
+    # Forecast accuracy targets
+    forecast_accuracy_target:
+      type: "percentage"
+      default: 85
+      min: 70
+      description: "Target forecast accuracy percentage"
+      ui_component: "slider"
+      relevant_agents: ["forecast_alignment", "health_overview"]
+      
+    commit_accuracy_target:
+      type: "percentage"
+      default: 90
+      min: 80
+      description: "Target accuracy for committed deals"
+      ui_component: "slider"
+      relevant_agents: ["forecast_alignment"]
+
+  # ===========================================
+  # SECTION 8: DUPLICATE DETECTION PARAMETERS
+  # ===========================================
+  duplicate_parameters:
+    # Similarity thresholds
+    name_similarity_threshold:
+      type: "percentage"
+      default: 85
+      min: 60
+      description: "Threshold for name similarity matching"
+      ui_component: "slider"
+      relevant_agents: ["duplicate_detection"]
+      
+    account_similarity_threshold:
+      type: "percentage"
+      default: 90
+      min: 70
+      description: "Threshold for account similarity matching"
+      ui_component: "slider"
+      relevant_agents: ["duplicate_detection"]
+      
+    amount_variance_threshold:
+      type: "percentage"
+      default: 10
+      min: 0
+      description: "Acceptable variance in deal amounts for duplicates"
+      ui_component: "slider"
+      relevant_agents: ["duplicate_detection"]
+      
+    close_date_variance_days:
+      type: "int"
+      default: 30
+      min: 7
+      description: "Acceptable variance in close dates (days)"
+      ui_component: "input"
+      relevant_agents: ["duplicate_detection"]
+
+  # ===========================================
+  # SECTION 9: QUARTER-END & SEASONAL PARAMETERS
+  # ===========================================
+  seasonal_parameters:
+    # Quarter-end detection
+    quarter_end_window_days:
+      type: "int"
+      default: 30
+      min: 7
+      description: "Days before quarter-end to flag potential dumping"
+      ui_component: "input"
+      relevant_agents: ["quarter_end_dumping"]
+      
+    quarter_end_deal_threshold:
+      type: "percentage"
+      default: 40
+      min: 20
+      description: "Percentage of deals closing in quarter-end window"
+      ui_component: "slider"
+      relevant_agents: ["quarter_end_dumping"]
+      
+    # Seasonal adjustments
+    q4_multiplier:
+      type: "float"
+      default: 1.3
+      min: 1.0
+      description: "Q4 seasonal adjustment multiplier"
+      ui_component: "slider"
+      relevant_agents: ["forecast_alignment", "stage_velocity", "quarter_end_dumping"]
+      
+    q1_multiplier:
+      type: "float"
+      default: 0.8
+      min: 0.5
+      description: "Q1 seasonal adjustment multiplier"
+      ui_component: "slider"
+      relevant_agents: ["forecast_alignment", "stage_velocity"]
+
+  # ===========================================
+  # SECTION 10: INDUSTRY & SEGMENT PARAMETERS
+  # ===========================================
+  industry_parameters:
+    # Industry-specific adjustments
+    enable_industry_adjustments:
+      type: "bool"
+      default: true
+      description: "Enable industry-specific parameter adjustments"
+      ui_component: "checkbox"
+      relevant_agents: ["sandbagging_detection", "stage_velocity", "forecast_alignment"]
+      
+    saas_sales_cycle_multiplier:
+      type: "float"
+      default: 1.0
+      min: 0.5
+      description: "SaaS industry sales cycle multiplier"
+      ui_component: "slider"
+      relevant_agents: ["stage_velocity", "forecast_alignment"]
+      
+    enterprise_sales_cycle_multiplier:
+      type: "float"
+      default: 1.8
+      min: 1.0
+      description: "Enterprise sales cycle multiplier"
+      ui_component: "slider"
+      relevant_agents: ["stage_velocity", "sandbagging_detection"]
+      
+    smb_sales_cycle_multiplier:
+      type: "float"
+      default: 0.6
+      min: 0.3
+      description: "SMB sales cycle multiplier"
+      ui_component: "slider"
+      relevant_agents: ["stage_velocity", "conversion_rate"]
+
+  # ===========================================
+  # SECTION 11: CONVERSION & PERFORMANCE PARAMETERS
+  # ===========================================
+  conversion_parameters:
+    # Conversion rate targets
+    lead_to_opportunity_rate:
+      type: "percentage"
+      default: 15
+      min: 5
+      description: "Target lead to opportunity conversion rate"
+      ui_component: "slider"
+      relevant_agents: ["conversion_rate", "health_overview"]
+      
+    opportunity_to_close_rate:
+      type: "percentage"
+      default: 25
+      min: 10
+      description: "Target opportunity to close conversion rate"
+      ui_component: "slider"
+      relevant_agents: ["conversion_rate", "forecast_alignment"]
+      
+    demo_to_close_rate:
+      type: "percentage"
+      default: 35
+      min: 15
+      description: "Target demo to close conversion rate"
+      ui_component: "slider"
+      relevant_agents: ["conversion_rate", "activity_tracking"]
+      
+    proposal_to_close_rate:
+      type: "percentage"
+      default: 45
+      min: 20
+      description: "Target proposal to close conversion rate"
+      ui_component: "slider"
+      relevant_agents: ["conversion_rate", "stage_velocity"]
+
+  # ===========================================
+  # SECTION 12: GOVERNANCE & COMPLIANCE PARAMETERS
+  # ===========================================
+  governance_parameters:
+    # Audit and compliance
+    audit_trail_retention_days:
+      type: "int"
+      default: 2555  # 7 years
+      min: 365
+      description: "Days to retain audit trail records"
+      ui_component: "input"
+      relevant_agents: ["all"]  # All agents need audit trails
+      
+    requires_approval_threshold:
+      type: "currency"
+      default: 1000000
+      min: 100000
+      description: "Deal value requiring manager approval"
+      ui_component: "currency_input"
+      relevant_agents: ["deal_risk_scoring", "forecast_alignment"]
+      
+    compliance_check_frequency:
+      type: "int"
+      default: 7
+      min: 1
+      description: "Days between compliance checks"
+      ui_component: "input"
+      relevant_agents: ["missing_fields", "data_quality", "ownerless_deals"]
+      
+    evidence_pack_retention_days:
+      type: "int"
+      default: 2555
+      min: 365
+      description: "Days to retain evidence packs"
+      ui_component: "input"
+      relevant_agents: ["all"]
+
+  # ===========================================
+  # SECTION 13: PERFORMANCE & SLA PARAMETERS
+  # ===========================================
+  performance_parameters:
+    # Execution performance
+    max_execution_time_ms:
+      type: "int"
+      default: 30000
+      min: 1000
+      description: "Maximum allowed execution time (milliseconds)"
+      ui_component: "input"
+      relevant_agents: ["all"]
+      
+    max_opportunities_per_batch:
+      type: "int"
+      default: 10000
+      min: 100
+      description: "Maximum opportunities to process in single batch"
+      ui_component: "input"
+      relevant_agents: ["all"]
+      
+    memory_limit_mb:
+      type: "int"
+      default: 512
+      min: 64
+      description: "Memory limit for agent execution (MB)"
+      ui_component: "input"
+      relevant_agents: ["all"]
+      
+    # SLA targets
+    response_time_sla_ms:
+      type: "int"
+      default: 5000
+      min: 1000
+      description: "SLA response time target (milliseconds)"
+      ui_component: "input"
+      relevant_agents: ["all"]
+      
+    accuracy_sla_percentage:
+      type: "percentage"
+      default: 95
+      min: 80
+      description: "SLA accuracy target percentage"
+      ui_component: "slider"
+      relevant_agents: ["all"]
+
+# ===========================================
+# AGENT RELEVANCE MAPPING
+# ===========================================
+# Defines which parameters are relevant for each agent
+agent_parameter_relevance:
+  sandbagging_detection:
+    primary: ["high_value_threshold", "low_probability_threshold", "sandbagging_threshold", "confidence_threshold"]
+    secondary: ["mega_deal_threshold", "enterprise_deal_threshold", "enable_industry_adjustments", "high_risk_threshold"]
+    tertiary: ["forecast_accuracy_threshold", "stage_risk_weight", "value_risk_weight", "enterprise_sales_cycle_multiplier"]
+    
+  stage_velocity:
+    primary: ["prospecting_stage_days", "qualification_stage_days", "discovery_stage_days", "proposal_stage_days", "negotiation_stage_days", "contract_stage_days"]
+    secondary: ["slow_velocity_multiplier", "fast_velocity_multiplier", "demo_activity_weight", "meeting_activity_weight"]
+    tertiary: ["saas_sales_cycle_multiplier", "enterprise_sales_cycle_multiplier", "q4_multiplier", "q1_multiplier"]
+    
+  missing_fields:
+    primary: ["compliance_threshold", "critical_compliance_threshold", "required_fields_count", "critical_fields_count"]
+    secondary: ["compliance_check_frequency"]
+    tertiary: ["audit_trail_retention_days"]
+    
+  duplicate_detection:
+    primary: ["name_similarity_threshold", "account_similarity_threshold", "amount_variance_threshold", "close_date_variance_days"]
+    secondary: ["confidence_threshold"]
+    tertiary: ["low_value_threshold"]
+    
+  ownerless_deals:
+    primary: ["compliance_threshold"]
+    secondary: ["low_value_threshold", "compliance_check_frequency"]
+    tertiary: ["audit_trail_retention_days"]
+    
+  stale_deals:
+    primary: ["stale_deal_threshold", "inactive_deal_threshold"]
+    secondary: ["minimum_activities_per_week", "low_value_threshold"]
+    tertiary: ["activity_risk_weight"]
+    
+  deal_risk_scoring:
+    primary: ["high_risk_threshold", "medium_risk_threshold", "low_risk_threshold"]
+    secondary: ["stage_risk_weight", "activity_risk_weight", "timeline_risk_weight", "value_risk_weight"]
+    tertiary: ["high_value_threshold", "confidence_threshold", "requires_approval_threshold"]
+    
+  deals_at_risk:
+    primary: ["high_risk_threshold", "slow_velocity_multiplier", "minimum_activities_per_week"]
+    secondary: ["stale_deal_threshold", "activity_risk_weight", "stage_risk_weight"]
+    tertiary: ["high_value_threshold", "negotiation_stage_days"]
+    
+  forecast_alignment:
+    primary: ["forecast_accuracy_target", "commit_accuracy_target", "high_probability_threshold"]
+    secondary: ["pipeline_coverage_ratio", "commit_coverage_ratio", "forecast_accuracy_threshold"]
+    tertiary: ["q4_multiplier", "q1_multiplier", "enable_industry_adjustments"]
+    
+  quarter_end_dumping:
+    primary: ["quarter_end_window_days", "quarter_end_deal_threshold"]
+    secondary: ["fast_velocity_multiplier", "contract_stage_days", "proposal_stage_days"]
+    tertiary: ["q4_multiplier", "mega_deal_threshold"]
+    
+  coverage_analysis:
+    primary: ["pipeline_coverage_ratio", "commit_coverage_ratio", "best_case_coverage_ratio"]
+    secondary: ["enterprise_deal_threshold", "high_value_threshold"]
+    tertiary: ["forecast_accuracy_target"]
+    
+  activity_tracking:
+    primary: ["minimum_activities_per_week", "high_touch_activities_per_week"]
+    secondary: ["call_activity_weight", "meeting_activity_weight", "email_activity_weight", "demo_activity_weight"]
+    tertiary: ["stale_deal_threshold", "activity_risk_weight"]
+    
+  conversion_rate:
+    primary: ["lead_to_opportunity_rate", "opportunity_to_close_rate", "demo_to_close_rate", "proposal_to_close_rate"]
+    secondary: ["smb_sales_cycle_multiplier", "high_probability_threshold"]
+    tertiary: ["smb_deal_threshold"]
+    
+  health_overview:
+    primary: ["forecast_accuracy_threshold", "pipeline_coverage_ratio", "compliance_threshold"]
+    secondary: ["inactive_deal_threshold", "lead_to_opportunity_rate", "opportunity_to_close_rate"]
+    tertiary: ["high_value_threshold", "accuracy_sla_percentage"]
+    
+  data_quality:
+    primary: ["compliance_threshold", "critical_compliance_threshold", "required_fields_count"]
+    secondary: ["compliance_check_frequency", "critical_fields_count"]
+    tertiary: ["audit_trail_retention_days"]
+    
+  pipeline_summary:
+    primary: ["high_value_threshold", "pipeline_coverage_ratio", "forecast_accuracy_threshold"]
+    secondary: ["enterprise_deal_threshold", "smb_deal_threshold", "compliance_threshold"]
+    tertiary: ["lead_to_opportunity_rate", "opportunity_to_close_rate"]
+
+# ===========================================
+# UI GROUPINGS FOR FRONTEND
+# ===========================================
+# How parameters should be grouped in the frontend UI
+ui_parameter_groups:
+  "Deal Value & Thresholds":
+    - "high_value_threshold"
+    - "mega_deal_threshold"
+    - "enterprise_deal_threshold"
+    - "smb_deal_threshold"
+    - "low_value_threshold"
+    
+  "Probability & Confidence":
+    - "low_probability_threshold"
+    - "high_probability_threshold"
+    - "confidence_threshold"
+    - "sandbagging_threshold"
+    - "forecast_accuracy_threshold"
+    
+  "Time & Velocity":
+    - "prospecting_stage_days"
+    - "qualification_stage_days"
+    - "discovery_stage_days"
+    - "proposal_stage_days"
+    - "negotiation_stage_days"
+    - "contract_stage_days"
+    - "slow_velocity_multiplier"
+    - "fast_velocity_multiplier"
+    
+  "Data Quality & Compliance":
+    - "compliance_threshold"
+    - "critical_compliance_threshold"
+    - "required_fields_count"
+    - "critical_fields_count"
+    - "compliance_check_frequency"
+    
+  "Risk Assessment":
+    - "high_risk_threshold"
+    - "medium_risk_threshold"
+    - "low_risk_threshold"
+    - "stage_risk_weight"
+    - "activity_risk_weight"
+    - "timeline_risk_weight"
+    - "value_risk_weight"
+    
+  "Activity & Engagement":
+    - "minimum_activities_per_week"
+    - "high_touch_activities_per_week"
+    - "call_activity_weight"
+    - "meeting_activity_weight"
+    - "email_activity_weight"
+    - "demo_activity_weight"
+    
+  "Forecast & Coverage":
+    - "pipeline_coverage_ratio"
+    - "commit_coverage_ratio"
+    - "best_case_coverage_ratio"
+    - "forecast_accuracy_target"
+    - "commit_accuracy_target"
+    
+  "Industry & Seasonal":
+    - "enable_industry_adjustments"
+    - "saas_sales_cycle_multiplier"
+    - "enterprise_sales_cycle_multiplier"
+    - "smb_sales_cycle_multiplier"
+    - "q4_multiplier"
+    - "q1_multiplier"

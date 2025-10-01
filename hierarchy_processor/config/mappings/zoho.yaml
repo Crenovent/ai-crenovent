@@ -1,0 +1,304 @@
+metadata:
+  name: "Zoho People"
+  description: "Zoho People HRMS CSV export format configuration (Updated)"
+  version: "2.0"
+  priority: 70
+  confidence_threshold: 0.7
+
+detection:
+  # Headers that strongly suggest Zoho People format
+  required_headers:
+    - "email"
+    - "first_name"
+    - "last_name"
+  
+  strong_indicators:
+    - "user_id"
+    - "hire_date"
+    - "business_title"
+    - "managername"
+    - "super_ref"
+    - "org_name"
+    - "division"
+    - "active"
+    - "category"
+    - "termination_date"
+  
+  # Zoho-specific patterns (updated format)
+  patterns:
+    - "user_id"  # Zoho employee identifier
+    - "hire_date"  # Zoho date field
+    - "business_title"  # Zoho job title field
+    - "managername"  # Zoho manager field
+    - "super_ref"  # Zoho supervisor reference
+    - "org_name"  # Zoho organization field
+
+fields:
+  # Core identity fields (required)
+  "Name":
+    source_headers: 
+      - "first_name"
+      - "middle_name"
+      - "last_name"
+    transformation: "combine_names"  # Combine first_name + middle_name + last_name
+    required: true
+    validation:
+      min_length: 2
+      pattern: "^[A-Za-z\\s\\-\\.]+$"
+  
+  "Email":
+    source_headers: ["email"]
+    required: true
+    validation:
+      pattern: "^[\\w\\.-]+@[\\w\\.-]+\\.[a-zA-Z]{2,}$"
+  
+  # Hierarchy fields
+  "Reporting Email":
+    source_headers: ["managername"]  # Manager name, we'll need to map this
+    required: false
+    transformation: "manager_name_to_email"  # Custom transformation needed
+  
+  "Reporting Manager Name":
+    source_headers: ["managername"]
+    required: false
+    validation:
+      min_length: 2
+  
+  "Reporting Role Function":
+    source_headers: ["super_ref"]  # Supervisor reference
+    required: false
+  
+  # Job information
+  "Role Title":
+    source_headers: 
+      - "business_title"
+      - "position_title"
+    required: false
+    transformation: "prefer_business_title"  # Prefer business_title over position_title
+  
+  "Department":
+    source_headers: 
+      - "division"
+      - "org_name"
+    required: false
+    transformation: "prefer_division"  # Prefer division over org_name
+  
+  # Location fields
+  "Location":
+    source_headers: 
+      - "city"
+      - "state" 
+      - "country"
+    transformation: "combine_location"  # Combine city, state, country
+    required: false
+  
+  "City":
+    source_headers: ["city"]
+    required: false
+  
+  "State":
+    source_headers: ["state"]
+    required: false
+  
+  "Country":
+    source_headers: ["country"]
+    required: false
+  
+  # Employment details
+  "Employee ID":
+    source_headers: ["user_id"]
+    required: false
+  
+  "Start Date":
+    source_headers: ["hire_date"]
+    required: false
+    transformation: "standardize_date"
+    validation:
+      date_format: ["YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY", "YYYY/MM/DD"]
+  
+  "End Date":
+    source_headers: ["termination_date"]
+    required: false
+    transformation: "standardize_date"
+  
+  "Employment Status":
+    source_headers: ["active"]
+    required: false
+    transformation: "boolean_to_status"  # Convert true/false to Active/Inactive
+  
+  "Employee Category":
+    source_headers: ["category"]
+    required: false
+  
+  # Additional fields that might be useful
+  "First Name":
+    source_headers: ["first_name"]
+    required: false
+  
+  "Middle Name":
+    source_headers: ["middle_name"]
+    required: false
+  
+  "Last Name":
+    source_headers: ["last_name"]
+    required: false
+  
+  "Organization":
+    source_headers: ["org_name"]
+    required: false
+
+transformations:
+  combine_names:
+    description: "Combine first, middle, last names with proper spacing"
+    logic: |
+      def combine_names(row, source_headers):
+          parts = []
+          for header in ['first_name', 'middle_name', 'last_name']:
+              if header in row and row[header]:
+                  parts.append(str(row[header]).strip())
+          return ' '.join(parts) if parts else ''
+  
+  combine_location:
+    description: "Combine city, state, country into location string"
+    logic: |
+      def combine_location(row, source_headers):
+          parts = []
+          for header in ['city', 'state', 'country']:
+              if header in row and row[header]:
+                  parts.append(str(row[header]).strip())
+          return ', '.join(parts) if parts else ''
+  
+  prefer_business_title:
+    description: "Use business_title if available, fallback to position_title"
+    logic: |
+      def prefer_business_title(row, source_headers):
+          if 'business_title' in row and row['business_title']:
+              return str(row['business_title']).strip()
+          elif 'position_title' in row and row['position_title']:
+              return str(row['position_title']).strip()
+          return ''
+  
+  prefer_division:
+    description: "Use division if available, fallback to org_name"
+    logic: |
+      def prefer_division(row, source_headers):
+          if 'division' in row and row['division']:
+              return str(row['division']).strip()
+          elif 'org_name' in row and row['org_name']:
+              return str(row['org_name']).strip()
+          return ''
+  
+  boolean_to_status:
+    description: "Convert boolean active field to employment status"
+    logic: |
+      def boolean_to_status(row, source_headers):
+          if 'active' in row:
+              active = str(row['active']).lower()
+              if active in ['true', '1', 'yes', 'active']:
+                  return 'Active'
+              elif active in ['false', '0', 'no', 'inactive']:
+                  return 'Inactive'
+          return 'Unknown'
+  
+  standardize_date:
+    description: "Convert various date formats to YYYY-MM-DD"
+    logic: |
+      def standardize_date(row, source_headers):
+          from datetime import datetime
+          date_value = None
+          for header in source_headers:
+              if header in row and row[header]:
+                  date_value = str(row[header]).strip()
+                  break
+          
+          if not date_value:
+              return ''
+          
+          # Try different date formats
+          formats = ['%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y', '%Y/%m/%d', '%m-%d-%Y', '%d-%m-%Y']
+          for fmt in formats:
+              try:
+                  parsed_date = datetime.strptime(date_value, fmt)
+                  return parsed_date.strftime('%Y-%m-%d')
+              except ValueError:
+                  continue
+          
+          return date_value  # Return original if no format matches
+  
+  manager_name_to_email:
+    description: "Convert manager name to email format (placeholder transformation)"
+    logic: |
+      def manager_name_to_email(row, source_headers):
+          # This would need custom logic based on your organization's email patterns
+          # For now, return the manager name as-is
+          if 'managername' in row and row['managername']:
+              return str(row['managername']).strip()
+          return ''
+
+validation_rules:
+  required_fields:
+    - "Name"
+    - "Email"
+  
+  field_validations:
+    "Email":
+      - type: "regex"
+        pattern: "^[\\w\\.-]+@[\\w\\.-]+\\.[a-zA-Z]{2,}$"
+        message: "Invalid email format"
+    
+    "Name":
+      - type: "min_length"
+        value: 2
+        message: "Name must be at least 2 characters"
+      - type: "regex"
+        pattern: "^[A-Za-z\\s\\-\\.]+$"
+        message: "Name contains invalid characters"
+  
+  business_rules:
+    - rule: "active_employee_validation"
+      description: "Active employees should have hire_date but no termination_date"
+      logic: |
+        def validate_active_employee(row):
+            is_active = str(row.get('active', '')).lower() in ['true', '1', 'yes', 'active']
+            has_hire_date = bool(row.get('hire_date', '').strip())
+            has_term_date = bool(row.get('termination_date', '').strip())
+            
+            if is_active and has_term_date:
+                return False, "Active employee should not have termination date"
+            if is_active and not has_hire_date:
+                return False, "Active employee should have hire date"
+            
+            return True, ""
+
+examples:
+  sample_headers:
+    - "user_id,first_name,middle_name,last_name,email,active,org_name,business_title,super_ref,managername,position_title,division,city,state,country,hire_date,termination_date,category"
+  
+  sample_data:
+    - user_id: "ZH001"
+      first_name: "John"
+      middle_name: "Michael"
+      last_name: "Smith"
+      email: "john.smith@company.com"
+      active: "true"
+      org_name: "Sales Organization"
+      business_title: "Senior Account Executive"
+      super_ref: "ZH002"
+      managername: "Jane Doe"
+      position_title: "Account Executive"
+      division: "North America Sales"
+      city: "New York"
+      state: "NY"
+      country: "USA"
+      hire_date: "2023-01-15"
+      termination_date: ""
+      category: "Full Time"
+
+notes:
+  - "Updated Zoho People format uses standard field names similar to Workday"
+  - "business_title is preferred over position_title for job titles"
+  - "super_ref contains the supervisor's user_id reference"
+  - "managername contains the actual manager name"
+  - "division is more specific than org_name for department mapping"
+  - "active field indicates current employment status"
+  - "category indicates employment type (Full Time, Part Time, Contractor, etc.)"

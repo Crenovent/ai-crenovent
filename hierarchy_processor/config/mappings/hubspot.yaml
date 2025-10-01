@@ -1,0 +1,198 @@
+metadata:
+  system: "hubspot"
+  version: "1.0"
+  description: "HubSpot contact/user export field mappings"
+
+detection:
+  required_fields:
+    name: ["First Name", "Last Name", "Contact Name"]
+    email: ["Email", "Email Address"]
+    company: ["Company", "Company Name"]
+    role: ["Job Title", "Title"]
+  unique_indicators:
+    - "First Name"
+    - "Last Name"
+    - "Lead Status"
+    - "Contact Owner"
+    - "Deal Stage"
+
+fields:
+  Name:
+    patterns: ["Contact Name", "Full Name", "Name"]
+    required: true
+    type: "string"
+    transformation: "combine_name"
+  
+  Email:
+    patterns: ["Email", "Email Address", "Primary Email", "Work Email"]
+    required: true
+    type: "email"
+    transformation: "extract_email"
+  
+  Role Title:
+    patterns: ["Job Title", "Title", "Position", "Role"]
+    required: false
+    type: "string"
+  
+  Reporting Email:
+    patterns: 
+      # Primary reporting patterns (most common)
+      - "Manager Email"
+      - "Direct Manager Email" 
+      - "Supervisor Email"
+      - "reports to (email)"  # User-specific patterns
+      - "reports_to_(email)"
+      - "reports to email"
+      - "reports_to_email"
+      - "reportstoemail"
+      - "reportsto(email)"
+      - "reports-to-email"
+      - "reports.to.email"
+      - "reporting email"
+      - "reporting_email"
+      - "reportingemail"
+      - "reports_to_manager_email"
+      - "reports_to_mgr_email"
+      - "reportstomanageremail"
+      - "reportstomgr"
+      # Manager variations
+      - "manager email"
+      - "manager_email"
+      - "manageremail"
+      - "mgr email"
+      - "mgr_email"
+      - "mgr_e_mail"
+      - "mgremail"
+      - "boss email"
+      - "boss_email"
+      - "bossemail"
+      - "line manager email"
+      - "line_manager_email"
+      - "linemanageremail"
+      - "reporting manager email"
+      - "reporting_manager_email"
+      - "reportingmanageremail"
+      # Hierarchy patterns
+      - "reports_to"
+      - "reportsto"
+      - "reports-to"
+      - "reports.to"
+      - "parent_email"
+      - "parentemail"
+      - "superior_email"
+      - "superioremail"
+      - "leader_email"
+      - "leaderemail"
+      - "head_email"
+      - "heademail"
+    required: false
+    type: "email"
+    hierarchy_priority: 1
+  
+  Reporting Manager Name:
+    patterns: ["Manager Name", "Direct Manager", "Supervisor", "Reports To"]
+    required: false
+    type: "string"
+    hierarchy_priority: 2
+  
+  Reporting Role Function:
+    patterns: ["Manager Title", "Manager Role", "Supervisor Title"]
+    required: false
+    type: "string"
+  
+  Role Function:
+    patterns: ["Department", "Function", "Team", "Division"]
+    required: false
+    type: "string"
+  
+  Region:
+    patterns: ["Region", "Sales Region", "Territory", "Geographic Region"]
+    required: false
+    type: "string"
+    hierarchy_level: "region"
+  
+  Area:
+    patterns: ["Area", "Market Area", "Sales Area"]
+    required: false
+    type: "string"
+    hierarchy_level: "area"
+  
+  District:
+    patterns: ["District", "Sales District"]
+    required: false
+    type: "string"
+    hierarchy_level: "district"
+  
+  Territory:
+    patterns: ["Territory", "Sales Territory", "Zone"]
+    required: false
+    type: "string"
+    hierarchy_level: "territory"
+  
+  Segment:
+    patterns: ["Segment", "Market Segment", "Customer Segment"]
+    required: false
+    type: "string"
+    hierarchy_level: "segment"
+
+processing_rules:
+  name_combination:
+    enabled: true
+    fields: ["First Name", "Last Name"]
+    separator: " "
+    required: true
+  
+  role_mapping:
+    "Sales Rep": "sales"
+    "Sales Representative": "sales"
+    "Account Executive": "sales"
+    "Sales Manager": "manager"
+    "Team Lead": "manager"
+    "Director": "director"
+    "VP Sales": "vp"
+    "Chief Revenue Officer": "cro"
+    "CRO Role": "cro"  # Alternative CRO mapping
+    "Marketing Manager": "marketing"
+    "Customer Success Manager": "customer_success"
+    "System Administrator": "system_admin"  # CSV role, not system admin
+    "Administrator": "system_admin"
+    "Admin": "system_admin"
+    "IT Administrator": "system_admin"
+  
+  status_filtering:
+    enabled: true
+    field: "Contact Lifecycle Stage"
+    include_values: ["customer", "opportunity", "lead", "subscriber"]
+  
+  geographic_inference:
+    enabled: true
+    country_to_region:
+      "United States": "Americas"
+      "Canada": "Americas"
+      "Mexico": "Americas"
+      "United Kingdom": "EMEA"
+      "Germany": "EMEA"
+      "France": "EMEA"
+      "Spain": "EMEA"
+      "Italy": "EMEA"
+      "Japan": "APAC"
+      "Australia": "APAC"
+      "Singapore": "APAC"
+      "India": "APAC"
+
+value_mappings:
+  lifecycle_stage:
+    "subscriber": "lead"
+    "lead": "lead"
+    "marketingqualifiedlead": "mql"
+    "salesqualifiedlead": "sql"
+    "opportunity": "opportunity"
+    "customer": "customer"
+    "evangelist": "customer"
+  
+  lead_status:
+    "New": "new"
+    "Open": "open"
+    "In Progress": "in_progress"
+    "Qualified": "qualified"
+    "Unqualified": "unqualified"

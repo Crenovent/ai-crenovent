@@ -1,0 +1,336 @@
+# Risk Analysis Configuration Schemas
+# ===================================
+# Configuration parameters for risk analysis RBA agents
+
+sandbagging_detection:
+  description: "Identify sandbagging or inflated deals (low probability but high value)"
+  category: "risk_analysis"
+  parameters:
+    # Core Thresholds
+    high_value_threshold:
+      type: "currency"
+      default: 250000
+      min: 10000
+      max: 50000000
+      label: "High Value Threshold"
+      description: "Minimum deal amount to be considered high-value"
+      ui_component: "currency_input"
+    
+    sandbagging_threshold:
+      type: "percentage"
+      default: 65
+      min: 0
+      max: 100
+      label: "Sandbagging Score Threshold"
+      description: "Minimum score to flag a deal as sandbagging"
+      ui_component: "slider"
+    
+    low_probability_threshold:
+      type: "percentage"
+      default: 35
+      min: 0
+      max: 100
+      label: "Low Probability Threshold"
+      description: "Maximum probability to be considered low"
+      ui_component: "slider"
+    
+    # Advanced Stage Analysis
+    advanced_stage_probability_threshold:
+      type: "percentage"
+      default: 40
+      min: 0
+      max: 100
+      label: "Advanced Stage Min Probability"
+      description: "Minimum probability expected for advanced stages"
+      ui_component: "slider"
+    
+    # Mega Deal Settings
+    mega_deal_threshold:
+      type: "currency"
+      default: 1000000
+      min: 100000
+      max: 100000000
+      label: "Mega Deal Threshold"
+      description: "Amount threshold for mega deal classification"
+      ui_component: "currency_input"
+    
+    mega_deal_probability_threshold:
+      type: "percentage"
+      default: 50
+      min: 0
+      max: 100
+      label: "Mega Deal Min Probability"
+      description: "Minimum probability required for mega deals"
+      ui_component: "slider"
+    
+    # Confidence and Quality
+    confidence_threshold:
+      type: "percentage"
+      default: 70
+      min: 50
+      max: 100
+      label: "Confidence Threshold"
+      description: "Minimum confidence level for flagging"
+      ui_component: "slider"
+    
+    # Industry Adjustments
+    enable_industry_adjustments:
+      type: "bool"
+      default: true
+      label: "Enable Industry Adjustments"
+      description: "Apply industry-specific probability adjustments"
+      ui_component: "checkbox"
+    
+    # Stage Probability Minimums
+    stage_probability_minimums:
+      type: "object"
+      default:
+        "Prospecting": 10
+        "Qualification": 20
+        "Needs Analysis": 25
+        "Value Proposition": 35
+        "Id. Decision Makers": 45
+        "Proposal/Price Quote": 60
+        "Contract Negotiation": 75
+        "Closed Won": 90
+      label: "Stage Probability Minimums"
+      description: "Minimum probability expected for each sales stage"
+      ui_component: "stage_probability_matrix"
+
+deal_risk_scoring:
+  description: "Apply comprehensive risk scoring to deals and categorize into risk levels"
+  category: "risk_analysis"
+  parameters:
+    # Risk Score Thresholds
+    high_risk_threshold:
+      type: "percentage"
+      default: 80
+      min: 50
+      max: 100
+      label: "High Risk Threshold"
+      description: "Minimum score for high risk classification"
+      ui_component: "slider"
+    
+    medium_risk_threshold:
+      type: "percentage"
+      default: 50
+      min: 20
+      max: 80
+      label: "Medium Risk Threshold"
+      description: "Minimum score for medium risk classification"
+      ui_component: "slider"
+    
+    # Risk Factors Weights
+    probability_weight:
+      type: "float"
+      default: 0.3
+      min: 0.0
+      max: 1.0
+      label: "Probability Weight"
+      description: "Weight of probability in risk calculation"
+      ui_component: "slider"
+    
+    amount_weight:
+      type: "float"
+      default: 0.25
+      min: 0.0
+      max: 1.0
+      label: "Amount Weight"
+      description: "Weight of deal amount in risk calculation"
+      ui_component: "slider"
+    
+    stage_weight:
+      type: "float"
+      default: 0.2
+      min: 0.0
+      max: 1.0
+      label: "Stage Weight"
+      description: "Weight of sales stage in risk calculation"
+      ui_component: "slider"
+    
+    activity_weight:
+      type: "float"
+      default: 0.15
+      min: 0.0
+      max: 1.0
+      label: "Activity Weight"
+      description: "Weight of recent activity in risk calculation"
+      ui_component: "slider"
+    
+    age_weight:
+      type: "float"
+      default: 0.1
+      min: 0.0
+      max: 1.0
+      label: "Age Weight"
+      description: "Weight of deal age in risk calculation"
+      ui_component: "slider"
+    
+    # Activity Analysis
+    minimum_activity_days:
+      type: "int"
+      default: 14
+      min: 1
+      max: 90
+      label: "Minimum Activity Days"
+      description: "Days without activity to increase risk score"
+      ui_component: "input"
+    
+    # Deal Age Thresholds
+    stale_deal_days:
+      type: "int"
+      default: 60
+      min: 14
+      max: 365
+      label: "Stale Deal Days"
+      description: "Days in stage to be considered stale"
+      ui_component: "input"
+
+pipeline_hygiene:
+  description: "Run comprehensive pipeline hygiene check for data quality and process compliance"
+  category: "risk_analysis"
+  parameters:
+    # Stale Deal Detection
+    stale_deal_threshold_days:
+      type: "int"
+      default: 60
+      min: 14
+      max: 365
+      label: "Stale Deal Threshold (Days)"
+      description: "Days in stage before flagging as stale"
+      ui_component: "input"
+    
+    # Stage-Specific Thresholds
+    prospecting_max_days:
+      type: "int"
+      default: 30
+      min: 7
+      max: 90
+      label: "Prospecting Max Days"
+      description: "Maximum days allowed in prospecting stage"
+      ui_component: "input"
+    
+    qualification_max_days:
+      type: "int"
+      default: 45
+      min: 14
+      max: 120
+      label: "Qualification Max Days"
+      description: "Maximum days allowed in qualification stage"
+      ui_component: "input"
+    
+    proposal_max_days:
+      type: "int"
+      default: 30
+      min: 7
+      max: 90
+      label: "Proposal Max Days"
+      description: "Maximum days allowed in proposal stage"
+      ui_component: "input"
+    
+    negotiation_max_days:
+      type: "int"
+      default: 21
+      min: 7
+      max: 60
+      label: "Negotiation Max Days"
+      description: "Maximum days allowed in negotiation stage"
+      ui_component: "input"
+    
+    # Data Quality Checks
+    require_close_date:
+      type: "bool"
+      default: true
+      label: "Require Close Date"
+      description: "Flag deals missing close dates"
+      ui_component: "checkbox"
+    
+    require_amount:
+      type: "bool"
+      default: true
+      label: "Require Amount"
+      description: "Flag deals missing amounts"
+      ui_component: "checkbox"
+    
+    require_probability:
+      type: "bool"
+      default: true
+      label: "Require Probability"
+      description: "Flag deals missing probability"
+      ui_component: "checkbox"
+    
+    minimum_deal_amount:
+      type: "currency"
+      default: 1000
+      min: 1
+      max: 1000000
+      label: "Minimum Deal Amount"
+      description: "Minimum amount for deal validation"
+      ui_component: "currency_input"
+
+at_risk_deals:
+  description: "Identify deals at risk of slipping or losing"
+  category: "risk_analysis"
+  parameters:
+    # Risk Indicators
+    close_date_slip_days:
+      type: "int"
+      default: 30
+      min: 1
+      max: 90
+      label: "Close Date Slip Days"
+      description: "Days past original close date to flag"
+      ui_component: "input"
+    
+    no_activity_days:
+      type: "int"
+      default: 21
+      min: 1
+      max: 90
+      label: "No Activity Days"
+      description: "Days without activity to flag as at-risk"
+      ui_component: "input"
+    
+    probability_drop_threshold:
+      type: "percentage"
+      default: 20
+      min: 5
+      max: 50
+      label: "Probability Drop Threshold"
+      description: "Percentage drop in probability to flag"
+      ui_component: "slider"
+    
+    # Customer Engagement Signals
+    email_response_days:
+      type: "int"
+      default: 7
+      min: 1
+      max: 30
+      label: "Email Response Days"
+      description: "Days without email response to flag"
+      ui_component: "input"
+    
+    meeting_acceptance_rate:
+      type: "percentage"
+      default: 50
+      min: 0
+      max: 100
+      label: "Meeting Acceptance Rate"
+      description: "Minimum meeting acceptance rate"
+      ui_component: "slider"
+    
+    # Competitive Risk
+    competitor_mentioned:
+      type: "bool"
+      default: true
+      label: "Flag Competitor Mentions"
+      description: "Flag deals with competitor mentions"
+      ui_component: "checkbox"
+    
+    # Financial Risk
+    budget_not_confirmed:
+      type: "bool"
+      default: true
+      label: "Flag Unconfirmed Budget"
+      description: "Flag deals without budget confirmation"
+      ui_component: "checkbox"
