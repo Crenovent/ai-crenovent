@@ -46,6 +46,7 @@ ENV/
 .env
 .env.local
 .env.production
+.env_clean
 
 # IDE
 .vscode/
