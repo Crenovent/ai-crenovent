@@ -48,6 +48,12 @@ ENV/
 .env.production
 .env_clean
 
+# Azure secrets and credentials
+azure-secrets.env
+azure-secrets.txt
+*.secrets
+secrets/
+
 # IDE
 .vscode/
 .idea/
