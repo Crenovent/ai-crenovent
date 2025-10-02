@@ -46,6 +46,14 @@ numpy==1.24.3
 # Data processing
 pyodbc==4.0.39
 
+# Data processing
+pyodbc==4.0.39
+
+# Azure dependencies for database configuration
+azure-identity==1.15.0
+azure-keyvault-secrets==4.7.0
+azure-storage-blob==12.19.0
+
 # Enterprise LangChain Tools for Revolutionary AI
 langchain-experimental>=0.0.60
 tavily-python==0.3.3
