@@ -1,9 +1,0 @@
-{
-  "DATABASE_URL": "postgresql://crenoventdb:Revopsmax123@crenovent-backend.postgres.database.azure.com:5432/user_db",
-  "AZURE_OPENAI_API_KEY": "CmCVDz4LJch8OZrhQrQKGzFkfrNNTkxyRlwoGAZ2sQbIZrIMATcZJQQJ99BHAC77bzfXJ3w3AAAAACOGgPYw",
-  "AZURE_OPENAI_ENDPOINT": "https://crenovent-planning-agen-resource.cognitiveservices.azure.com/",
-  "SERVICE_HOST": "0.0.0.0",
-  "SERVICE_PORT": "8000",
-  "AI_SERVICE_URL": "https://revai-ai-mainv2-evc4fzcva8bdcnfm.centralindia-01.azurewebsites.net",
-  "WEBSITES_PORT": "8000"
-}

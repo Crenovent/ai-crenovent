@@ -56,13 +56,13 @@ class CRUDAgent:
     5. Provides detailed feedback on results
     """
     
-   def __init__(self, backend_url: str = None):
-    if backend_url is None:
-        backend_url = os.getenv('BACKEND_BASE_URL', 'https://revai-api-mainv2.azurewebsites.net')
+    def __init__(self, backend_url: str = None):
+        if backend_url is None:
+            backend_url = os.getenv('BACKEND_BASE_URL', 'http://localhost:3001')
+        
         self.agent_id = "crud_agent"
         self.name = "CRUD Operations Agent"
         self.description = "Natural language database operations with confirmation"
-        
         self.backend_url = backend_url
         
         # Memory for operation history

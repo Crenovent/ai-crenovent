@@ -50,9 +50,9 @@ class RealTimeDashboard:
         self.test_results = {}
         self.last_update = datetime.now()
         
-        # Service URLs
-        self.python_ai_service_url = "http://localhost:8001"
-        self.nodejs_backend_url = "http://localhost:3001"
+        # Service URLs - Environment aware
+        self.python_ai_service_url = os.getenv('AI_SERVICE_URL', 'http://localhost:8000')
+        self.nodejs_backend_url = os.getenv('BACKEND_BASE_URL', 'http://localhost:3001')
         
         # Setup routes
         self.setup_routes()

@@ -1,12 +1,14 @@
 """
 Configuration settings for the Crenovent AI Service
+Multi-environment support with smart defaults
 """
 from pydantic_settings import BaseSettings
+from pydantic import Field
 from typing import Optional
 import os
 
 class Settings(BaseSettings):
-    """Application settings with environment variable support"""
+    """Application settings with environment variable support and smart defaults"""
     
     # Database Configuration
     database_url: str
@@ -19,13 +21,27 @@ class Settings(BaseSettings):
     azure_openai_deployment_name: str = "gpt-4o-mini"  # For LangChain SQL Agent
     azure_openai_embedding_deployment: str = "text-embedding-3-small"
     
-    # Service Configuration
-    service_port: int = 8000
-    service_host: str = "localhost"
+    # Service Configuration - Environment aware
+    service_port: int = Field(default=8000, env="SERVICE_PORT")
+    service_host: str = Field(default="0.0.0.0", env="SERVICE_HOST")
     log_level: str = "INFO"
     
-    # Integration Configuration
-   nodejs_backend_url: str = "https://revai-api-mainv2.azurewebsites.net"
+    # Integration Configuration - Environment aware with smart defaults
+    nodejs_backend_url: str = Field(
+        default="http://localhost:3001",
+        env="NODEJS_BACKEND_URL",
+        description="Node.js backend URL - auto-detected based on environment"
+    )
+    backend_base_url: str = Field(
+        default="http://localhost:3001",
+        env="BACKEND_BASE_URL", 
+        description="Backend base URL - auto-detected based on environment"
+    )
+    ai_service_url: str = Field(
+        default="http://localhost:8000",
+        env="AI_SERVICE_URL",
+        description="AI service URL - auto-detected based on environment"
+    )
     
     # Strategic Planning RAG Configuration (pgvector only)
     max_search_results: int = 10  # Strategic plans and conversations
@@ -38,9 +54,14 @@ class Settings(BaseSettings):
     conversation_memory_limit: int = 20  # Recent conversations to remember
     plan_search_limit: int = 5  # Similar plans to retrieve
     
+    # Environment Configuration
+    environment: str = Field(default="local", env="ENVIRONMENT")
+    
     class Config:
         env_file = ".env"
         case_sensitive = False
+        # Allow extra fields for flexibility
+        extra = "allow"
 
 # Global settings instance
 settings = Settings()

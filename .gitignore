@@ -42,17 +42,65 @@ venv/
 env/
 ENV/
 
-# Environment variables
+# Environment variables - ALL environments
 .env
+.env.*
+!.env.template
+!.env.example
 .env.local
+.env.development
+.env.staging
 .env.production
+.env.azure
 .env_clean
+.env_backup
+.env_*
 
 # Azure secrets and credentials
 azure-secrets.env
 azure-secrets.txt
+azure-app-settings.json
+azure-credentials.json
 *.secrets
 secrets/
+.secrets/
+credentials/
+.credentials/
+
+# API Keys and tokens
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.cert
+api-keys.txt
+tokens.txt
+auth-tokens.json
+jwt-secrets.txt
+
+# Database credentials
+database.env
+db-config.json
+connection-strings.txt
+postgres-credentials.json
+
+# Service Principal files
+service-principal.json
+sp-credentials.json
+client-secrets.json
+
+# Configuration files with secrets
+config.json
+settings.json
+local-config.json
+prod-config.json
+
+# Backup files that might contain secrets
+*.bak
+*.backup
+*_backup
+*.old
 
 # IDE
 .vscode/
@@ -68,6 +116,58 @@ Thumbs.db
 # Logs
 *.log
 logs/
+*.log.*
+app.log
+error.log
+access.log
+
+# Test results and reports
+test-results/
+test-reports/
+coverage-reports/
+*.coverage
+htmlcov/
+
+# Runtime files
+*.pid
+*.sock
+*.lock
+
+# Security scan reports
+security-check-report.json
+environment-validation-report.json
+vulnerability-report.json
+
+# Development artifacts
+.pytest_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+*.cover
+
+# Editor and IDE files
+.vscode/settings.json
+.vscode/launch.json
+.idea/workspace.xml
+.idea/tasks.xml
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
+*.tmp
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+docker-compose.local.yml
+
+# Kubernetes
+*.kubeconfig
+k8s-secrets.yaml
 
 # Database
 *.db
