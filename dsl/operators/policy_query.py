@@ -23,7 +23,7 @@ class PolicyAwareQueryOperator(BaseOperator):
     
     def __init__(self):
         super().__init__("policy_query")
-        self.backend_base_url = "http://localhost:3001"  # Node.js backend
+        self.backend_base_url = os.getenv('BACKEND_BASE_URL', 'https://revai-api-mainv2.azurewebsites.net')
         self.timeout = 30  # seconds
         self.max_retries = 3
     

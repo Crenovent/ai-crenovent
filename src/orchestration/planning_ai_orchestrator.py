@@ -81,7 +81,7 @@ class PlanningAIOrchestrator:
         
         # Initialize multi-agent system
         self.form_monitor = FormMonitorAgent()
-        self.crud_agent = CRUDAgent(backend_url='http://localhost:3001')
+        self.crud_agent = CRUDAgent(backend_url=os.getenv('BACKEND_BASE_URL', 'https://revai-api-mainv2.azurewebsites.net'))
         self.conversation_agent = ConversationAgent(azure_openai_api_key=os.getenv('AZURE_OPENAI_API_KEY'))
         
         # AI agents pool for concurrent processing

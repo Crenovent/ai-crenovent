@@ -758,10 +758,10 @@ async def health_check():
 
 if __name__ == "__main__":
     import os
-    port = int(os.environ.get("PORT", 8001))  # Use port 8001 by default, or PORT env var
+    port = int(os.environ.get("PORT", 8000)) # Use port 8001 by default, or PORT env var
     uvicorn.run(
         "main:app",
-        host="127.0.0.1",  # Use localhost instead of 0.0.0.0 to avoid permission issues
+        host="0.0.0.0" # Use localhost instead of 0.0.0.0 to avoid permission issues
         port=port,
         reload=True,
         log_level="info"

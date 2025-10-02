@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     
     # Integration Configuration
-    nodejs_backend_url: str = "http://localhost:3000"
+   nodejs_backend_url: str = "https://revai-api-mainv2.azurewebsites.net"
     
     # Strategic Planning RAG Configuration (pgvector only)
     max_search_results: int = 10  # Strategic plans and conversations
