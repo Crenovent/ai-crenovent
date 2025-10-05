@@ -15,7 +15,7 @@ from typing import Dict, List, Any, Optional
 from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel, Field
 
-from src.services.smart_capability_registry import SmartCapabilityRegistry, CapabilityType
+from dsl.registry.enhanced_capability_registry import EnhancedCapabilityRegistry, CapabilityType
 
 logger = logging.getLogger(__name__)
 

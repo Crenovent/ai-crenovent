@@ -1000,7 +1000,8 @@ class OnboardingRBAAgent(EnhancedBaseRBAAgent):
 def register_agent():
     """Register this agent with the RBA agent registry"""
     try:
-        from ...registry.rba_agent_registry import rba_registry
+        from ...registry.enhanced_capability_registry import EnhancedCapabilityRegistry
+        rba_registry = EnhancedCapabilityRegistry()
         
         agent_info = {
             'agent_class': OnboardingRBAAgent,

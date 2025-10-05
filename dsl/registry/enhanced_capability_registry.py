@@ -1,14 +1,29 @@
 """
-Enhanced Capability Registry - Tasks 14.1.1, 14.1.3, 14.1.6, 14.2.1, 14.2.10, 14.2.11
-Implements comprehensive capability metadata management with full tenant isolation and SaaS focus.
+Consolidated Capability Registry - Comprehensive Capability Management
+=====================================================================
+Consolidated from multiple capability registry files to eliminate duplication.
+Implements Tasks 14.1.1, 14.1.3, 14.1.6, 14.2.1, 14.2.10, 14.2.11
+Enhanced with Chapter 6.4: DSL Template Repository and Versioning
 
-Features:
+Consolidated Features:
 - Dynamic capability metadata storage (Task 14.1.1)
 - Multi-tenant capability mapping (Task 14.1.3) 
 - SaaS-specific workflow templates (Task 14.1.6)
 - Trust score storage per capability (Task 14.2.1)
 - Metadata attachment to capabilities (Task 14.2.10)
 - Dynamic trust score computation (Task 14.2.11)
+- Auto-discovery of existing RBA/RBIA/AALA capabilities
+- Smart matching with context awareness
+- Self-populating and maintaining registry
+- Dynamic RBA agent discovery and registration
+- Analysis type to agent mapping
+- Priority-based agent selection
+
+Enhanced Features (Chapter 6.4):
+- Tasks 6.4-T08, T09: DSL template repository with versioning and reuse
+- Tasks 6.4-T21, T23: DSL lifecycle management and schema versioning
+- Tasks 6.4-T28: Multi-industry KG overlays and domain-specific knowledge
+- Tasks 6.4-T36: Adoption metrics dashboard for DSL templates per tenant
 """
 
 import asyncio
@@ -425,6 +440,119 @@ class EnhancedCapabilityRegistry:
         except Exception as e:
             self.logger.error(f"Failed to register capability {metadata.name}: {e}")
             return False
+    
+    def register_custom_agent(self, agent_class, tenant_id: int = 1300, **kwargs):
+        """Register a custom RBA agent - compatibility method for legacy agents"""
+        try:
+            # Extract agent information
+            agent_name = agent_class.__name__
+            capability_id = f"agent_{agent_name.lower()}_{uuid.uuid4().hex[:8]}"
+            
+            # Create capability metadata from agent class
+            metadata = CapabilityMetadata(
+                capability_id=capability_id,
+                tenant_id=tenant_id,
+                tenant_tier=TenantTier.T1,
+                industry_code=IndustryCode.SAAS,
+                name=agent_name,
+                capability_type=CapabilityType.RBA,
+                version="1.0.0",
+                description=kwargs.get('description', f"Custom RBA agent: {agent_name}"),
+                saas_workflows=kwargs.get('saas_workflows', {}),
+                business_metrics=kwargs.get('business_metrics', {}),
+                customer_impact_score=kwargs.get('customer_impact_score', 0.5),
+                input_schema=kwargs.get('input_schema', {}),
+                output_schema=kwargs.get('output_schema', {}),
+                operator_definition={"agent_class": agent_name, "module": agent_class.__module__},
+                avg_execution_time_ms=kwargs.get('avg_execution_time_ms', 1000),
+                success_rate=kwargs.get('success_rate', 0.95),
+                usage_count=0,
+                compliance_requirements=kwargs.get('compliance_requirements', []),
+                policy_tags=kwargs.get('policy_tags', []),
+                created_by_user_id=kwargs.get('created_by_user_id', 1)
+            )
+            
+            # Store in cache (sync operation)
+            self.capability_cache[capability_id] = metadata
+            self._update_tenant_mapping(tenant_id, capability_id)
+            
+            # Store agent class reference for direct access
+            if not hasattr(self, 'agent_classes'):
+                self.agent_classes = {}
+            self.agent_classes[agent_name] = agent_class
+            
+            self.logger.info(f"✅ Registered custom agent: {agent_name}")
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"❌ Failed to register custom agent {agent_class.__name__}: {e}")
+            return False
+    
+    def get_all_agents(self) -> Dict[str, Any]:
+        """Get all registered agents - compatibility method for legacy code"""
+        try:
+            agents = {}
+            
+            # Get from agent classes if available
+            if hasattr(self, 'agent_classes'):
+                for agent_name, agent_class in self.agent_classes.items():
+                    agents[agent_name] = type('AgentInfo', (), {
+                        'agent_class': agent_class,
+                        'name': agent_name,
+                        'description': f"RBA Agent: {agent_name}"
+                    })()
+            
+            # Also get from capability cache
+            for capability_id, metadata in self.capability_cache.items():
+                if metadata.capability_type == CapabilityType.RBA:
+                    agent_name = metadata.name
+                    if agent_name not in agents:
+                        agents[agent_name] = type('AgentInfo', (), {
+                            'agent_class': None,  # Class not available from metadata
+                            'name': agent_name,
+                            'description': metadata.description,
+                            'capability_id': capability_id
+                        })()
+            
+            return agents
+            
+        except Exception as e:
+            self.logger.error(f"❌ Failed to get all agents: {e}")
+            return {}
+    
+    def get_supported_analysis_types(self) -> List[str]:
+        """Get all supported analysis types - compatibility method for legacy code"""
+        try:
+            analysis_types = []
+            
+            # Get from capability cache
+            for capability_id, metadata in self.capability_cache.items():
+                if metadata.capability_type == CapabilityType.RBA:
+                    # Extract analysis types from metadata
+                    if hasattr(metadata, 'saas_workflows') and metadata.saas_workflows:
+                        analysis_types.extend(metadata.saas_workflows.keys())
+                    
+                    # Add default analysis type based on capability name
+                    analysis_type = metadata.name.lower().replace('agent', '').replace('rba', '').strip('_')
+                    if analysis_type and analysis_type not in analysis_types:
+                        analysis_types.append(analysis_type)
+            
+            # Add some default analysis types if none found
+            if not analysis_types:
+                analysis_types = [
+                    'pipeline_analysis',
+                    'forecast_analysis', 
+                    'revenue_analysis',
+                    'user_onboarding',
+                    'location_mapping',
+                    'data_quality_check'
+                ]
+            
+            return list(set(analysis_types))  # Remove duplicates
+            
+        except Exception as e:
+            self.logger.error(f"❌ Failed to get supported analysis types: {e}")
+            return ['pipeline_analysis', 'forecast_analysis', 'revenue_analysis']
     
     def _update_tenant_mapping(self, tenant_id: int, capability_id: str):
         """Update tenant-to-capability mapping - Task 14.1.3"""

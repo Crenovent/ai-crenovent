@@ -20,7 +20,7 @@ from typing import Dict, Any
 
 # Import our services
 from src.services.connection_pool_manager import pool_manager
-from src.services.smart_capability_registry import get_smart_registry
+from dsl.registry.enhanced_capability_registry import EnhancedCapabilityRegistry
 from dsl.hub.routing_orchestrator import RoutingOrchestrator
 from dsl.knowledge.kg_store import KnowledgeGraphStore
 from dsl.compiler.runtime import WorkflowRuntime
@@ -38,6 +38,23 @@ try:
     from src.api.builder.templates import router as template_router  
     from src.api.builder.execution import router as execution_router
     from api.parameter_discovery import router as parameter_router
+    from api.ai_builder_api import router as ai_builder_router
+    from api.cross_module_api import router as cross_module_router
+    from api.approval_workflow_api import router as approval_workflow_router
+    from api.trust_scoring_api import router as trust_scoring_router
+    from api.evidence_pack_api import router as evidence_pack_router
+    from api.audit_pack_api import router as audit_pack_router
+    from api.governance_dashboard_api import router as governance_dashboard_router
+    from api.industry_templates_api import router as industry_templates_router
+    from api.ai_approval_assistant_api import router as ai_approval_assistant_router
+    from api.retry_engine_api import router as retry_engine_router
+    from api.fallback_escalation_api import router as fallback_escalation_router
+    from api.resilience_logging_api import router as resilience_logging_router
+    from api.conflict_resolution_api import router as conflict_resolution_router
+    from api.policy_pack_validation_api import router as policy_pack_validation_router
+    from api.ai_policy_analyzer_api import router as ai_policy_analyzer_router
+    from api.risk_simulation_api import router as risk_simulation_router
+    from api.saas_adoption_api import router as saas_adoption_router
 except ImportError:
     # Create fallback routers if the files don't exist
     from fastapi import APIRouter
@@ -45,6 +62,23 @@ except ImportError:
     template_router = APIRouter()
     execution_router = APIRouter()
     parameter_router = APIRouter()
+    ai_builder_router = APIRouter()
+    cross_module_router = APIRouter()
+    approval_workflow_router = APIRouter()
+    trust_scoring_router = APIRouter()
+    evidence_pack_router = APIRouter()
+    audit_pack_router = APIRouter()
+    governance_dashboard_router = APIRouter()
+    industry_templates_router = APIRouter()
+    ai_approval_assistant_router = APIRouter()
+    retry_engine_router = APIRouter()
+    fallback_escalation_router = APIRouter()
+    resilience_logging_router = APIRouter()
+    conflict_resolution_router = APIRouter()
+    policy_pack_validation_router = APIRouter()
+    ai_policy_analyzer_router = APIRouter()
+    risk_simulation_router = APIRouter()
+    saas_adoption_router = APIRouter()
 
 # Import RBA Hierarchy Processor
 rba_hierarchy_router = None
@@ -113,7 +147,7 @@ async def lifespan(app: FastAPI):
         
         # Initialize Smart Capability Registry
         logger.info("🎯 Initializing Smart Capability Registry...")
-        registry = get_smart_registry(pool_manager)
+        registry = EnhancedCapabilityRegistry()
         await registry.initialize()
         
         # Initialize Routing Orchestrator
@@ -213,6 +247,111 @@ app.include_router(workflow_router, prefix="/api/builder", tags=["Workflows"])
 app.include_router(template_router, prefix="/api/builder", tags=["Templates"])
 app.include_router(execution_router, prefix="/api/builder", tags=["Execution"])
 app.include_router(parameter_router, tags=["Parameter Discovery"])
+app.include_router(ai_builder_router, tags=["AI Builder"])
+app.include_router(cross_module_router, tags=["Cross-Module Orchestration"])
+app.include_router(approval_workflow_router, prefix="/api/governance", tags=["Approval Workflows"])
+app.include_router(trust_scoring_router, prefix="/api/trust", tags=["Trust Scoring"])
+app.include_router(evidence_pack_router, prefix="/api/evidence", tags=["Evidence Packs"])
+app.include_router(audit_pack_router, prefix="/api/audit", tags=["Audit Packs"])
+app.include_router(governance_dashboard_router, prefix="/api/dashboards", tags=["Governance Dashboards"])
+app.include_router(industry_templates_router, prefix="/api/industry", tags=["Industry Templates"])
+app.include_router(ai_approval_assistant_router, prefix="/api/ai-assistant", tags=["AI Approval Assistant"])
+app.include_router(retry_engine_router, prefix="/api/retry", tags=["Retry Engine"])
+app.include_router(fallback_escalation_router, prefix="/api/fallback", tags=["Fallback & Escalation"])
+app.include_router(resilience_logging_router, prefix="/api/resilience", tags=["Resilience Logging"])
+app.include_router(conflict_resolution_router, prefix="/api/conflicts", tags=["Conflict Resolution"])
+app.include_router(policy_pack_validation_router, prefix="/api/policy-validation", tags=["Policy Pack Validation"])
+app.include_router(ai_policy_analyzer_router, prefix="/api/ai-policy", tags=["AI Policy Analyzer"])
+app.include_router(risk_simulation_router, prefix="/api/risk-simulation", tags=["Risk Simulation"])
+app.include_router(saas_adoption_router, prefix="/api/saas-adoption", tags=["SaaS Adoption"])
+
+# Chapter 19.4 - Flywheel Activation
+try:
+    from api.flywheel_activation_api import router as flywheel_activation_router
+    app.include_router(flywheel_activation_router, prefix="/api/flywheel", tags=["Flywheel Activation"])
+except ImportError:
+    logger.warning("Flywheel Activation API not found, skipping...")
+
+try:
+    from api.chapter20_dashboard_api import router as chapter20_dashboard_router
+    app.include_router(chapter20_dashboard_router, prefix="/api/chapter20", tags=["Chapter 20 Dashboards"])
+except ImportError:
+    logger.warning("Chapter 20 Dashboard API not found, skipping...")
+
+# Chapter 21 - Measurement & Feedback Loops (Backend Skeleton)
+try:
+    from api.chapter21_business_impact_api import router as chapter21_business_impact_router
+    app.include_router(chapter21_business_impact_router, prefix="/api/chapter21/business-impact", tags=["Chapter 21 Business Impact"])
+except ImportError:
+    logger.warning("Chapter 21 Business Impact API not found, skipping...")
+
+try:
+    from api.chapter21_persona_reporting_api import router as chapter21_persona_router
+    app.include_router(chapter21_persona_router, prefix="/api/chapter21/persona-reporting", tags=["Chapter 21 Persona Reporting"])
+except ImportError:
+    logger.warning("Chapter 21 Persona Reporting API not found, skipping...")
+
+try:
+    from api.chapter21_feedback_skeleton_api import router as chapter21_feedback_router
+    app.include_router(chapter21_feedback_router, prefix="/api/chapter21/feedback-skeleton", tags=["Chapter 21 Feedback Skeleton"])
+except ImportError:
+    logger.warning("Chapter 21 Feedback Skeleton API not found, skipping...")
+
+# DSL Reconciliation API (Task 7.1.16)
+try:
+    from api.dsl_reconciliation_api import router as dsl_reconciliation_router
+    app.include_router(dsl_reconciliation_router, prefix="/api/dsl-reconciliation", tags=["DSL Reconciliation"])
+except ImportError:
+    logger.warning("DSL Reconciliation API not found, skipping...")
+
+# Block Intelligence API (Task 7.3.1)
+try:
+    from api.block_intelligence_api import router as block_intelligence_router
+    app.include_router(block_intelligence_router, prefix="/api/block-intelligence", tags=["Block Intelligence"])
+except ImportError:
+    logger.warning("Block Intelligence API not found, skipping...")
+
+# Observability Taxonomy API (Task 7.4.1)
+try:
+    from api.observability_taxonomy_api import router as observability_taxonomy_router
+    app.include_router(observability_taxonomy_router, prefix="/api/observability-taxonomy", tags=["Observability Taxonomy"])
+except ImportError:
+    logger.warning("Observability Taxonomy API not found, skipping...")
+
+    # Governance Hooks API (Chapter 8.5)
+    try:
+        from api.governance_hooks_api import router as governance_hooks_router
+        app.include_router(governance_hooks_router, prefix="/api/governance-hooks", tags=["Governance Hooks"])
+    except ImportError:
+        logger.warning("Governance Hooks API not found, skipping...")
+
+    # Schema Registry API (Task 9.2.3)
+    try:
+        from api.schema_registry_api import router as schema_registry_router
+        app.include_router(schema_registry_router, prefix="/api/schema-registry", tags=["Schema Registry"])
+    except ImportError:
+        logger.warning("Schema Registry API not found, skipping...")
+
+    # Cross-Plane Orchestration API (Task 9.3.3)
+    try:
+        from api.cross_plane_orchestration_api import router as cross_plane_router
+        app.include_router(cross_plane_router, prefix="/api/cross-plane", tags=["Cross-Plane Orchestration"])
+    except ImportError:
+        logger.warning("Cross-Plane Orchestration API not found, skipping...")
+
+    # DSL Contracts API (Task 9.3.4)
+    try:
+        from api.dsl_contracts_api import router as dsl_contracts_router
+        app.include_router(dsl_contracts_router, prefix="/api/dsl-contracts", tags=["DSL Contracts"])
+    except ImportError:
+        logger.warning("DSL Contracts API not found, skipping...")
+
+    # SLA Enforcement API (Task 9.1.11)
+    try:
+        from api.sla_enforcement_api import router as sla_enforcement_router
+        app.include_router(sla_enforcement_router, prefix="/api/sla-enforcement", tags=["SLA Enforcement"])
+    except ImportError:
+        logger.warning("SLA Enforcement API not found, skipping...")
 
 # Include RBA Hierarchy Router (always include, but may be empty fallback)
 if rba_hierarchy_router:
@@ -291,10 +430,16 @@ if HIERARCHY_PROCESSOR_AVAILABLE:
         # Import hierarchy processor components
         from hierarchy_processor.config.loader import ConfigLoader
         from hierarchy_processor.utils.validators import DataValidator
+        from hierarchy_processor.core.csv_detector import CSVDetector
+        from hierarchy_processor.core.field_mapper import FieldMapper
+        from hierarchy_processor.core.data_normalizer import DataNormalizer
         
         # Initialize hierarchy processor components
         config_loader = ConfigLoader()
         data_validator = DataValidator()
+        csv_detector = CSVDetector()
+        field_mapper = FieldMapper()
+        data_normalizer = DataNormalizer()
 
         # Initialize Enhanced Universal Mapper for Crenovent format
         from hierarchy_processor.core.enhanced_universal_mapper import EnhancedUniversalMapper
@@ -313,6 +458,18 @@ if HIERARCHY_PROCESSOR_AVAILABLE:
             LLM_FALLBACK_AVAILABLE = False
             llm_processor = None
             logger.warning(f"⚠️ LLM Fallback Processor not available: {e}")
+        
+        # Define extract_columns_with_llm function
+        def extract_columns_with_llm(df, target_columns):
+            """Extract columns using LLM processor"""
+            if LLM_FALLBACK_AVAILABLE and llm_processor:
+                try:
+                    return llm_processor.extract_columns(df, target_columns)
+                except Exception as e:
+                    logger.error(f"LLM extraction failed: {e}")
+                    return pd.DataFrame(), target_columns
+            else:
+                return pd.DataFrame(), target_columns
         
         @app.post("/api/hierarchy/normalize-csv-universal", tags=["Hierarchy Processor"])
         async def normalize_csv_universal(request: CSVProcessRequest):

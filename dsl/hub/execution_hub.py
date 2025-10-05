@@ -24,7 +24,7 @@ from ..intelligence.decision_logging_system import get_decision_logging_system
 from ..intelligence.evidence_pack_generator import get_evidence_pack_generator
 from ..intelligence.trust_scoring_engine import get_trust_scoring_engine
 from ..registry.enhanced_capability_registry import get_enhanced_capability_registry
-from ..governance.enhanced_policy_manager import get_enhanced_policy_manager
+from ..governance.policy_engine import PolicyEngine
 from ..execution.enhanced_execution_tracker import get_enhanced_execution_tracker
 
 logger = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ class ExecutionHub:
         
         # Initialize enhanced registry and execution tracking
         self.enhanced_capability_registry = get_enhanced_capability_registry(pool_manager)
-        self.enhanced_policy_manager = get_enhanced_policy_manager(pool_manager)
+        self.policy_engine = PolicyEngine(pool_manager)
         self.enhanced_execution_tracker = get_enhanced_execution_tracker(pool_manager)
         
         # Initialize hub components
@@ -113,7 +113,7 @@ class ExecutionHub:
             await self.enhanced_capability_registry.initialize()
             print("🎯 Enhanced Capability Registry initialized")
             
-            await self.enhanced_policy_manager.initialize()
+            await self.policy_engine.initialize()
             print("⚖️ Enhanced Policy Manager initialized")
             
             await self.enhanced_execution_tracker.initialize()

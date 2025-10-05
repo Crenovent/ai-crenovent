@@ -1,6 +1,7 @@
 """
-DSL Parser - Converts YAML workflows into executable workflow objects
-Enhanced with governance-by-design validation (Task 7.1.3)
+Enhanced DSL Parser - Converts YAML workflows into executable workflow objects
+Enhanced with governance-by-design validation and orchestration DSL grammar
+Tasks 6.4-T01 to T08: Orchestration DSL grammar, primitives, governance guards, evidence hooks
 """
 
 import yaml

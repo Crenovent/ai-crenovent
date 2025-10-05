@@ -4,6 +4,7 @@ FastAPI endpoints for dynamic pipeline agent execution
 """
 
 from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import Response
 from typing import Dict, Any, Optional
 from datetime import datetime
 import logging
@@ -12,7 +13,8 @@ from .models import PipelineAgentRequest, clean_for_json_serialization
 from .csv_data_loader import crm_data_loader
 from dsl.compiler.runtime import WorkflowRuntime
 from dsl.orchestration.dynamic_rba_orchestrator import dynamic_rba_orchestrator
-from dsl.registry.rba_agent_registry import rba_registry
+from dsl.observability.metrics_collector import get_metrics_collector
+from dsl.registry.enhanced_capability_registry import EnhancedCapabilityRegistry
 from dsl.hub.intent_parser_v2 import CleanIntentParser
 from src.services.connection_pool_manager import ConnectionPoolManager
 import numpy as np
@@ -36,11 +38,12 @@ async def list_available_agents():
     """
     try:
         # Initialize the RBA registry
-        rba_registry.initialize()
+        registry = EnhancedCapabilityRegistry()
+        await registry.initialize()
         
         # Get all RBA agents
         rba_agents = []
-        all_agents = rba_registry.get_all_agents()
+        all_agents = await registry.get_all_agents()
         
         for agent_name, agent_info in all_agents.items():
             agent_data = {
@@ -55,10 +58,10 @@ async def list_available_agents():
             rba_agents.append(agent_data)
         
         # Get supported analysis types
-        supported_analysis_types = rba_registry.get_supported_analysis_types()
+        supported_analysis_types = await registry.get_supported_analysis_types()
         
         # Get registry stats
-        registry_stats = rba_registry.get_registry_stats()
+        registry_stats = await registry.get_registry_stats()
         
         return {
             "success": True,
@@ -248,6 +251,193 @@ async def execute_pipeline_agent(request: PipelineAgentRequest, fastapi_request:
         raise HTTPException(status_code=500, detail=f"Pipeline execution failed: {str(e)}")
 
 
+@router.post("/execute-dsl-workflow")
+async def execute_dsl_workflow_endpoint(
+    workflow_dsl: Dict[str, Any],
+    input_data: Dict[str, Any] = {},
+    tenant_id: str = "1300",
+    user_id: str = "1323",
+    fastapi_request: Request = None
+):
+    """
+    Execute DSL workflow with enhanced governance and idempotency
+    
+    This endpoint integrates the new RBA Build Plan components:
+    - DSL Parser integration
+    - Runtime execution engine  
+    - Idempotency framework
+    - Governance-first design
+    
+    Args:
+        workflow_dsl: DSL workflow definition (YAML or dict)
+        input_data: Input data for workflow execution
+        tenant_id: Tenant identifier for isolation
+        user_id: User identifier
+        
+    Returns:
+        Enhanced workflow execution results with governance metadata
+    """
+    try:
+        logger.info(f"🚀 [Enhanced RBA] Executing DSL workflow for tenant {tenant_id}")
+        
+        # Initialize enhanced orchestrator if needed
+        if not hasattr(dynamic_rba_orchestrator, 'workflow_runtime') or not dynamic_rba_orchestrator.workflow_runtime:
+            await dynamic_rba_orchestrator.initialize_enhanced_components(pool_manager)
+        
+        # Create user context
+        user_context = {
+            'tenant_id': tenant_id,
+            'user_id': user_id,
+            'execution_timestamp': datetime.now().isoformat(),
+            'source': 'api_endpoint',
+            'governance_required': True,
+            'evidence_capture': True
+        }
+        
+        # Execute DSL workflow with enhanced capabilities
+        result = await dynamic_rba_orchestrator.execute_dsl_workflow(
+            workflow_dsl=workflow_dsl,
+            input_data=input_data,
+            user_context=user_context,
+            tenant_id=tenant_id,
+            user_id=user_id
+        )
+        
+        logger.info(f"✅ [Enhanced RBA] DSL workflow execution completed: {result.get('execution_id')}")
+        
+        return {
+            "success": result.get('success', True),
+            "execution_id": result.get('execution_id'),
+            "workflow_id": result.get('workflow_id'),
+            "result_data": result.get('result_data', {}),
+            "execution_time_ms": result.get('execution_time_ms', 0),
+            "evidence_pack_id": result.get('evidence_pack_id'),
+            "orchestrator_type": result.get('orchestrator_type', 'dynamic_rba_enhanced'),
+            "governance_metadata": {
+                "tenant_id": tenant_id,
+                "user_id": user_id,
+                "policy_compliance": True,
+                "evidence_captured": bool(result.get('evidence_pack_id')),
+                "audit_trail_available": True
+            },
+            "error_message": result.get('error_message'),
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ [Enhanced RBA] DSL workflow execution failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Enhanced DSL workflow execution failed: {str(e)}")
+
+@router.get("/metrics")
+async def get_observability_metrics(
+    tenant_id: Optional[int] = None,
+    time_window_minutes: int = 60,
+    format: str = "json"  # json or prometheus
+):
+    """
+    Get observability metrics for monitoring dashboards (Task 20.1-T16 to 20.1-T20)
+    
+    Args:
+        tenant_id: Optional tenant filter
+        time_window_minutes: Time window for metrics aggregation
+        format: Output format (json or prometheus)
+    
+    Returns:
+        Aggregated metrics in requested format
+    """
+    try:
+        metrics_collector = get_metrics_collector()
+        
+        if format == "prometheus":
+            # Return Prometheus format for scraping
+            prometheus_metrics = metrics_collector.export_prometheus_metrics()
+            return Response(
+                content=prometheus_metrics,
+                media_type="text/plain; version=0.0.4; charset=utf-8"
+            )
+        else:
+            # Return JSON format for dashboards
+            aggregated_metrics = metrics_collector.get_aggregated_metrics(
+                tenant_id=tenant_id,
+                time_window_minutes=time_window_minutes
+            )
+            
+            # Add tenant-specific summary if tenant_id provided
+            tenant_summary = None
+            if tenant_id:
+                tenant_summary = metrics_collector.get_tenant_metrics_summary(tenant_id)
+            
+            return {
+                "success": True,
+                "metrics": aggregated_metrics,
+                "tenant_summary": tenant_summary,
+                "time_window_minutes": time_window_minutes,
+                "timestamp": datetime.now().isoformat(),
+                "total_metrics_collected": len(metrics_collector.metrics_buffer)
+            }
+            
+    except Exception as e:
+        logger.error(f"❌ Failed to get observability metrics: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get metrics: {str(e)}")
+
+@router.get("/metrics/tenant/{tenant_id}")
+async def get_tenant_metrics(tenant_id: int):
+    """
+    Get tenant-specific metrics summary for executive dashboards (Task 6.7-T09)
+    """
+    try:
+        metrics_collector = get_metrics_collector()
+        tenant_summary = metrics_collector.get_tenant_metrics_summary(tenant_id)
+        
+        return {
+            "success": True,
+            "tenant_metrics": tenant_summary,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Failed to get tenant metrics: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get tenant metrics: {str(e)}")
+
+@router.post("/metrics/business-impact")
+async def record_business_impact(
+    kpi_type: str,
+    impact_value: float,
+    impact_category: str,
+    tenant_id: int,
+    workflow_id: Optional[str] = None,
+    industry_code: str = "SaaS",
+    region: str = "US"
+):
+    """
+    Record business KPI impact metrics (Task 20.1-T03)
+    """
+    try:
+        metrics_collector = get_metrics_collector()
+        
+        metrics_collector.record_business_impact(
+            kpi_type=kpi_type,
+            impact_value=impact_value,
+            impact_category=impact_category,
+            tenant_id=tenant_id,
+            workflow_id=workflow_id,
+            industry_code=industry_code,
+            region=region
+        )
+        
+        return {
+            "success": True,
+            "message": "Business impact metrics recorded",
+            "kpi_type": kpi_type,
+            "impact_value": impact_value,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Failed to record business impact: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to record business impact: {str(e)}")
+
+
 async def parse_analysis_type_from_input(user_input: str) -> str:
     """Parse analysis type from user input using intelligent semantic analysis"""
     try:
@@ -263,7 +453,9 @@ async def parse_analysis_type_from_input(user_input: str) -> str:
             analysis_type = parsed_intent.workflow_category
             
             # Validate against available agents dynamically
-            available_types = rba_registry.get_supported_analysis_types()
+            registry = EnhancedCapabilityRegistry()
+            await registry.initialize()
+            available_types = await registry.get_supported_analysis_types()
             
             if analysis_type in available_types:
                 logger.info(f"🎯 Semantic Intent Analysis: '{user_input}' → {analysis_type}")
@@ -318,7 +510,9 @@ async def _intelligent_pattern_matching(user_input: str) -> str:
     """Intelligent pattern matching that maps frontend requests to available agents"""
     
     # Get available analysis types from registry
-    available_types = rba_registry.get_supported_analysis_types()
+    registry = EnhancedCapabilityRegistry()
+    await registry.initialize()
+    available_types = await registry.get_supported_analysis_types()
     
     # Dynamic mapping based on keywords in user input
     input_lower = user_input.lower()

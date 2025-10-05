@@ -96,11 +96,13 @@ class CleanIntentParser:
         """Get available workflows dynamically from RBA Agent Registry"""
         try:
             # Import registry dynamically to avoid circular imports
-            from dsl.registry.rba_agent_registry import rba_registry
+            from dsl.registry.enhanced_capability_registry import EnhancedCapabilityRegistry
+            rba_registry = EnhancedCapabilityRegistry()
             
             # Initialize registry if needed
-            if not rba_registry._initialized:
-                rba_registry.initialize()
+            if not hasattr(rba_registry, '_initialized') or not rba_registry._initialized:
+                # For sync context, we'll use the capabilities directly
+                pass
             
             # Get all supported analysis types from the registry
             analysis_types = rba_registry.get_supported_analysis_types()

@@ -13,8 +13,9 @@ from .rba_config import router as rba_config_router
 from .universal_parameters import router as universal_parameters_router
 from .templates import router as templates_router
 from .csv_integration import router as csv_integration_router
-from .governance import router as governance_router
+from .governance_dashboard_api import router as governance_router
 from .parameter_discovery import router as parameter_discovery_router
+from .integrated_rba_api import router as integrated_rba_router
 
 logger = logging.getLogger(__name__)
 
@@ -44,8 +45,11 @@ def include_workflow_builder_routes(app: FastAPI):
     # Parameter discovery
     app.include_router(parameter_discovery_router, tags=["Parameter Discovery"])
     
+    # NEW: Integrated RBA System API
+    app.include_router(integrated_rba_router, tags=["Integrated RBA System"])
+    
     logger.info("✅ All Workflow Builder API routes registered")
-    logger.info("📦 Modules: workflow_builder, pipeline_agents, templates, csv_integration, governance, parameter_discovery")
+    logger.info("📦 Modules: workflow_builder, pipeline_agents, templates, csv_integration, governance, parameter_discovery, integrated_rba_api")
 
 
 # Backward compatibility exports
