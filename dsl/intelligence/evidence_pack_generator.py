@@ -1,16 +1,19 @@
 """
-Dynamic Evidence Pack Generator
-==============================
+Enhanced Dynamic Evidence Pack Generator
+=======================================
 Implements tamper-evident evidence pack generation with full tenant separation.
-Tasks: 7.1.14, 16.4 - Evidence pack service with immutable compliance logs
+Tasks: 6.2-T10, 7.1.14, 16.4 - Evidence pack service with immutable compliance logs
 
-Features:
-- Tenant-isolated evidence generation
-- Dynamic industry-specific evidence types
+Enhanced Features:
+- Tenant-isolated evidence generation with multi-tenant RLS
+- Dynamic industry-specific evidence types (SaaS, Banking, Insurance)
 - Tamper-evident logging with blockchain-style hash chaining
-- SaaS-focused compliance evidence
-- Real-time evidence validation
-- Regulator-ready export formats
+- Digital signature integration with cryptographic verification
+- Multi-level evidence capture (step-level and workflow-level)
+- Comprehensive audit trails with immutable timestamps
+- Compliance framework support (SOX, GDPR, RBI, HIPAA, PCI-DSS)
+- Real-time evidence validation and integrity checking
+- Regulator-ready export formats (PDF, CSV, JSON)
 """
 
 import logging

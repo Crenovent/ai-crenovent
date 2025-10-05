@@ -1,13 +1,17 @@
 """
-DSL Workflow Runtime Engine
-==========================
+Enhanced DSL Workflow Runtime Engine
+===================================
 
-Implements Task 6.2-T05, T06, T07:
+Implements Tasks 6.2-T05 through T17:
 - Runtime step executor for deterministic execution
-- Idempotency framework with unique run IDs
-- Evidence pack generation and audit trails
+- Advanced idempotency framework with Redis caching
+- Comprehensive evidence pack generation and audit trails
+- Circuit breaker protection for cascading failure prevention
+- Intelligent retry management with exponential backoff
+- Override mechanism with approval workflows
+- Real-time monitoring and observability integration
 
-Executes validated workflows through RBA operators with full governance.
+Executes validated workflows through RBA operators with full governance enforcement.
 """
 
 import asyncio

@@ -1,0 +1,496 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://revai.pro/schemas/dsl/workflow/v1.0.0",
+  "type": "object",
+  "title": "DSL Workflow Schema",
+  "description": "Complete JSON Schema for DSL workflow definitions (Task 7.1.2)",
+  "required": ["workflow_id", "name", "steps", "governance"],
+  "properties": {
+    "workflow_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "Unique workflow identifier"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "description": "Human-readable workflow name"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Workflow description"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "default": "1.0.0",
+      "description": "Semantic version"
+    },
+    "industry": {
+      "type": "string",
+      "enum": ["SaaS", "Banking", "Insurance", "Healthcare", "E-commerce", "IT Services"],
+      "description": "Industry vertical"
+    },
+    "compliance_frameworks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["SOX", "GDPR", "HIPAA", "RBI", "IRDAI", "PCI-DSS", "DPDP", "SOC2", "ISO27001"]
+      },
+      "description": "Applicable compliance frameworks"
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/step"
+      },
+      "description": "Workflow steps"
+    },
+    "governance": {
+      "type": "object",
+      "required": ["tenant_id", "region_id", "sla_tier", "policy_pack_id"],
+      "properties": {
+        "tenant_id": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Tenant identifier for multi-tenant isolation"
+        },
+        "region_id": {
+          "type": "string",
+          "enum": ["US", "EU", "APAC", "GLOBAL"],
+          "description": "Data residency region"
+        },
+        "sla_tier": {
+          "type": "string",
+          "enum": ["T0", "T1", "T2", "T3"],
+          "description": "SLA tier for execution priority"
+        },
+        "policy_pack_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Policy pack identifier for governance"
+        },
+        "trust_threshold": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.8,
+          "description": "Minimum trust score required for execution"
+        },
+        "trust_policy": {
+          "type": "string",
+          "enum": ["strict", "permissive", "adaptive"],
+          "default": "strict",
+          "description": "Trust enforcement policy"
+        },
+        "consent_frameworks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["GDPR", "DPDP", "CCPA", "LGPD"]
+          },
+          "description": "Consent frameworks for privacy compliance"
+        },
+        "allowed_regions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["US", "EU", "APAC", "GLOBAL"]
+          },
+          "description": "Allowed regions for data processing"
+        },
+        "data_residency_policy": {
+          "type": "string",
+          "enum": ["strict", "flexible", "global"],
+          "default": "strict",
+          "description": "Data residency enforcement policy"
+        },
+        "trust_metadata": {
+          "type": "object",
+          "properties": {
+            "workflow_trust_threshold": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "trust_policy": {"type": "string"},
+            "trust_aggregation_method": {"type": "string", "enum": ["weighted_average", "minimum", "maximum"]},
+            "trust_validation_enabled": {"type": "boolean"},
+            "trust_score_required_for_execution": {"type": "boolean"},
+            "trust_calculation_factors": {"type": "object"},
+            "trust_score_cache_ttl": {"type": "integer", "minimum": 0},
+            "trust_score_api_integration": {"type": "boolean"}
+          },
+          "description": "Trust score metadata and configuration"
+        }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "created_by": {"type": "string"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "updated_at": {"type": "string", "format": "date-time"},
+        "tags": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "category": {"type": "string"},
+        "complexity_level": {
+          "type": "string",
+          "enum": ["simple", "medium", "complex", "expert"]
+        }
+      },
+      "description": "Additional workflow metadata"
+    }
+  },
+  "definitions": {
+    "step": {
+      "type": "object",
+      "required": ["id", "name", "type"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "Unique step identifier within workflow"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "description": "Human-readable step name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "query", "decision", "action", "notify", "governance",
+            "agent_call", "ml_decision", "subscription", "billing",
+            "customer_success", "churn_analysis", "revenue_recognition", "usage_metering"
+          ],
+          "description": "Step type from DSL primitives"
+        },
+        "params": {
+          "type": "object",
+          "description": "Step-specific parameters",
+          "anyOf": [
+            {"$ref": "#/definitions/query_params"},
+            {"$ref": "#/definitions/decision_params"},
+            {"$ref": "#/definitions/agent_call_params"},
+            {"$ref": "#/definitions/ml_decision_params"},
+            {"$ref": "#/definitions/notify_params"},
+            {"$ref": "#/definitions/governance_params"}
+          ]
+        },
+        "conditions": {
+          "type": "object",
+          "description": "Step execution conditions"
+        },
+        "next_steps": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Next step IDs for workflow flow"
+        },
+        "governance": {
+          "type": "object",
+          "properties": {
+            "evidence_capture": {
+              "type": "boolean",
+              "default": true,
+              "description": "Enable evidence pack generation"
+            },
+            "consent_id": {
+              "type": "string",
+              "description": "Consent identifier for GDPR/DPDP compliance"
+            },
+            "region_id": {
+              "type": "string",
+              "enum": ["US", "EU", "APAC", "GLOBAL"],
+              "description": "Step-level region constraint"
+            },
+            "cross_border_approved": {
+              "type": "boolean",
+              "description": "Approval for cross-border data transfer"
+            },
+            "pii_handling": {
+              "type": "string",
+              "enum": ["none", "pseudonymized", "encrypted", "masked"],
+              "description": "PII handling method"
+            },
+            "trust_threshold": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0,
+              "description": "Step-level trust threshold"
+            },
+            "trust_metadata": {
+              "type": "object",
+              "description": "Step-level trust configuration"
+            },
+            "agent_data_consent": {
+              "type": "string",
+              "description": "Consent for agent data sharing"
+            },
+            "agent_region": {
+              "type": "string",
+              "enum": ["US", "EU", "APAC", "GLOBAL"],
+              "description": "Agent execution region"
+            },
+            "model_consent": {
+              "type": "string",
+              "description": "Consent for ML model training"
+            }
+          },
+          "description": "Step-level governance configuration"
+        },
+        "retry_config": {
+          "type": "object",
+          "properties": {
+            "max_attempts": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10,
+              "default": 3,
+              "description": "Maximum retry attempts"
+            },
+            "backoff_multiplier": {
+              "type": "number",
+              "minimum": 1.0,
+              "default": 2.0,
+              "description": "Exponential backoff multiplier"
+            },
+            "max_delay": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 300,
+              "description": "Maximum delay between retries (seconds)"
+            },
+            "retry_on": {
+              "type": "array",
+              "items": {"type": "string"},
+              "default": ["timeout", "connection_error", "rate_limit"],
+              "description": "Error types that trigger retry"
+            }
+          },
+          "description": "Retry configuration for step execution"
+        }
+      },
+      "additionalProperties": false
+    },
+    "query_params": {
+      "type": "object",
+      "required": ["source", "resource"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["salesforce", "postgres", "api", "external"],
+          "description": "Data source type"
+        },
+        "resource": {
+          "type": "string",
+          "description": "Resource identifier (table, object, endpoint)"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["field", "op", "value"],
+            "properties": {
+              "field": {"type": "string"},
+              "op": {"type": "string", "enum": ["=", "!=", ">", "<", ">=", "<=", "IN", "NOT IN", "LIKE", "NOT LIKE"]},
+              "value": {}
+            }
+          },
+          "description": "Query filters"
+        },
+        "select": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Fields to select"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000,
+          "description": "Result limit"
+        },
+        "order_by": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["field"],
+            "properties": {
+              "field": {"type": "string"},
+              "direction": {"type": "string", "enum": ["ASC", "DESC"], "default": "ASC"}
+            }
+          },
+          "description": "Ordering specification"
+        }
+      }
+    },
+    "decision_params": {
+      "type": "object",
+      "required": ["expression"],
+      "properties": {
+        "expression": {
+          "type": "string",
+          "description": "Boolean expression for decision logic"
+        },
+        "on_true": {
+          "type": "string",
+          "description": "Next step if expression is true"
+        },
+        "on_false": {
+          "type": "string",
+          "description": "Next step if expression is false"
+        },
+        "on_else": {
+          "type": "string",
+          "description": "Default next step"
+        }
+      }
+    },
+    "agent_call_params": {
+      "type": "object",
+      "required": ["agent_id", "task"],
+      "properties": {
+        "agent_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "description": "Agent identifier"
+        },
+        "task": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Task description for the agent"
+        },
+        "context": {
+          "type": "object",
+          "description": "Context data for the agent"
+        },
+        "tools": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Available tools for the agent"
+        },
+        "max_iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50,
+          "default": 10,
+          "description": "Maximum agent iterations"
+        },
+        "timeout": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3600,
+          "default": 300,
+          "description": "Agent timeout in seconds"
+        }
+      }
+    },
+    "ml_decision_params": {
+      "type": "object",
+      "required": ["model_id", "input_features", "thresholds"],
+      "properties": {
+        "model_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "description": "ML model identifier"
+        },
+        "input_features": {
+          "type": "object",
+          "description": "Input features for the model"
+        },
+        "thresholds": {
+          "type": "object",
+          "required": ["accept", "reject"],
+          "properties": {
+            "accept": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "reject": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+          },
+          "description": "Decision thresholds"
+        },
+        "model_version": {
+          "type": "string",
+          "description": "Model version to use"
+        },
+        "feature_preprocessing": {
+          "type": "object",
+          "description": "Feature preprocessing configuration"
+        }
+      }
+    },
+    "notify_params": {
+      "type": "object",
+      "required": ["channels", "message"],
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["slack", "email", "webhook", "sms", "teams"]
+          },
+          "minItems": 1,
+          "description": "Notification channels"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Notification message"
+        },
+        "recipients": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Notification recipients"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"],
+          "default": "medium",
+          "description": "Notification priority"
+        },
+        "template": {
+          "type": "string",
+          "description": "Message template identifier"
+        }
+      }
+    },
+    "governance_params": {
+      "type": "object",
+      "required": ["action"],
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": ["record", "create_evidence_pack", "trigger_approval", "log_override"],
+          "description": "Governance action type"
+        },
+        "evidence_type": {
+          "type": "string",
+          "description": "Type of evidence to generate"
+        },
+        "retention_days": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3650,
+          "description": "Evidence retention period in days"
+        },
+        "approval_type": {
+          "type": "string",
+          "enum": ["manager", "director", "compliance", "auto"],
+          "description": "Required approval type"
+        },
+        "timeout_hours": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 168,
+          "description": "Approval timeout in hours"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
