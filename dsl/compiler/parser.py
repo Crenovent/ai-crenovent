@@ -1,23 +1,20 @@
 """
-DSL Compiler - Parser Component with Rich Error Recovery
-========================================================
+DSL Compiler - Parser Component
+==============================
 
-Task 6.2.2: Implement parser with rich error recovery
-- Convert DSL v2 grammar into executable AST
-- Panic-mode error recovery for partial parsing
-- Structured diagnostics with error codes, line hints
-- Tokenization and AST generation per DSL v2
+Implements Task 6.2-T01, T02, T03:
+- Define DSL grammar for RBA workflows
+- Build parser to translate DSL into AST
+- Implement static analyzer for validation
 
-Dependencies: Task 6.2.1 (DSL v2 grammar)
-Outputs: AST → input for IR builder (6.2.4)
+Parses YAML/JSON workflows into Abstract Syntax Tree for execution.
 """
 
 import yaml
 import json
 import logging
 import hashlib
-import re
-from typing import Dict, List, Any, Optional, Union, Tuple, NamedTuple
+from typing import Dict, List, Any, Optional, Union
 from dataclasses import dataclass, field
 from enum import Enum
 from datetime import datetime
@@ -32,80 +29,9 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-# Task 6.2.2: Structured Diagnostics
-class ErrorCode(Enum):
-    """Error codes for structured diagnostics"""
-    SYNTAX_ERROR = "E001"
-    MISSING_REQUIRED_FIELD = "E002"
-    INVALID_STEP_TYPE = "E003"
-    INVALID_ML_CONFIG = "E004"
-    MISSING_FALLBACK = "E005"
-    INVALID_CONFIDENCE = "E006"
-    INVALID_THRESHOLD = "E007"
-    CIRCULAR_DEPENDENCY = "E008"
-    UNKNOWN_REFERENCE = "E009"
-    POLICY_PACK_NOT_FOUND = "E010"
-
-@dataclass
-class Diagnostic:
-    """Structured diagnostic information"""
-    error_code: ErrorCode
-    line: int
-    column: int
-    message: str
-    hint: Optional[str] = None
-    severity: str = "error"  # error, warning, info
-
-@dataclass
-class Token:
-    """Token representation for DSL v2"""
-    type: str
-    value: str
-    line: int
-    column: int
-
-class TokenType(Enum):
-    """Token types for DSL v2 tokenization"""
-    # Literals
-    IDENTIFIER = "IDENTIFIER"
-    STRING = "STRING"
-    NUMBER = "NUMBER"
-    BOOLEAN = "BOOLEAN"
-
-    # Keywords
-    WORKFLOW_ID = "workflow_id"
-    NAME = "name"
-    MODULE = "module"
-    AUTOMATION_TYPE = "automation_type"
-    VERSION = "version"
-    POLICY_PACK = "policy_pack"
-    STEPS = "steps"
-    GOVERNANCE = "governance"
-
-    # ML Keywords (from Task 6.2.1)
-    ML_NODE = "ml_node"
-    THRESHOLD = "threshold"
-    CONFIDENCE = "confidence"
-    FALLBACK = "fallback"
-    EXPLAINABILITY = "explainability"
-
-    # Operators
-    COLON = ":"
-    COMMA = ","
-    LBRACE = "{"
-    RBRACE = "}"
-    LBRACKET = "["
-    RBRACKET = "]"
-
-    # Special
-    NEWLINE = "NEWLINE"
-    INDENT = "INDENT"
-    DEDENT = "DEDENT"
-    EOF = "EOF"
-
 class StepType(Enum):
-    """DSL v2 Step Types with ML nodes"""
-    # Traditional RBA steps
+    """DSL Step Types - Task 6.2-T01 with SaaS extensions"""
+    # Base DSL primitives
     QUERY = "query"
     DECISION = "decision" 
     ACTION = "action"
@@ -114,12 +40,13 @@ class StepType(Enum):
     AGENT_CALL = "agent_call"
     ML_DECISION = "ml_decision"
     
-    # ML steps (Task 6.2.1)
-    ML_NODE = "ml_node"
-    ML_PREDICT = "ml_predict"
-    ML_SCORE = "ml_score"
-    ML_CLASSIFY = "ml_classify"
-    ML_EXPLAIN = "ml_explain"
+    # SaaS-specific primitives (Task 7.1.1)
+    SUBSCRIPTION = "subscription"          # Subscription lifecycle operations
+    BILLING = "billing"                   # Billing and revenue operations
+    CUSTOMER_SUCCESS = "customer_success" # Customer health and success metrics
+    CHURN_ANALYSIS = "churn_analysis"     # Churn prediction and prevention
+    REVENUE_RECOGNITION = "revenue_recognition" # Revenue recognition workflows
+    USAGE_METERING = "usage_metering"     # Usage-based billing metering
 
 class WorkflowStatus(Enum):
     """Workflow execution status"""
@@ -129,7 +56,6 @@ class WorkflowStatus(Enum):
     FAILED = "failed"
     CANCELLED = "cancelled"
 
-# Task 6.2.2: AST Node Definitions
 @dataclass
 class DSLStep:
     """Single step in DSL workflow with SaaS extensions"""
@@ -185,6 +111,10 @@ class DSLCompiler:
         self.mandatory_governance_fields = ['tenant_id', 'region_id', 'sla_tier', 'policy_pack_id']
         self.linting_rules = self._load_linting_rules()
         
+        # Schema registry integration (Task 7.1.7)
+        self.schema_registry = get_schema_registry()
+        self.schema_validation_enabled = self.schema_registry is not None
+        
     def compile_workflow(self, workflow_definition: Union[str, Dict], format: str = 'yaml') -> DSLWorkflowAST:
         """
         Compile workflow definition into AST
@@ -203,6 +133,13 @@ class DSLCompiler:
             else:
                 workflow_dict = workflow_definition
                 
+            # Schema validation (Task 7.1.7)
+            if self.schema_validation_enabled:
+                schema_results = self.schema_registry.validate_workflow(workflow_dict)
+                if not schema_results['valid']:
+                    raise CompilationError(f"Schema validation failed: {schema_results['errors']}")
+                self.logger.info(f"✅ Schema validation passed: {schema_results['schema_id']} v{schema_results['schema_version']}")
+            
             # Create AST from parsed definition
             ast = self._create_ast(workflow_dict)
             
@@ -220,6 +157,21 @@ class DSLCompiler:
                 policy_results = self._validate_policy_compliance(ast)
                 if not policy_results['compliant']:
                     raise CompilationError(f"Policy validation failed: {policy_results['violations']}")
+            
+            # Consent validation (Task 7.1.8)
+            consent_results = self._validate_consent_compliance(ast)
+            if not consent_results['compliant']:
+                raise CompilationError(f"Consent validation failed: {consent_results['violations']}")
+            
+            # Residency enforcement (Task 7.1.9)
+            residency_results = self._validate_residency_compliance(ast)
+            if not residency_results['compliant']:
+                raise CompilationError(f"Residency validation failed: {residency_results['violations']}")
+            
+            # Trust score annotations (Task 7.1.10)
+            trust_results = self._validate_and_annotate_trust_scores(ast)
+            if not trust_results['compliant']:
+                raise CompilationError(f"Trust score validation failed: {trust_results['violations']}")
             
             # Generate plan hash for audit trail (Task 6.2-T04)
             ast.plan_hash = self._generate_plan_hash(ast)
@@ -406,6 +358,342 @@ class DSLCompiler:
         # Check tenant isolation
         if not ast.governance.get('tenant_id'):
             violations.append("All workflows must specify tenant_id for isolation")
+        
+        return {
+            'compliant': len(violations) == 0,
+            'violations': violations
+        }
+    
+    def _validate_consent_compliance(self, ast: DSLWorkflowAST) -> Dict[str, Any]:
+        """
+        Validate consent compliance in DSL workflow (Task 7.1.8)
+        
+        Args:
+            ast: DSL workflow AST
+            
+        Returns:
+            Dict with consent validation results
+        """
+        violations = []
+        
+        try:
+            # Get region and industry from governance metadata
+            governance = ast.governance or {}
+            region_id = governance.get('region_id', 'GLOBAL')
+            industry_overlay = governance.get('industry_overlay', 'GENERIC')
+            
+            # Define regions requiring consent validation
+            consent_required_regions = ['EU', 'UK', 'IN', 'CA', 'BR']  # GDPR, UK-GDPR, DPDP, PIPEDA, LGPD
+            
+            # Check if consent is required for this region
+            consent_required = region_id in consent_required_regions
+            
+            if consent_required:
+                # Validate consent_id is present
+                consent_id = governance.get('consent_id')
+                if not consent_id:
+                    violations.append(f"Consent ID required for region {region_id} but not provided")
+                
+                # Validate consent scope covers workflow operations
+                consent_scope = governance.get('consent_scope', [])
+                workflow_operations = self._extract_workflow_operations(ast)
+                
+                for operation in workflow_operations:
+                    if operation not in consent_scope:
+                        violations.append(f"Operation '{operation}' not covered by consent scope")
+                
+                # Validate consent expiry
+                consent_expiry = governance.get('consent_expiry')
+                if consent_expiry:
+                    try:
+                        from datetime import datetime
+                        expiry_date = datetime.fromisoformat(consent_expiry.replace('Z', '+00:00'))
+                        if expiry_date < datetime.utcnow().replace(tzinfo=expiry_date.tzinfo):
+                            violations.append(f"Consent expired on {consent_expiry}")
+                    except ValueError:
+                        violations.append(f"Invalid consent expiry format: {consent_expiry}")
+                
+                # Industry-specific consent requirements
+                if industry_overlay == 'HEALTHCARE':
+                    # HIPAA requires explicit consent for PHI processing
+                    phi_processing = any(
+                        step.params and step.params.get('data_type') == 'phi' 
+                        for step in ast.steps
+                    )
+                    if phi_processing and 'phi_processing' not in consent_scope:
+                        violations.append("PHI processing requires explicit consent for healthcare workflows")
+                
+                elif industry_overlay == 'FINANCIAL':
+                    # Financial data requires specific consent categories
+                    financial_operations = ['credit_check', 'payment_processing', 'account_analysis']
+                    for op in financial_operations:
+                        if op in workflow_operations and op not in consent_scope:
+                            violations.append(f"Financial operation '{op}' requires explicit consent")
+            
+            self.logger.info(f"✅ Consent validation completed: {len(violations)} violations found")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Consent validation failed: {e}")
+            violations.append(f"Consent validation error: {str(e)}")
+        
+        return {
+            'compliant': len(violations) == 0,
+            'violations': violations
+        }
+    
+    def _extract_workflow_operations(self, ast: DSLWorkflowAST) -> List[str]:
+        """Extract operations performed by workflow for consent validation"""
+        operations = set()
+        
+        for step in ast.steps:
+            step_type = step.type.value if hasattr(step.type, 'value') else str(step.type)
+            step_params = step.params or {}
+            
+            # Map step types to operations
+            if step_type == 'query':
+                source = step_params.get('source', 'unknown')
+                operations.add(f"data_query_{source}")
+                
+                # Specific data types
+                if 'customer' in str(step_params).lower():
+                    operations.add('customer_data_access')
+                if 'billing' in str(step_params).lower():
+                    operations.add('billing_data_access')
+                if 'usage' in str(step_params).lower():
+                    operations.add('usage_data_access')
+            
+            elif step_type == 'decision':
+                operations.add('automated_decision_making')
+                
+                # Check for profiling
+                if any(keyword in str(step_params).lower() for keyword in ['score', 'risk', 'profile', 'segment']):
+                    operations.add('profiling')
+            
+            elif step_type == 'ml_decision':
+                operations.add('automated_decision_making')
+                operations.add('profiling')
+                operations.add('ml_processing')
+            
+            elif step_type == 'notify':
+                operations.add('communication')
+                
+                # Check for marketing communications
+                if 'marketing' in str(step_params).lower():
+                    operations.add('marketing_communication')
+            
+            elif step_type == 'agent_call':
+                operations.add('ai_processing')
+                operations.add('automated_decision_making')
+            
+            # Check for specific data types in parameters
+            data_type = step_params.get('data_type')
+            if data_type == 'phi':
+                operations.add('phi_processing')
+            elif data_type == 'financial':
+                operations.add('financial_data_processing')
+            elif data_type == 'biometric':
+                operations.add('biometric_processing')
+        
+        return list(operations)
+    
+    def _validate_residency_compliance(self, ast: DSLWorkflowAST) -> Dict[str, Any]:
+        """
+        Validate residency compliance in DSL workflow (Task 7.1.9)
+        
+        Args:
+            ast: DSL workflow AST
+            
+        Returns:
+            Dict with residency validation results
+        """
+        violations = []
+        
+        try:
+            governance = ast.governance or {}
+            region_id = governance.get('region_id', 'GLOBAL')
+            tenant_id = governance.get('tenant_id')
+            
+            # Validate region-specific requirements
+            if region_id == 'EU':
+                # GDPR requirements
+                if not governance.get('gdpr_compliant', False):
+                    violations.append("EU region requires GDPR compliance flag")
+                
+                # Data residency check
+                data_residency = governance.get('data_residency', 'GLOBAL')
+                if data_residency not in ['EU', 'GLOBAL']:
+                    violations.append(f"EU region requires EU or GLOBAL data residency, got {data_residency}")
+            
+            elif region_id == 'IN':
+                # DPDP requirements
+                if not governance.get('dpdp_compliant', False):
+                    violations.append("IN region requires DPDP compliance flag")
+                
+                # Data localization check for critical personal data
+                has_critical_data = any(
+                    step.params and step.params.get('data_sensitivity') == 'critical'
+                    for step in ast.steps
+                )
+                if has_critical_data:
+                    data_residency = governance.get('data_residency', 'GLOBAL')
+                    if data_residency != 'IN':
+                        violations.append("Critical personal data in IN region must have IN data residency")
+            
+            elif region_id == 'US':
+                # State-specific requirements (simplified)
+                state = governance.get('state')
+                if state == 'CA' and not governance.get('ccpa_compliant', False):
+                    violations.append("California requires CCPA compliance flag")
+            
+            # Cross-border data transfer validation
+            for step in ast.steps:
+                step_params = step.params or {}
+                target_region = step_params.get('target_region')
+                
+                if target_region and target_region != region_id:
+                    # Check if cross-border transfer is allowed
+                    transfer_mechanism = governance.get('cross_border_transfer_mechanism')
+                    if not transfer_mechanism:
+                        violations.append(f"Cross-border data transfer to {target_region} requires transfer mechanism")
+                    
+                    # Specific transfer validations
+                    if region_id == 'EU' and target_region not in ['EU', 'UK']:
+                        adequacy_decision = governance.get('adequacy_decision', False)
+                        standard_contractual_clauses = governance.get('standard_contractual_clauses', False)
+                        
+                        if not (adequacy_decision or standard_contractual_clauses):
+                            violations.append(f"EU to {target_region} transfer requires adequacy decision or SCCs")
+            
+            self.logger.info(f"✅ Residency validation completed: {len(violations)} violations found")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Residency validation failed: {e}")
+            violations.append(f"Residency validation error: {str(e)}")
+        
+        return {
+            'compliant': len(violations) == 0,
+            'violations': violations
+        }
+    
+    def _validate_and_annotate_trust_scores(self, ast: DSLWorkflowAST) -> Dict[str, Any]:
+        """
+        Validate and annotate trust scores in DSL (Task 7.1.10)
+        
+        Adds reliability metadata for agent orchestration and integrates with trust scoring API
+        """
+        violations = []
+        
+        try:
+            # Check workflow-level trust configuration
+            governance = ast.governance or {}
+            trust_threshold = governance.get('trust_threshold', 0.8)
+            trust_policy = governance.get('trust_policy', 'strict')
+            
+            # Validate trust threshold range
+            if not (0.0 <= trust_threshold <= 1.0):
+                violations.append(f"Invalid trust_threshold {trust_threshold}: must be between 0.0 and 1.0")
+            
+            # Check each step for trust score requirements
+            for step in ast.steps:
+                step_params = step.params or {}
+                step_type = step.type.value if hasattr(step.type, 'value') else str(step.type)
+                governance_block = step.governance or {}
+                
+                # Agent calls and ML decisions require trust scores
+                if step_type in ['agent_call', 'ml_decision']:
+                    
+                    # Check for trust_threshold at step level
+                    step_trust_threshold = governance_block.get('trust_threshold', trust_threshold)
+                    if not (0.0 <= step_trust_threshold <= 1.0):
+                        violations.append(f"Step {step.step_id}: Invalid trust_threshold {step_trust_threshold}")
+                    
+                    # Agent calls require agent trust metadata
+                    if step_type == 'agent_call':
+                        agent_id = step_params.get('agent_id', '')
+                        if not agent_id:
+                            violations.append(f"Step {step.step_id}: Missing agent_id for trust scoring")
+                        
+                        # Annotate with trust requirements
+                        if 'trust_metadata' not in governance_block:
+                            governance_block['trust_metadata'] = {
+                                'required_trust_score': step_trust_threshold,
+                                'trust_policy': trust_policy,
+                                'fallback_on_low_trust': True,
+                                'trust_validation_required': True,
+                                'agent_id': agent_id,
+                                'trust_calculation_method': 'weighted_average',
+                                'trust_factors': ['execution_history', 'error_rate', 'sla_compliance', 'override_frequency']
+                            }
+                    
+                    # ML decisions require model trust metadata
+                    if step_type == 'ml_decision':
+                        model_id = step_params.get('model_id', '')
+                        if not model_id:
+                            violations.append(f"Step {step.step_id}: Missing model_id for trust scoring")
+                        
+                        # Annotate with model trust requirements
+                        if 'trust_metadata' not in governance_block:
+                            governance_block['trust_metadata'] = {
+                                'required_model_trust_score': step_trust_threshold,
+                                'model_confidence_threshold': step_params.get('thresholds', {}).get('accept', 0.8),
+                                'trust_policy': trust_policy,
+                                'fallback_on_low_trust': True,
+                                'model_validation_required': True,
+                                'model_id': model_id,
+                                'trust_calculation_method': 'confidence_weighted',
+                                'trust_factors': ['model_accuracy', 'prediction_confidence', 'data_quality', 'drift_detection']
+                            }
+                
+                # Query steps may require data source trust validation
+                elif step_type == 'query':
+                    source = step_params.get('source', '')
+                    if source in ['api', 'external']:
+                        # External data sources require trust validation
+                        if 'trust_metadata' not in governance_block:
+                            governance_block['trust_metadata'] = {
+                                'data_source_trust_required': True,
+                                'source_validation_policy': trust_policy,
+                                'trust_threshold': trust_threshold,
+                                'source': source,
+                                'trust_factors': ['data_freshness', 'source_reliability', 'schema_compliance']
+                            }
+                
+                # All steps get basic trust tracking
+                if 'trust_metadata' not in governance_block:
+                    governance_block['trust_metadata'] = {
+                        'trust_tracking_enabled': True,
+                        'execution_trust_logging': True,
+                        'step_type': step_type,
+                        'trust_factors': ['execution_success', 'latency', 'resource_usage']
+                    }
+                
+                # Update the step with annotated governance
+                step.governance = governance_block
+            
+            # Annotate workflow-level trust metadata
+            if 'trust_metadata' not in governance:
+                governance['trust_metadata'] = {
+                    'workflow_trust_threshold': trust_threshold,
+                    'trust_policy': trust_policy,
+                    'trust_aggregation_method': 'weighted_average',
+                    'trust_validation_enabled': True,
+                    'trust_score_required_for_execution': True,
+                    'trust_calculation_factors': {
+                        'step_success_rate': 0.4,
+                        'sla_compliance': 0.3,
+                        'override_frequency': 0.2,
+                        'execution_latency': 0.1
+                    },
+                    'trust_score_cache_ttl': 300,  # 5 minutes
+                    'trust_score_api_integration': True
+                }
+                ast.governance = governance
+            
+            self.logger.info(f"Trust score validation completed: {len(violations)} violations found")
+            
+        except Exception as e:
+            self.logger.error(f"Trust score validation error: {e}")
+            violations.append(f"Trust score validation failed: {str(e)}")
         
         return {
             'compliant': len(violations) == 0,

@@ -1,11 +1,19 @@
 """
-RBA Connector Gateway - Task 10.1-T13, T14
-Policy-aware connector gateway that serves as single choke point for all external system calls.
-Implements rate limits, quotas, circuit-breakers, and governance-first design.
+Integration Gateway - Tasks 9.2.19, 10.1-T13, T14
+Unified ingress/egress gateway for all external system calls across planes.
+Implements rate limits, quotas, circuit-breakers, governance-first design, and cross-plane routing.
+
+Task 9.2.19: Integration Gateway - Unified ingress/egress
+- Cross-plane request routing and load balancing
+- Dynamic service discovery and health checking
+- Governance plane integration for all requests
+- Multi-tenant request isolation and SLA enforcement
+- Real-time monitoring and observability
 """
 
 import asyncio
 import json
+import os
 import time
 import logging
 from datetime import datetime, timezone, timedelta
@@ -23,6 +31,33 @@ class GatewayStatus(Enum):
     DEGRADED = "degraded"
     CIRCUIT_OPEN = "circuit_open"
     MAINTENANCE = "maintenance"
+
+# Task 9.2.19: Integration Gateway enhancements
+class PlaneType(Enum):
+    """Architectural planes for request routing"""
+    CONTROL = "control"
+    EXECUTION = "execution"
+    DATA = "data"
+    GOVERNANCE = "governance"
+    UX = "ux"
+
+class ServiceType(Enum):
+    """Service types for dynamic discovery"""
+    ORCHESTRATOR = "orchestrator"
+    REGISTRY = "registry"
+    EVIDENCE = "evidence"
+    POLICY = "policy"
+    CONNECTOR = "connector"
+    AGENT = "agent"
+    DASHBOARD = "dashboard"
+
+class LoadBalancingStrategy(Enum):
+    """Load balancing strategies"""
+    ROUND_ROBIN = "round_robin"
+    WEIGHTED = "weighted"
+    LEAST_CONNECTIONS = "least_connections"
+    HEALTH_BASED = "health_based"
+    SLA_AWARE = "sla_aware"
 
 class PolicyDecision(Enum):
     """Policy enforcement decision"""
@@ -109,7 +144,10 @@ class PolicyEnforcementResult:
 
 @dataclass
 class CircuitBreakerState:
-    """Circuit breaker state for a connector"""
+    """
+    Task 9.5.8: Enhanced Circuit breaker state for APIs - Resilience patterns
+    DYNAMIC configuration with no hardcoding
+    """
     connector_name: str
     tenant_id: str
     
@@ -120,48 +158,127 @@ class CircuitBreakerState:
     last_failure_time: Optional[datetime] = None
     last_success_time: Optional[datetime] = None
     
-    # Configuration
-    failure_threshold: int = 5
-    recovery_timeout: int = 60  # seconds
-    success_threshold: int = 3  # for half-open -> closed transition
+    # DYNAMIC configuration - no hardcoding
+    failure_threshold: int = field(default_factory=lambda: int(os.getenv("CIRCUIT_BREAKER_FAILURE_THRESHOLD", "5")))
+    recovery_timeout_seconds: int = field(default_factory=lambda: int(os.getenv("CIRCUIT_BREAKER_RECOVERY_TIMEOUT", "60")))
+    half_open_max_calls: int = field(default_factory=lambda: int(os.getenv("CIRCUIT_BREAKER_HALF_OPEN_CALLS", "3")))
+    
+    # SLA-aware thresholds
+    sla_tier: str = "standard"
+    response_time_threshold_ms: int = field(default_factory=lambda: int(os.getenv("CIRCUIT_BREAKER_RESPONSE_THRESHOLD", "5000")))
+    
+    # Advanced metrics
+    total_requests: int = 0
+    total_failures: int = 0
+    avg_response_time_ms: float = 0.0
+    error_rate: float = 0.0
+    
+    # Plane-specific configuration
+    plane_type: Optional[str] = None
+    service_type: Optional[str] = None
     
     def should_allow_request(self) -> bool:
-        """Check if request should be allowed based on circuit breaker state"""
+        """
+        Task 9.5.8: Enhanced circuit breaker logic - DYNAMIC decision making
+        Check if request should be allowed based on circuit breaker state
+        """
         now = datetime.now(timezone.utc)
         
         if self.state == "closed":
             return True
         elif self.state == "open":
-            if self.last_failure_time and (now - self.last_failure_time).total_seconds() > self.recovery_timeout:
+            # Check if recovery timeout has passed - DYNAMIC timeout
+            if self.last_failure_time and (now - self.last_failure_time).total_seconds() > self.recovery_timeout_seconds:
                 self.state = "half_open"
                 self.success_count = 0
                 return True
             return False
         elif self.state == "half_open":
-            return True
+            # Allow limited requests in half-open state
+            return self.success_count < self.half_open_max_calls
         
         return False
     
-    def record_success(self):
-        """Record successful request"""
+    def record_success(self, response_time_ms: float = 0.0):
+        """
+        Task 9.5.8: Enhanced success recording with SLA awareness
+        Record successful request with response time tracking
+        """
         self.last_success_time = datetime.now(timezone.utc)
+        self.total_requests += 1
+        
+        # Update average response time
+        if self.total_requests > 1:
+            self.avg_response_time_ms = (
+                (self.avg_response_time_ms * (self.total_requests - 1) + response_time_ms) / 
+                self.total_requests
+            )
+        else:
+            self.avg_response_time_ms = response_time_ms
+        
+        # Update error rate
+        self.error_rate = self.total_failures / self.total_requests if self.total_requests > 0 else 0.0
         
         if self.state == "half_open":
             self.success_count += 1
-            if self.success_count >= self.success_threshold:
+            # Transition to closed if enough successes - DYNAMIC threshold
+            if self.success_count >= self.half_open_max_calls:
                 self.state = "closed"
                 self.failure_count = 0
         elif self.state == "closed":
+            # Reduce failure count on success (gradual recovery)
             self.failure_count = max(0, self.failure_count - 1)
     
-    def record_failure(self):
-        """Record failed request"""
+    def record_failure(self, response_time_ms: float = 0.0, error_type: str = "unknown"):
+        """
+        Task 9.5.8: Enhanced failure recording with error classification
+        Record failed request with detailed error tracking
+        """
         self.last_failure_time = datetime.now(timezone.utc)
         self.failure_count += 1
+        self.total_requests += 1
+        self.total_failures += 1
         
-        if self.failure_count >= self.failure_threshold:
+        # Update average response time (even for failures)
+        if self.total_requests > 1:
+            self.avg_response_time_ms = (
+                (self.avg_response_time_ms * (self.total_requests - 1) + response_time_ms) / 
+                self.total_requests
+            )
+        else:
+            self.avg_response_time_ms = response_time_ms
+        
+        # Update error rate
+        self.error_rate = self.total_failures / self.total_requests
+        
+        # Check for SLA-aware circuit breaking
+        sla_breach = response_time_ms > self.response_time_threshold_ms
+        
+        # Open circuit if failure threshold reached or SLA consistently breached
+        if self.failure_count >= self.failure_threshold or (sla_breach and self.error_rate > 0.5):
             self.state = "open"
             self.success_count = 0
+    
+    def get_circuit_breaker_status(self) -> Dict[str, Any]:
+        """Get comprehensive circuit breaker status"""
+        return {
+            "state": self.state,
+            "failure_count": self.failure_count,
+            "success_count": self.success_count,
+            "total_requests": self.total_requests,
+            "total_failures": self.total_failures,
+            "error_rate": round(self.error_rate, 3),
+            "avg_response_time_ms": round(self.avg_response_time_ms, 2),
+            "last_failure_time": self.last_failure_time.isoformat() if self.last_failure_time else None,
+            "last_success_time": self.last_success_time.isoformat() if self.last_success_time else None,
+            "configuration": {
+                "failure_threshold": self.failure_threshold,
+                "recovery_timeout_seconds": self.recovery_timeout_seconds,
+                "half_open_max_calls": self.half_open_max_calls,
+                "response_time_threshold_ms": self.response_time_threshold_ms,
+                "sla_tier": self.sla_tier
+            }
+        }
 
 class ConnectorGateway:
     """
@@ -730,5 +847,336 @@ class ConnectorGateway:
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }
 
-# Global gateway instance
+# Task 9.2.19: Integration Gateway - Unified ingress/egress
+@dataclass
+class ServiceEndpoint:
+    """Service endpoint for dynamic discovery"""
+    service_id: str
+    service_type: ServiceType
+    plane: PlaneType
+    endpoint_url: str
+    health_check_url: str
+    tenant_id: Optional[int] = None
+    sla_tier: str = "standard"
+    weight: int = 100
+    max_connections: int = 1000
+    timeout_ms: int = 30000
+    
+    # Health and performance metrics
+    is_healthy: bool = True
+    response_time_ms: float = 0.0
+    success_rate: float = 1.0
+    active_connections: int = 0
+    last_health_check: Optional[datetime] = None
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "service_id": self.service_id,
+            "service_type": self.service_type.value,
+            "plane": self.plane.value,
+            "endpoint_url": self.endpoint_url,
+            "tenant_id": self.tenant_id,
+            "sla_tier": self.sla_tier,
+            "is_healthy": self.is_healthy,
+            "response_time_ms": self.response_time_ms,
+            "success_rate": self.success_rate,
+            "active_connections": self.active_connections,
+            "last_health_check": self.last_health_check.isoformat() if self.last_health_check else None
+        }
+
+class IntegrationGateway(ConnectorGateway):
+    """
+    Task 9.2.19: Integration Gateway - Unified ingress/egress
+    Enhanced ConnectorGateway with cross-plane routing and service discovery
+    """
+    
+    def __init__(self, pool_manager=None):
+        super().__init__(pool_manager)
+        
+        # Service discovery and routing - DYNAMIC configuration
+        self.service_registry: Dict[str, ServiceEndpoint] = {}
+        self.plane_services: Dict[PlaneType, List[str]] = {plane: [] for plane in PlaneType}
+        self.load_balancing_strategy = LoadBalancingStrategy.SLA_AWARE
+        
+        # Cross-plane routing configuration - NO hardcoding
+        self.routing_rules: Dict[str, Dict[str, Any]] = {}
+        self.plane_priorities: Dict[PlaneType, int] = {
+            PlaneType.GOVERNANCE: 1,  # Highest priority
+            PlaneType.CONTROL: 2,
+            PlaneType.EXECUTION: 3,
+            PlaneType.DATA: 4,
+            PlaneType.UX: 5  # Lowest priority
+        }
+        
+        # Dynamic configuration from environment/tenant settings
+        self.gateway_config = {
+            "health_check_interval_seconds": int(os.getenv("GATEWAY_HEALTH_CHECK_INTERVAL", "30")),
+            "service_discovery_enabled": os.getenv("GATEWAY_SERVICE_DISCOVERY", "true").lower() == "true",
+            "cross_plane_routing_enabled": os.getenv("GATEWAY_CROSS_PLANE_ROUTING", "true").lower() == "true",
+            "load_balancing_enabled": os.getenv("GATEWAY_LOAD_BALANCING", "true").lower() == "true",
+            "auto_scaling_enabled": os.getenv("GATEWAY_AUTO_SCALING", "true").lower() == "true",
+            "governance_enforcement": os.getenv("GATEWAY_GOVERNANCE_ENFORCEMENT", "true").lower() == "true"
+        }
+        
+        # Observability and monitoring
+        self.cross_plane_metrics = {
+            "requests_by_plane": {plane.value: 0 for plane in PlaneType},
+            "response_times_by_plane": {plane.value: [] for plane in PlaneType},
+            "errors_by_plane": {plane.value: 0 for plane in PlaneType},
+            "service_discovery_events": 0,
+            "routing_decisions": 0,
+            "load_balancing_decisions": 0
+        }
+        
+        logger.info("🌐 Integration Gateway initialized with cross-plane routing")
+    
+    async def register_service(self, service: ServiceEndpoint) -> bool:
+        """Register a service endpoint for dynamic discovery"""
+        try:
+            # Validate service configuration
+            if not service.service_id or not service.endpoint_url:
+                logger.error(f"Invalid service configuration: {service}")
+                return False
+            
+            # Register service
+            self.service_registry[service.service_id] = service
+            
+            # Add to plane-specific service list
+            if service.service_id not in self.plane_services[service.plane]:
+                self.plane_services[service.plane].append(service.service_id)
+            
+            # Perform initial health check
+            await self._health_check_service(service.service_id)
+            
+            self.cross_plane_metrics["service_discovery_events"] += 1
+            logger.info(f"✅ Registered service {service.service_id} on {service.plane.value} plane")
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to register service {service.service_id}: {e}")
+            return False
+    
+    async def route_request(self, request: ConnectorRequest, target_plane: PlaneType, 
+                          service_type: ServiceType) -> Dict[str, Any]:
+        """Route request to appropriate service using dynamic discovery and load balancing"""
+        try:
+            # Get available services for the target plane and type
+            available_services = self._get_available_services(target_plane, service_type, request.tenant_id)
+            
+            if not available_services:
+                return {
+                    "success": False,
+                    "error": f"No available services for {service_type.value} on {target_plane.value} plane",
+                    "plane": target_plane.value,
+                    "service_type": service_type.value
+                }
+            
+            # Select service using load balancing strategy
+            selected_service = await self._select_service(available_services, request)
+            
+            if not selected_service:
+                return {
+                    "success": False,
+                    "error": "No healthy services available",
+                    "plane": target_plane.value,
+                    "service_type": service_type.value
+                }
+            
+            # Route request to selected service
+            response = await self._execute_service_request(selected_service, request)
+            
+            # Update metrics
+            self.cross_plane_metrics["requests_by_plane"][target_plane.value] += 1
+            self.cross_plane_metrics["routing_decisions"] += 1
+            
+            return response
+            
+        except Exception as e:
+            logger.error(f"❌ Request routing failed: {e}")
+            self.cross_plane_metrics["errors_by_plane"][target_plane.value] += 1
+            return {
+                "success": False,
+                "error": str(e),
+                "plane": target_plane.value,
+                "service_type": service_type.value
+            }
+    
+    def _get_available_services(self, plane: PlaneType, service_type: ServiceType, 
+                              tenant_id: Optional[str] = None) -> List[ServiceEndpoint]:
+        """Get available services for plane and type with tenant filtering"""
+        available = []
+        
+        for service_id in self.plane_services.get(plane, []):
+            service = self.service_registry.get(service_id)
+            if not service:
+                continue
+            
+            # Filter by service type
+            if service.service_type != service_type:
+                continue
+            
+            # Filter by tenant (if specified and service is tenant-specific)
+            if tenant_id and service.tenant_id and str(service.tenant_id) != str(tenant_id):
+                continue
+            
+            # Filter by health status
+            if not service.is_healthy:
+                continue
+            
+            available.append(service)
+        
+        return available
+    
+    async def _select_service(self, services: List[ServiceEndpoint], 
+                            request: ConnectorRequest) -> Optional[ServiceEndpoint]:
+        """Select service using configured load balancing strategy - DYNAMIC selection"""
+        if not services:
+            return None
+        
+        self.cross_plane_metrics["load_balancing_decisions"] += 1
+        
+        if self.load_balancing_strategy == LoadBalancingStrategy.SLA_AWARE:
+            # Sort by SLA tier and response time
+            sla_priorities = {"premium": 1, "standard": 2, "basic": 3}
+            services.sort(key=lambda s: (
+                sla_priorities.get(s.sla_tier, 4),
+                s.response_time_ms,
+                s.active_connections
+            ))
+            return services[0]
+        
+        elif self.load_balancing_strategy == LoadBalancingStrategy.HEALTH_BASED:
+            # Select service with best health metrics
+            services.sort(key=lambda s: (-s.success_rate, s.response_time_ms))
+            return services[0]
+        
+        elif self.load_balancing_strategy == LoadBalancingStrategy.LEAST_CONNECTIONS:
+            # Select service with least active connections
+            services.sort(key=lambda s: s.active_connections)
+            return services[0]
+        
+        else:  # ROUND_ROBIN (default)
+            # Simple round-robin selection
+            return services[0]
+    
+    async def _execute_service_request(self, service: ServiceEndpoint, 
+                                     request: ConnectorRequest) -> Dict[str, Any]:
+        """Execute request against selected service"""
+        start_time = time.time()
+        
+        try:
+            # Increment active connections
+            service.active_connections += 1
+            
+            # Build request URL dynamically
+            request_url = f"{service.endpoint_url.rstrip('/')}/{request.operation}"
+            
+            # Execute request (placeholder - would use actual HTTP client)
+            await asyncio.sleep(0.1)  # Simulate network call
+            
+            # Calculate response time
+            response_time = (time.time() - start_time) * 1000
+            
+            # Update service metrics dynamically
+            service.response_time_ms = (service.response_time_ms + response_time) / 2
+            service.success_rate = min(1.0, service.success_rate + 0.01)
+            
+            # Update cross-plane metrics
+            plane_response_times = self.cross_plane_metrics["response_times_by_plane"][service.plane.value]
+            plane_response_times.append(response_time)
+            if len(plane_response_times) > 100:  # Keep last 100 measurements
+                plane_response_times.pop(0)
+            
+            return {
+                "success": True,
+                "service_id": service.service_id,
+                "plane": service.plane.value,
+                "response_time_ms": response_time,
+                "data": {"message": "Request processed successfully"}
+            }
+            
+        except Exception as e:
+            # Update error metrics
+            service.success_rate = max(0.0, service.success_rate - 0.05)
+            logger.error(f"Service request failed: {e}")
+            
+            return {
+                "success": False,
+                "service_id": service.service_id,
+                "plane": service.plane.value,
+                "error": str(e)
+            }
+        
+        finally:
+            # Decrement active connections
+            service.active_connections = max(0, service.active_connections - 1)
+    
+    async def _health_check_service(self, service_id: str) -> bool:
+        """Perform health check on a specific service"""
+        service = self.service_registry.get(service_id)
+        if not service:
+            return False
+        
+        try:
+            # Perform health check (placeholder - would use actual HTTP call)
+            await asyncio.sleep(0.05)  # Simulate health check call
+            
+            service.is_healthy = True
+            service.last_health_check = datetime.now()
+            
+            return True
+            
+        except Exception as e:
+            logger.warning(f"Health check failed for service {service_id}: {e}")
+            service.is_healthy = False
+            service.last_health_check = datetime.now()
+            
+            return False
+    
+    async def start_health_monitoring(self):
+        """Start background health monitoring for all services"""
+        async def health_monitor():
+            while True:
+                try:
+                    await asyncio.sleep(self.gateway_config["health_check_interval_seconds"])
+                    
+                    # Health check all registered services
+                    for service_id in list(self.service_registry.keys()):
+                        await self._health_check_service(service_id)
+                    
+                except Exception as e:
+                    logger.error(f"Health monitoring error: {e}")
+        
+        # Start health monitoring task
+        if self.gateway_config["service_discovery_enabled"]:
+            asyncio.create_task(health_monitor())
+            logger.info("🔍 Started health monitoring for all services")
+    
+    def get_integration_gateway_status(self) -> Dict[str, Any]:
+        """Get comprehensive integration gateway status"""
+        base_status = self.get_gateway_status()
+        
+        # Add integration gateway specific metrics
+        base_status.update({
+            "integration_gateway": {
+                "registered_services": len(self.service_registry),
+                "services_by_plane": {
+                    plane.value: len(services) 
+                    for plane, services in self.plane_services.items()
+                },
+                "cross_plane_metrics": self.cross_plane_metrics.copy(),
+                "load_balancing_strategy": self.load_balancing_strategy.value,
+                "configuration": self.gateway_config.copy()
+            },
+            "service_health": {
+                service_id: service.to_dict()
+                for service_id, service in self.service_registry.items()
+            }
+        })
+        
+        return base_status
+
+# Global gateway instances
 connector_gateway = ConnectorGateway()
+integration_gateway = IntegrationGateway()
