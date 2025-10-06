@@ -23,6 +23,28 @@ class OverrideType(Enum):
     BUSINESS_EXCEPTION = "business_exception"
     TECHNICAL_OVERRIDE = "technical_override"
     RISK_ACCEPTANCE = "risk_acceptance"
+    # Chapter 16.2: SaaS Industry Scenarios
+    POLICY_VIOLATION = "policy_violation"
+    EMERGENCY_BYPASS = "emergency_bypass"
+    COMPLIANCE_WAIVER = "compliance_waiver"
+
+class OverrideCategory(Enum):
+    """Chapter 16.2: Override categories for industry scenarios"""
+    REVENUE_RECOGNITION = "revenue_recognition"
+    CHURN_PREVENTION = "churn_prevention"
+    SUBSCRIPTION_LIFECYCLE = "subscription_lifecycle"
+    USAGE_BILLING = "usage_billing"
+    BILLING_DISPUTE = "billing_dispute"
+    COMPLIANCE_WAIVER = "compliance_waiver"
+
+class IndustryScenario(Enum):
+    """Chapter 16.2: SaaS industry-specific scenarios"""
+    SAAS_REVENUE_ADJUSTMENT = "saas_revenue_adjustment"
+    SUBSCRIPTION_CANCELLATION = "subscription_cancellation"
+    BILLING_DISPUTE_RESOLUTION = "billing_dispute_resolution"
+    CHURN_PREVENTION_OVERRIDE = "churn_prevention_override"
+    USAGE_OVERAGE_WAIVER = "usage_overage_waiver"
+    COMPLIANCE_EXCEPTION = "compliance_exception"
 
 class OverrideStatus(Enum):
     """Override status"""
@@ -51,6 +73,12 @@ class ApprovalRole(Enum):
     OPERATIONS_MANAGER = "operations_manager"
     SECURITY_OFFICER = "security_officer"
     LEGAL_COUNSEL = "legal_counsel"
+    # Chapter 16.2: SaaS-specific approval roles
+    FINANCE_MANAGER = "finance_manager"
+    CUSTOMER_SUCCESS_MANAGER = "customer_success_manager"
+    SALES_DIRECTOR = "sales_director"
+    BILLING_MANAGER = "billing_manager"
+    VP_CUSTOMER_SUCCESS = "vp_customer_success"
 
 @dataclass
 class OverrideRequest:
@@ -82,11 +110,25 @@ class OverrideRequest:
     compliance_frameworks: List[str] = field(default_factory=list)
     regulatory_impact: str = ""
     
+    # Chapter 16.2: Industry scenario fields
+    override_category: Optional[OverrideCategory] = None
+    industry_scenario: Optional[IndustryScenario] = None
+    financial_impact_usd: Optional[float] = None
+    supporting_documents: List[str] = field(default_factory=list)
+    witness_user_ids: List[int] = field(default_factory=list)
+    original_decision: Dict[str, Any] = field(default_factory=dict)
+    override_decision: Dict[str, Any] = field(default_factory=dict)
+    
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
         data['override_type'] = self.override_type.value
         data['risk_level'] = self.risk_level.value
+        # Chapter 16.2: Include new enum fields
+        if self.override_category:
+            data['override_category'] = self.override_category.value
+        if self.industry_scenario:
+            data['industry_scenario'] = self.industry_scenario.value
         return data
 
 @dataclass
@@ -287,10 +329,24 @@ class OverrideLedgerManager:
             OverrideType.COMPLIANCE_EXCEPTION: [ApprovalRole.COMPLIANCE_MANAGER, ApprovalRole.LEGAL_COUNSEL],
             OverrideType.BUSINESS_EXCEPTION: [ApprovalRole.CRO],
             OverrideType.TECHNICAL_OVERRIDE: [ApprovalRole.OPERATIONS_MANAGER, ApprovalRole.SECURITY_OFFICER],
-            OverrideType.RISK_ACCEPTANCE: [ApprovalRole.RISK_MANAGER, ApprovalRole.CFO]
+            OverrideType.RISK_ACCEPTANCE: [ApprovalRole.RISK_MANAGER, ApprovalRole.CFO],
+            # Chapter 16.2: SaaS industry scenario workflows
+            OverrideType.POLICY_VIOLATION: [ApprovalRole.FINANCE_MANAGER, ApprovalRole.CFO],
+            OverrideType.EMERGENCY_BYPASS: [ApprovalRole.OPERATIONS_MANAGER, ApprovalRole.COMPLIANCE_MANAGER],
+            OverrideType.COMPLIANCE_WAIVER: [ApprovalRole.COMPLIANCE_MANAGER, ApprovalRole.LEGAL_COUNSEL]
         }
         
-        self.logger.info(f"✅ Initialized approval workflows for {len(self.approval_workflows)} override types")
+        # Chapter 16.2: SaaS industry scenario-specific workflows
+        self.saas_scenario_workflows = {
+            IndustryScenario.SAAS_REVENUE_ADJUSTMENT: [ApprovalRole.FINANCE_MANAGER, ApprovalRole.CFO],
+            IndustryScenario.SUBSCRIPTION_CANCELLATION: [ApprovalRole.CUSTOMER_SUCCESS_MANAGER, ApprovalRole.SALES_DIRECTOR],
+            IndustryScenario.BILLING_DISPUTE_RESOLUTION: [ApprovalRole.BILLING_MANAGER, ApprovalRole.FINANCE_MANAGER],
+            IndustryScenario.CHURN_PREVENTION_OVERRIDE: [ApprovalRole.CUSTOMER_SUCCESS_MANAGER, ApprovalRole.VP_CUSTOMER_SUCCESS],
+            IndustryScenario.USAGE_OVERAGE_WAIVER: [ApprovalRole.BILLING_MANAGER, ApprovalRole.CUSTOMER_SUCCESS_MANAGER],
+            IndustryScenario.COMPLIANCE_EXCEPTION: [ApprovalRole.COMPLIANCE_MANAGER, ApprovalRole.LEGAL_COUNSEL]
+        }
+        
+        self.logger.info(f"✅ Initialized approval workflows for {len(self.approval_workflows)} override types and {len(self.saas_scenario_workflows)} SaaS scenarios")
     
     async def create_override_request(
         self,
@@ -753,6 +809,83 @@ class OverrideLedgerManager:
             'overrides_by_risk_level': overrides_by_risk,
             'pending_approvals': len([e for e in self.ledger_entries.values() if e.status == OverrideStatus.PENDING_APPROVAL]),
             'active_overrides': len([e for e in self.ledger_entries.values() if e.status == OverrideStatus.ACTIVE])
+        }
+    
+    def get_saas_override_templates(self) -> Dict[str, Any]:
+        """Chapter 16.2: Get SaaS override scenario templates"""
+        return {
+            "scenarios": {
+                "saas_revenue_adjustment": {
+                    "name": "SaaS Revenue Recognition Adjustment",
+                    "description": "Override revenue recognition timing or amount",
+                    "risk_factors": ["sox_compliance", "audit_impact", "financial_reporting"],
+                    "required_approvers": [ApprovalRole.FINANCE_MANAGER.value, ApprovalRole.CFO.value],
+                    "compliance_frameworks": ["SOX"],
+                    "typical_reasons": [
+                        "Contract amendment after revenue recognition",
+                        "Customer payment dispute resolution",
+                        "Subscription upgrade/downgrade timing",
+                        "Multi-year contract allocation adjustment"
+                    ]
+                },
+                "subscription_cancellation": {
+                    "name": "Subscription Cancellation Override",
+                    "description": "Override subscription cancellation policies",
+                    "risk_factors": ["customer_retention", "revenue_impact", "contract_terms"],
+                    "required_approvers": [ApprovalRole.CUSTOMER_SUCCESS_MANAGER.value, ApprovalRole.SALES_DIRECTOR.value],
+                    "compliance_frameworks": ["SAAS_BUSINESS_RULES"],
+                    "typical_reasons": [
+                        "High-value customer retention attempt",
+                        "Contract term negotiation",
+                        "Service level agreement breach",
+                        "Customer success intervention"
+                    ]
+                },
+                "billing_dispute_resolution": {
+                    "name": "Billing Dispute Resolution",
+                    "description": "Override billing calculations for dispute resolution",
+                    "risk_factors": ["customer_satisfaction", "revenue_impact", "legal_risk"],
+                    "required_approvers": [ApprovalRole.BILLING_MANAGER.value, ApprovalRole.FINANCE_MANAGER.value],
+                    "compliance_frameworks": ["SAAS_BUSINESS_RULES"],
+                    "typical_reasons": [
+                        "Usage calculation error",
+                        "Pricing tier misapplication",
+                        "Promotional discount application",
+                        "Service credit application"
+                    ]
+                },
+                "churn_prevention_override": {
+                    "name": "Churn Prevention Override",
+                    "description": "Override churn prediction actions for retention",
+                    "risk_factors": ["customer_lifetime_value", "retention_cost", "success_probability"],
+                    "required_approvers": [ApprovalRole.CUSTOMER_SUCCESS_MANAGER.value, ApprovalRole.VP_CUSTOMER_SUCCESS.value],
+                    "compliance_frameworks": ["SAAS_BUSINESS_RULES"],
+                    "typical_reasons": [
+                        "High-value customer at-risk",
+                        "Strategic account retention",
+                        "Competitive threat response",
+                        "Product adoption intervention"
+                    ]
+                },
+                "usage_overage_waiver": {
+                    "name": "Usage Overage Waiver",
+                    "description": "Waive usage overage charges",
+                    "risk_factors": ["revenue_impact", "customer_satisfaction", "precedent_setting"],
+                    "required_approvers": [ApprovalRole.BILLING_MANAGER.value, ApprovalRole.CUSTOMER_SUCCESS_MANAGER.value],
+                    "compliance_frameworks": ["SAAS_BUSINESS_RULES"],
+                    "typical_reasons": [
+                        "Service outage compensation",
+                        "Customer onboarding assistance",
+                        "Technical issue resolution",
+                        "Contract negotiation goodwill"
+                    ]
+                }
+            },
+            "approval_workflows": {k.value: [role.value for role in v] for k, v in self.saas_scenario_workflows.items()},
+            "override_types": [otype.value for otype in OverrideType],
+            "override_categories": [cat.value for cat in OverrideCategory],
+            "industry_scenarios": [scenario.value for scenario in IndustryScenario],
+            "risk_levels": [level.value for level in OverrideRiskLevel]
         }
 
 # Global instance
