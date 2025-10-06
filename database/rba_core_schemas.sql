@@ -353,6 +353,471 @@ CREATE POLICY dsl_capability_registry_rls_policy ON dsl_capability_registry
     FOR ALL USING (tenant_id = COALESCE(current_setting('app.current_tenant_id', true)::integer, -1));
 
 -- ============================================================================
+-- CHAPTER 14: CAPABILITY REGISTRY & MARKETPLACE TABLES
+-- ============================================================================
+
+-- Task 14.1.2: Provision capability_schema_version table (Track lifecycle states)
+CREATE TABLE IF NOT EXISTS capability_schema_version (
+    version_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    schema_id UUID NOT NULL,
+    tenant_id INTEGER NOT NULL,
+    
+    -- Version Information
+    version_number VARCHAR(50) NOT NULL, -- e.g., "1.2.3-alpha.1+build.123"
+    lifecycle_state VARCHAR(20) NOT NULL DEFAULT 'draft', -- draft, tested, promoted, deprecated, retired
+    
+    -- Schema Content
+    schema_definition JSONB NOT NULL,
+    schema_hash VARCHAR(64) NOT NULL, -- SHA256 hash for integrity
+    
+    -- Metadata
+    description TEXT,
+    release_notes TEXT,
+    breaking_changes BOOLEAN DEFAULT false,
+    
+    -- Lifecycle Timestamps
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    tested_at TIMESTAMPTZ,
+    promoted_at TIMESTAMPTZ,
+    deprecated_at TIMESTAMPTZ,
+    retired_at TIMESTAMPTZ,
+    
+    -- Governance
+    created_by_user_id INTEGER,
+    approved_by_user_id INTEGER,
+    
+    CONSTRAINT valid_lifecycle_state CHECK (lifecycle_state IN ('draft', 'tested', 'promoted', 'deprecated', 'retired')),
+    FOREIGN KEY (tenant_id) REFERENCES tenant_metadata(tenant_id)
+);
+
+-- Enable RLS on capability_schema_version
+ALTER TABLE capability_schema_version ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policy for capability_schema_version
+CREATE POLICY capability_schema_version_rls_policy ON capability_schema_version
+    FOR ALL USING (tenant_id = COALESCE(current_setting('app.current_tenant_id', true)::integer, -1));
+
+-- Task 14.1.4: Provision capability_schema_relation table (Capture capability relationships)
+CREATE TABLE IF NOT EXISTS capability_schema_relation (
+    relation_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id INTEGER NOT NULL,
+    
+    -- Relationship Definition
+    source_capability_id UUID NOT NULL,
+    target_capability_id UUID NOT NULL,
+    relation_type VARCHAR(50) NOT NULL, -- depends_on, extends, implements, conflicts_with, replaces
+    
+    -- Relationship Metadata
+    description TEXT,
+    strength DECIMAL(3,2) DEFAULT 1.0, -- Relationship strength (0.0 to 1.0)
+    is_required BOOLEAN DEFAULT false,
+    
+    -- Versioning
+    source_version VARCHAR(50),
+    target_version VARCHAR(50),
+    
+    -- Timestamps
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_by_user_id INTEGER,
+    
+    CONSTRAINT valid_relation_type CHECK (relation_type IN ('depends_on', 'extends', 'implements', 'conflicts_with', 'replaces')),
+    CONSTRAINT valid_strength CHECK (strength >= 0.0 AND strength <= 1.0),
+    CONSTRAINT no_self_reference CHECK (source_capability_id != target_capability_id),
+    FOREIGN KEY (tenant_id) REFERENCES tenant_metadata(tenant_id),
+    UNIQUE (tenant_id, source_capability_id, target_capability_id, relation_type)
+);
+
+-- Enable RLS on capability_schema_relation
+ALTER TABLE capability_schema_relation ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policy for capability_schema_relation
+CREATE POLICY capability_schema_relation_rls_policy ON capability_schema_relation
+    FOR ALL USING (tenant_id = COALESCE(current_setting('app.current_tenant_id', true)::integer, -1));
+
+-- Task 14.2.2: Provision capability_meta_sla table (Store SLA attributes)
+CREATE TABLE IF NOT EXISTS capability_meta_sla (
+    sla_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    capability_id UUID NOT NULL,
+    tenant_id INTEGER NOT NULL,
+    
+    -- SLA Metrics
+    max_response_time_ms INTEGER NOT NULL DEFAULT 5000,
+    max_throughput_per_second INTEGER NOT NULL DEFAULT 100,
+    min_availability_percent DECIMAL(5,2) NOT NULL DEFAULT 99.9,
+    max_error_rate_percent DECIMAL(5,2) NOT NULL DEFAULT 1.0,
+    
+    -- Performance Guarantees
+    p50_latency_ms INTEGER,
+    p95_latency_ms INTEGER,
+    p99_latency_ms INTEGER,
+    
+    -- Capacity Limits
+    max_concurrent_executions INTEGER DEFAULT 10,
+    max_memory_mb INTEGER DEFAULT 512,
+    max_cpu_percent DECIMAL(5,2) DEFAULT 80.0,
+    
+    -- SLA Tiers
+    sla_tier VARCHAR(20) NOT NULL DEFAULT 'standard', -- premium, standard, basic
+    priority_level INTEGER DEFAULT 3, -- 1=highest, 5=lowest
+    
+    -- Failover & Recovery
+    failover_enabled BOOLEAN DEFAULT false,
+    max_retry_attempts INTEGER DEFAULT 3,
+    circuit_breaker_threshold INTEGER DEFAULT 5,
+    
+    -- Industry Specific
+    industry_code VARCHAR(20),
+    compliance_requirements JSONB DEFAULT '[]',
+    
+    -- Timestamps
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    effective_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    effective_until TIMESTAMPTZ,
+    
+    -- Governance
+    created_by_user_id INTEGER,
+    approved_by_user_id INTEGER,
+    
+    CONSTRAINT valid_sla_tier CHECK (sla_tier IN ('premium', 'standard', 'basic')),
+    CONSTRAINT valid_priority CHECK (priority_level >= 1 AND priority_level <= 5),
+    CONSTRAINT valid_availability CHECK (min_availability_percent >= 0 AND min_availability_percent <= 100),
+    CONSTRAINT valid_error_rate CHECK (max_error_rate_percent >= 0 AND max_error_rate_percent <= 100),
+    FOREIGN KEY (tenant_id) REFERENCES tenant_metadata(tenant_id),
+    UNIQUE (tenant_id, capability_id, effective_from)
+);
+
+-- Enable RLS on capability_meta_sla
+ALTER TABLE capability_meta_sla ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policy for capability_meta_sla
+CREATE POLICY capability_meta_sla_rls_policy ON capability_meta_sla
+    FOR ALL USING (tenant_id = COALESCE(current_setting('app.current_tenant_id', true)::integer, -1));
+
+-- Task 14.2.3: Provision capability_meta_cost table (Store cost attribution refs)
+CREATE TABLE IF NOT EXISTS capability_meta_cost (
+    cost_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    capability_id UUID NOT NULL,
+    tenant_id INTEGER NOT NULL,
+    
+    -- Cost Components
+    compute_cost_per_execution DECIMAL(10,6) DEFAULT 0.001, -- USD per execution
+    storage_cost_per_mb_month DECIMAL(10,6) DEFAULT 0.0001, -- USD per MB per month
+    network_cost_per_gb DECIMAL(10,6) DEFAULT 0.01, -- USD per GB transferred
+    token_cost_per_1k DECIMAL(10,6) DEFAULT 0.002, -- USD per 1K tokens (AI models)
+    
+    -- Resource Usage Estimates
+    avg_compute_units DECIMAL(10,4) DEFAULT 1.0,
+    avg_memory_mb INTEGER DEFAULT 128,
+    avg_storage_mb INTEGER DEFAULT 10,
+    avg_network_gb DECIMAL(10,4) DEFAULT 0.1,
+    avg_tokens_per_execution INTEGER DEFAULT 0,
+    
+    -- Cost Attribution
+    cost_center VARCHAR(100),
+    department VARCHAR(100),
+    project_code VARCHAR(50),
+    budget_category VARCHAR(50),
+    
+    -- Billing Model
+    billing_model VARCHAR(20) NOT NULL DEFAULT 'per_execution', -- per_execution, per_hour, per_month, per_token
+    minimum_charge DECIMAL(10,6) DEFAULT 0.0,
+    maximum_charge DECIMAL(10,6),
+    
+    -- Industry & Tier Specific
+    industry_code VARCHAR(20),
+    sla_tier VARCHAR(20) DEFAULT 'standard',
+    volume_discount_threshold INTEGER DEFAULT 1000,
+    volume_discount_percent DECIMAL(5,2) DEFAULT 0.0,
+    
+    -- Timestamps
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    effective_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    effective_until TIMESTAMPTZ,
+    
+    -- Governance
+    created_by_user_id INTEGER,
+    approved_by_user_id INTEGER,
+    
+    CONSTRAINT valid_billing_model CHECK (billing_model IN ('per_execution', 'per_hour', 'per_month', 'per_token')),
+    CONSTRAINT valid_sla_tier CHECK (sla_tier IN ('premium', 'standard', 'basic')),
+    CONSTRAINT valid_discount CHECK (volume_discount_percent >= 0 AND volume_discount_percent <= 100),
+    FOREIGN KEY (tenant_id) REFERENCES tenant_metadata(tenant_id),
+    UNIQUE (tenant_id, capability_id, effective_from)
+);
+
+-- Enable RLS on capability_meta_cost
+ALTER TABLE capability_meta_cost ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policy for capability_meta_cost
+CREATE POLICY capability_meta_cost_rls_policy ON capability_meta_cost
+    FOR ALL USING (tenant_id = COALESCE(current_setting('app.current_tenant_id', true)::integer, -1));
+
+-- Task 14.3.1: Provision cap_version_meta table (Store version tuple + prerelease/build)
+CREATE TABLE IF NOT EXISTS cap_version_meta (
+    version_meta_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    capability_id UUID NOT NULL,
+    tenant_id INTEGER NOT NULL,
+    
+    -- Semantic Version Components
+    major_version INTEGER NOT NULL DEFAULT 1,
+    minor_version INTEGER NOT NULL DEFAULT 0,
+    patch_version INTEGER NOT NULL DEFAULT 0,
+    
+    -- Prerelease & Build Metadata
+    prerelease_identifier VARCHAR(50), -- alpha, beta, rc.1, etc.
+    build_metadata VARCHAR(100), -- build.123, commit.abc123, etc.
+    
+    -- Full Version String
+    version_string VARCHAR(100) NOT NULL, -- "1.2.3-alpha.1+build.123"
+    
+    -- Version Metadata
+    is_stable BOOLEAN DEFAULT false,
+    is_lts BOOLEAN DEFAULT false, -- Long Term Support
+    is_deprecated BOOLEAN DEFAULT false,
+    
+    -- Compatibility
+    backward_compatible BOOLEAN DEFAULT true,
+    forward_compatible BOOLEAN DEFAULT false,
+    breaking_changes JSONB DEFAULT '[]',
+    
+    -- Release Information
+    release_notes TEXT,
+    changelog TEXT,
+    migration_guide TEXT,
+    
+    -- Timestamps
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    released_at TIMESTAMPTZ,
+    deprecated_at TIMESTAMPTZ,
+    eol_date TIMESTAMPTZ, -- End of Life
+    
+    -- Governance
+    created_by_user_id INTEGER,
+    released_by_user_id INTEGER,
+    
+    CONSTRAINT valid_version_numbers CHECK (major_version >= 0 AND minor_version >= 0 AND patch_version >= 0),
+    FOREIGN KEY (tenant_id) REFERENCES tenant_metadata(tenant_id),
+    UNIQUE (tenant_id, capability_id, version_string)
+);
+
+-- Enable RLS on cap_version_meta
+ALTER TABLE cap_version_meta ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policy for cap_version_meta
+CREATE POLICY cap_version_meta_rls_policy ON cap_version_meta
+    FOR ALL USING (tenant_id = COALESCE(current_setting('app.current_tenant_id', true)::integer, -1));
+
+-- Task 14.3.2: Provision cap_version_state table (Track Draft→Tested→Promoted→EOL)
+CREATE TABLE IF NOT EXISTS cap_version_state (
+    state_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    version_meta_id UUID NOT NULL,
+    tenant_id INTEGER NOT NULL,
+    
+    -- Lifecycle State
+    current_state VARCHAR(20) NOT NULL DEFAULT 'draft',
+    previous_state VARCHAR(20),
+    
+    -- State Metadata
+    state_reason TEXT,
+    state_data JSONB DEFAULT '{}',
+    
+    -- Approval & Validation
+    requires_approval BOOLEAN DEFAULT false,
+    approved_by_user_id INTEGER,
+    approval_timestamp TIMESTAMPTZ,
+    
+    -- Testing & Validation
+    test_results JSONB DEFAULT '{}',
+    validation_status VARCHAR(20) DEFAULT 'pending',
+    quality_score DECIMAL(5,2),
+    
+    -- Promotion Criteria
+    promotion_criteria JSONB DEFAULT '{}',
+    promotion_eligible BOOLEAN DEFAULT false,
+    promotion_blocked_reason TEXT,
+    
+    -- Timestamps
+    state_entered_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    state_duration_hours INTEGER,
+    
+    -- Governance
+    changed_by_user_id INTEGER,
+    
+    CONSTRAINT valid_current_state CHECK (current_state IN ('draft', 'testing', 'validated', 'promoted', 'deprecated', 'eol')),
+    CONSTRAINT valid_previous_state CHECK (previous_state IS NULL OR previous_state IN ('draft', 'testing', 'validated', 'promoted', 'deprecated', 'eol')),
+    CONSTRAINT valid_validation_status CHECK (validation_status IN ('pending', 'passed', 'failed', 'skipped')),
+    CONSTRAINT valid_quality_score CHECK (quality_score IS NULL OR (quality_score >= 0 AND quality_score <= 100)),
+    FOREIGN KEY (version_meta_id) REFERENCES cap_version_meta(version_meta_id),
+    FOREIGN KEY (tenant_id) REFERENCES tenant_metadata(tenant_id)
+);
+
+-- Enable RLS on cap_version_state
+ALTER TABLE cap_version_state ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policy for cap_version_state
+CREATE POLICY cap_version_state_rls_policy ON cap_version_state
+    FOR ALL USING (tenant_id = COALESCE(current_setting('app.current_tenant_id', true)::integer, -1));
+
+-- Task 14.3.3: Provision cap_version_dep table (Capture dependencies)
+CREATE TABLE IF NOT EXISTS cap_version_dep (
+    dependency_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    version_meta_id UUID NOT NULL,
+    tenant_id INTEGER NOT NULL,
+    
+    -- Dependency Information
+    dependency_type VARCHAR(30) NOT NULL, -- capability, policy, schema, model, external
+    dependency_name VARCHAR(255) NOT NULL,
+    dependency_version VARCHAR(100),
+    dependency_version_constraint VARCHAR(100), -- ">=1.2.0,<2.0.0"
+    
+    -- Dependency Metadata
+    is_required BOOLEAN DEFAULT true,
+    is_dev_only BOOLEAN DEFAULT false,
+    is_runtime BOOLEAN DEFAULT true,
+    
+    -- External Dependencies
+    external_source VARCHAR(255), -- URL, package manager, etc.
+    external_checksum VARCHAR(128),
+    
+    -- Relationship Strength
+    coupling_strength VARCHAR(20) DEFAULT 'loose', -- tight, loose, optional
+    failure_impact VARCHAR(20) DEFAULT 'medium', -- critical, high, medium, low
+    
+    -- Version Compatibility
+    min_compatible_version VARCHAR(100),
+    max_compatible_version VARCHAR(100),
+    tested_versions JSONB DEFAULT '[]',
+    
+    -- Timestamps
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    
+    -- Governance
+    created_by_user_id INTEGER,
+    
+    CONSTRAINT valid_dependency_type CHECK (dependency_type IN ('capability', 'policy', 'schema', 'model', 'external')),
+    CONSTRAINT valid_coupling_strength CHECK (coupling_strength IN ('tight', 'loose', 'optional')),
+    CONSTRAINT valid_failure_impact CHECK (failure_impact IN ('critical', 'high', 'medium', 'low')),
+    FOREIGN KEY (version_meta_id) REFERENCES cap_version_meta(version_meta_id),
+    FOREIGN KEY (tenant_id) REFERENCES tenant_metadata(tenant_id),
+    UNIQUE (tenant_id, version_meta_id, dependency_name, dependency_type)
+);
+
+-- Enable RLS on cap_version_dep
+ALTER TABLE cap_version_dep ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policy for cap_version_dep
+CREATE POLICY cap_version_dep_rls_policy ON cap_version_dep
+    FOR ALL USING (tenant_id = COALESCE(current_setting('app.current_tenant_id', true)::integer, -1));
+
+-- Task 14.3.4: Provision cap_version_compat table (Store compatibility matrix)
+CREATE TABLE IF NOT EXISTS cap_version_compat (
+    compat_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id INTEGER NOT NULL,
+    
+    -- Version Compatibility Pair
+    source_version_id UUID NOT NULL,
+    target_version_id UUID NOT NULL,
+    
+    -- Compatibility Assessment
+    backward_compatible BOOLEAN DEFAULT false,
+    forward_compatible BOOLEAN DEFAULT false,
+    api_compatible BOOLEAN DEFAULT false,
+    data_compatible BOOLEAN DEFAULT false,
+    
+    -- Compatibility Details
+    compatibility_score DECIMAL(5,2), -- 0.0 to 100.0
+    breaking_changes JSONB DEFAULT '[]',
+    migration_required BOOLEAN DEFAULT false,
+    migration_complexity VARCHAR(20) DEFAULT 'medium', -- simple, medium, complex
+    
+    -- Test Results
+    compatibility_tested BOOLEAN DEFAULT false,
+    test_results JSONB DEFAULT '{}',
+    test_date TIMESTAMPTZ,
+    
+    -- Migration Information
+    migration_script TEXT,
+    migration_time_estimate_minutes INTEGER,
+    rollback_supported BOOLEAN DEFAULT false,
+    
+    -- Timestamps
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    
+    -- Governance
+    assessed_by_user_id INTEGER,
+    approved_by_user_id INTEGER,
+    
+    CONSTRAINT valid_compatibility_score CHECK (compatibility_score IS NULL OR (compatibility_score >= 0 AND compatibility_score <= 100)),
+    CONSTRAINT valid_migration_complexity CHECK (migration_complexity IN ('simple', 'medium', 'complex')),
+    CONSTRAINT no_self_compatibility CHECK (source_version_id != target_version_id),
+    FOREIGN KEY (source_version_id) REFERENCES cap_version_meta(version_meta_id),
+    FOREIGN KEY (target_version_id) REFERENCES cap_version_meta(version_meta_id),
+    FOREIGN KEY (tenant_id) REFERENCES tenant_metadata(tenant_id),
+    UNIQUE (tenant_id, source_version_id, target_version_id)
+);
+
+-- Enable RLS on cap_version_compat
+ALTER TABLE cap_version_compat ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policy for cap_version_compat
+CREATE POLICY cap_version_compat_rls_policy ON cap_version_compat
+    FOR ALL USING (tenant_id = COALESCE(current_setting('app.current_tenant_id', true)::integer, -1));
+
+-- Task 14.3.16: Tenant version pins table (tenant→cap version binding)
+CREATE TABLE IF NOT EXISTS tenant_version_pins (
+    pin_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id INTEGER NOT NULL,
+    capability_id UUID NOT NULL,
+    version_meta_id UUID NOT NULL,
+    version_string VARCHAR(100) NOT NULL,
+    
+    -- Pin Configuration
+    pin_reason TEXT,
+    auto_upgrade BOOLEAN DEFAULT false,
+    pin_expiry_date TIMESTAMPTZ,
+    
+    -- Pin Status
+    is_active BOOLEAN DEFAULT true,
+    override_reason TEXT,
+    
+    -- Timestamps
+    pinned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    
+    -- Governance
+    pinned_by_user_id INTEGER,
+    approved_by_user_id INTEGER,
+    
+    FOREIGN KEY (tenant_id) REFERENCES tenant_metadata(tenant_id),
+    FOREIGN KEY (version_meta_id) REFERENCES cap_version_meta(version_meta_id),
+    UNIQUE (tenant_id, capability_id)
+);
+
+-- Enable RLS on tenant_version_pins
+ALTER TABLE tenant_version_pins ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policy for tenant_version_pins
+CREATE POLICY tenant_version_pins_rls_policy ON tenant_version_pins
+    FOR ALL USING (tenant_id = COALESCE(current_setting('app.current_tenant_id', true)::integer, -1));
+
+-- Create indexes for performance
+CREATE INDEX IF NOT EXISTS idx_capability_schema_version_lifecycle ON capability_schema_version(tenant_id, lifecycle_state);
+CREATE INDEX IF NOT EXISTS idx_capability_schema_relation_source ON capability_schema_relation(tenant_id, source_capability_id);
+CREATE INDEX IF NOT EXISTS idx_capability_meta_sla_tier ON capability_meta_sla(tenant_id, sla_tier);
+CREATE INDEX IF NOT EXISTS idx_capability_meta_cost_billing ON capability_meta_cost(tenant_id, billing_model);
+CREATE INDEX IF NOT EXISTS idx_cap_version_meta_version ON cap_version_meta(tenant_id, version_string);
+CREATE INDEX IF NOT EXISTS idx_cap_version_state_current ON cap_version_state(tenant_id, current_state);
+CREATE INDEX IF NOT EXISTS idx_cap_version_dep_type ON cap_version_dep(tenant_id, dependency_type);
+CREATE INDEX IF NOT EXISTS idx_cap_version_compat_score ON cap_version_compat(tenant_id, compatibility_score);
+CREATE INDEX IF NOT EXISTS idx_tenant_version_pins_capability ON tenant_version_pins(tenant_id, capability_id);
+CREATE INDEX IF NOT EXISTS idx_tenant_version_pins_active ON tenant_version_pins(tenant_id, is_active);
+
+-- ============================================================================
 -- KNOWLEDGE GRAPH EXECUTION TRACES TABLE
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS kg_execution_traces (
