@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "RBIA Model Card Schema",
+    "type": "object",
+    "required": ["model_name", "model_version", "objective", "metrics", "owner", "risks"],
+    "properties": {
+      "model_name": {"type": "string"},
+      "model_version": {"type": "string"},
+      "objective": {"type": "object"},
+      "data": {"type": "object"},
+      "metrics": {"type": "object"},
+      "risks": {"type": "object"},
+      "compliance": {"type": "object"},
+      "deployment": {"type": "object"}
+    }
+  }
+  

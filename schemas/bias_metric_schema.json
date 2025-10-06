@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Bias Metric Schema",
+    "type": "object",
+    "properties": {
+      "metric_name": {
+        "type": "string",
+        "enum": ["EQOD", "DI", "TPR_gap"],
+        "description": "Bias/fairness metric name"
+      },
+      "industry": {
+        "type": "string",
+        "enum": ["SaaS", "Banking", "Insurance", "FS", "E-commerce"],
+        "description": "Industry type"
+      },
+      "threshold": {
+        "type": "number",
+        "description": "Threshold value for the metric"
+      }
+    },
+    "required": ["metric_name", "industry", "threshold"]
+  }

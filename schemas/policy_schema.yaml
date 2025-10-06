@@ -1,0 +1,14 @@
+policy_version: v1.0
+policy_name: confidence_guardrail
+applies_to: inference
+rules:
+  - name: min_confidence
+    condition: "output.confidence >= 0.8"
+    on_violation: "block"
+    severity: high
+  - name: data_residency
+    condition: "region == 'IN'"
+    on_violation: "quarantine"
+metadata:
+  owner: governance_team
+  last_reviewed: 2025-10-01

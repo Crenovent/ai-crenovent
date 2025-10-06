@@ -1,0 +1,50 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "RBIA Drift Metrics Schema v1",
+    "description": "Schema capturing feature-level drift statistics and thresholds for RBIA monitoring.",
+    "type": "object",
+    "required": ["feature_id", "stat_test", "value", "threshold", "decision_ts"],
+    "properties": {
+      "feature_id": {
+        "type": "string",
+        "description": "Unique name or identifier of the monitored feature."
+      },
+      "stat_test": {
+        "type": "string",
+        "enum": ["PSI", "KS", "KL", "JS", "Wasserstein"],
+        "description": "Statistical test used for drift detection (e.g., PSI, KS)."
+      },
+      "value": {
+        "type": "number",
+        "description": "Calculated drift statistic value (e.g., PSI score)."
+      },
+      "threshold": {
+        "type": "number",
+        "description": "Threshold above which drift is considered significant."
+      },
+      "decision_ts": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Timestamp when drift test was executed."
+      },
+      "model_id": {
+        "type": "string",
+        "description": "Optional model identifier associated with this drift metric."
+      },
+      "tenant_id": {
+        "type": "string",
+        "description": "Tenant or environment identifier (multi-tenant overlay)."
+      },
+      "industry": {
+        "type": "string",
+        "description": "Optional industry overlay (SaaS, Banking, etc.)."
+      },
+      "metadata": {
+        "type": "object",
+        "description": "Additional fields such as baseline_version, sample_size, or alert_flag.",
+        "additionalProperties": true
+      }
+    },
+    "additionalProperties": false
+  }
+  
