@@ -1,0 +1,610 @@
+# Production Security Configuration for RevAI Pro Platform
+# Comprehensive security policies and configurations
+
+---
+# Network Policies
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: revai-pro-network-policy
+  namespace: revai-prod
+spec:
+  podSelector:
+    matchLabels:
+      app: revai-pro
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow ingress from ingress controller
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 8001
+    - protocol: TCP
+      port: 8002
+    - protocol: TCP
+      port: 8003
+    - protocol: TCP
+      port: 8004
+    - protocol: TCP
+      port: 8005
+    - protocol: TCP
+      port: 8006
+    - protocol: TCP
+      port: 8007
+    - protocol: TCP
+      port: 8008
+    - protocol: TCP
+      port: 8009
+    - protocol: TCP
+      port: 8010
+    - protocol: TCP
+      port: 8011
+    - protocol: TCP
+      port: 8012
+    - protocol: TCP
+      port: 8013
+  # Allow ingress from monitoring
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 9090
+  # Allow ingress from Prometheus
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: prometheus
+    ports:
+    - protocol: TCP
+      port: 9090
+  egress:
+  # Allow egress to database
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: database
+    ports:
+    - protocol: TCP
+      port: 5432
+  # Allow egress to Redis
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: cache
+    ports:
+    - protocol: TCP
+      port: 6379
+  # Allow egress to Kafka
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: messaging
+    ports:
+    - protocol: TCP
+      port: 9092
+  # Allow egress to monitoring
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 9090
+  # Allow egress to external APIs
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 80
+
+---
+# Pod Security Policy
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: revai-pro-psp
+  namespace: revai-prod
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+    - ALL
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+  seLinux:
+    rule: 'RunAsAny'
+  fsGroup:
+    rule: 'RunAsAny'
+
+---
+# Security Context Constraints
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: revai-pro-scc
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowPrivilegedContainer: false
+allowedCapabilities: null
+defaultAddCapabilities: null
+fsGroup:
+  type: MustRunAs
+  ranges:
+    - min: 1000
+      max: 65535
+readOnlyRootFilesystem: true
+requiredDropCapabilities:
+- ALL
+runAsUser:
+  type: MustRunAsNonRoot
+seLinuxContext:
+  type: MustRunAs
+volumes:
+- configMap
+- downwardAPI
+- emptyDir
+- persistentVolumeClaim
+- projected
+- secret
+
+---
+# RBAC Configuration
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: revai-pro-cluster-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints", "persistentvolumeclaims", "events", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "daemonsets", "replicasets", "statefulsets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["monitoring.coreos.com"]
+  resources: ["servicemonitors", "podmonitors"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["networkpolicies"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: revai-pro-cluster-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: revai-pro-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: revai-pro-sa
+  namespace: revai-prod
+
+---
+# Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: revai-pro-sa
+  namespace: revai-prod
+  annotations:
+    iam.gke.io/gcp-service-account: revai-pro@project.iam.gserviceaccount.com
+
+---
+# Secret for Service Account
+apiVersion: v1
+kind: Secret
+metadata:
+  name: revai-pro-sa-secret
+  namespace: revai-prod
+  annotations:
+    kubernetes.io/service-account.name: revai-pro-sa
+type: kubernetes.io/service-account-token
+
+---
+# Pod Disruption Budget
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: revai-pro-pdb
+  namespace: revai-prod
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: revai-pro
+
+---
+# Resource Quotas
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: revai-pro-quota
+  namespace: revai-prod
+spec:
+  hard:
+    requests.cpu: "10"
+    requests.memory: 20Gi
+    limits.cpu: "20"
+    limits.memory: 40Gi
+    persistentvolumeclaims: "10"
+    pods: "50"
+    services: "20"
+    secrets: "20"
+    configmaps: "20"
+
+---
+# Limit Ranges
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: revai-pro-limits
+  namespace: revai-prod
+spec:
+  limits:
+  - default:
+      cpu: "500m"
+      memory: "1Gi"
+    defaultRequest:
+      cpu: "250m"
+      memory: "512Mi"
+    type: Container
+  - max:
+      cpu: "2"
+      memory: "4Gi"
+    min:
+      cpu: "100m"
+      memory: "128Mi"
+    type: Container
+
+---
+# Security Headers Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: security-headers-config
+  namespace: revai-prod
+data:
+  nginx.conf: |
+    server {
+        listen 80;
+        server_name _;
+        
+        # Security Headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'self';" always;
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+        
+        # Hide server information
+        server_tokens off;
+        
+        # Disable unnecessary methods
+        if ($request_method !~ ^(GET|HEAD|POST|PUT|DELETE|OPTIONS)$) {
+            return 405;
+        }
+        
+        # Rate limiting
+        limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
+        limit_req zone=api burst=20 nodelay;
+        
+        # Request size limits
+        client_max_body_size 10M;
+        
+        # Timeouts
+        client_body_timeout 60s;
+        client_header_timeout 60s;
+        keepalive_timeout 65s;
+        send_timeout 60s;
+        
+        location / {
+            proxy_pass http://revai-pro-backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            # Security headers for proxied requests
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Port $server_port;
+        }
+    }
+
+---
+# Falco Security Rules
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falco-rules
+  namespace: revai-prod
+data:
+  revai-pro-rules.yaml: |
+    - rule: RevAI Pro Unauthorized Access
+      desc: Detect unauthorized access to RevAI Pro services
+      condition: >
+        ka and ka.verb in (create, update, delete) and
+        ka.target.resource in (pods, services, deployments) and
+        ka.user.name != "revai-pro-sa"
+      output: >
+        Unauthorized access to RevAI Pro resources
+        (user=%ka.user.name verb=%ka.verb resource=%ka.target.resource)
+      priority: WARNING
+      tags: [revai-pro, unauthorized-access]
+
+    - rule: RevAI Pro Privilege Escalation
+      desc: Detect privilege escalation attempts
+      condition: >
+        ka and ka.verb in (create, update) and
+        ka.target.resource = "rolebindings" and
+        ka.target.name contains "revai-pro"
+      output: >
+        Privilege escalation attempt detected
+        (user=%ka.user.name resource=%ka.target.resource)
+      priority: CRITICAL
+      tags: [revai-pro, privilege-escalation]
+
+    - rule: RevAI Pro Resource Modification
+      desc: Detect unauthorized modification of RevAI Pro resources
+      condition: >
+        ka and ka.verb in (update, patch, delete) and
+        ka.target.resource in (configmaps, secrets) and
+        ka.target.namespace = "revai-prod" and
+        ka.user.name != "revai-pro-sa"
+      output: >
+        Unauthorized modification of RevAI Pro resources
+        (user=%ka.user.name resource=%ka.target.resource)
+      priority: WARNING
+      tags: [revai-pro, resource-modification]
+
+    - rule: RevAI Pro Network Policy Violation
+      desc: Detect network policy violations
+      condition: >
+        ka and ka.verb = "create" and
+        ka.target.resource = "networkpolicies" and
+        ka.target.namespace = "revai-prod"
+      output: >
+        Network policy modification detected
+        (user=%ka.user.name policy=%ka.target.name)
+      priority: WARNING
+      tags: [revai-pro, network-policy]
+
+    - rule: RevAI Pro Pod Creation
+      desc: Detect unauthorized pod creation
+      condition: >
+        ka and ka.verb = "create" and
+        ka.target.resource = "pods" and
+        ka.target.namespace = "revai-prod" and
+        ka.user.name != "revai-pro-sa"
+      output: >
+        Unauthorized pod creation detected
+        (user=%ka.user.name pod=%ka.target.name)
+      priority: WARNING
+      tags: [revai-pro, pod-creation]
+
+---
+# OPA Gatekeeper Policies
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: revaiprosecurity
+spec:
+  crd:
+    spec:
+      names:
+        kind: RevAIProSecurity
+      validation:
+        properties:
+          allowedImages:
+            type: array
+            items:
+              type: string
+          requiredSecurityContext:
+            type: boolean
+          allowedCapabilities:
+            type: array
+            items:
+              type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package revaiprosecurity
+        
+        violation[{"msg": msg}] {
+          input.review.object.spec.containers[_].image
+          not startswith(input.review.object.spec.containers[_].image, input.parameters.allowedImages[_])
+          msg := sprintf("Image not allowed: %v", [input.review.object.spec.containers[_].image])
+        }
+        
+        violation[{"msg": msg}] {
+          input.parameters.requiredSecurityContext
+          not input.review.object.spec.securityContext.runAsNonRoot
+          msg := "Security context must have runAsNonRoot set to true"
+        }
+        
+        violation[{"msg": msg}] {
+          input.review.object.spec.containers[_].securityContext.capabilities.add[_]
+          not input.review.object.spec.containers[_].securityContext.capabilities.add[_] in input.parameters.allowedCapabilities
+          msg := sprintf("Capability not allowed: %v", [input.review.object.spec.containers[_].securityContext.capabilities.add[_]])
+        }
+
+---
+apiVersion: config.gatekeeper.sh/v1alpha1
+kind: RevAIProSecurity
+metadata:
+  name: revai-pro-security-policy
+spec:
+  match:
+    kinds:
+      - apiGroups: ["apps"]
+        kinds: ["Deployment"]
+    namespaces: ["revai-prod"]
+  parameters:
+    allowedImages:
+      - "your-registry.com/revai-pro-"
+    requiredSecurityContext: true
+    allowedCapabilities: []
+
+---
+# Pod Security Standards
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: revai-prod
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+
+---
+# Security Scanning Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: security-scanning-config
+  namespace: revai-prod
+data:
+  trivy-config.yaml: |
+    # Trivy configuration for security scanning
+    format: json
+    output: /tmp/trivy-results.json
+    severity: HIGH,CRITICAL
+    ignore-unfixed: true
+    exit-code: 1
+    no-progress: true
+    quiet: true
+    
+  kube-bench-config.yaml: |
+    # kube-bench configuration for CIS Kubernetes Benchmark
+    target: master,node,etcd,policies
+    version: 1.6
+    benchmark: cis-1.6
+    json: true
+    output: /tmp/kube-bench-results.json
+    
+  kube-hunter-config.yaml: |
+    # kube-hunter configuration for penetration testing
+    active: true
+    passive: false
+    log: /tmp/kube-hunter-results.log
+    report: json
+    output: /tmp/kube-hunter-results.json
+
+---
+# Security Monitoring
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: security-monitoring-config
+  namespace: revai-prod
+data:
+  security-alerts.yml: |
+    groups:
+    - name: security-alerts
+      rules:
+      - alert: SecurityPolicyViolation
+        expr: increase(kubernetes_audit_total{verb="create",resource="pods"}[5m]) > 10
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High number of pod creation requests"
+          description: "{{ $value }} pod creation requests in the last 5 minutes"
+          
+      - alert: UnauthorizedAccess
+        expr: increase(kubernetes_audit_total{verb="delete",resource="secrets"}[5m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Unauthorized secret deletion attempt"
+          description: "Secret deletion attempt detected"
+          
+      - alert: PrivilegeEscalation
+        expr: increase(kubernetes_audit_total{verb="create",resource="rolebindings"}[5m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Privilege escalation attempt"
+          description: "Role binding creation attempt detected"
+
+---
+# Compliance Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: compliance-config
+  namespace: revai-prod
+data:
+  gdpr-compliance.yml: |
+    # GDPR Compliance Configuration
+    data_retention:
+      personal_data: "7y"  # 7 years
+      audit_logs: "3y"     # 3 years
+      metrics: "1y"        # 1 year
+      
+    data_processing:
+      consent_required: true
+      anonymization: true
+      encryption: true
+      access_control: true
+      
+    user_rights:
+      data_portability: true
+      right_to_erasure: true
+      data_rectification: true
+      access_rights: true
+      
+  soc2-compliance.yml: |
+    # SOC 2 Compliance Configuration
+    security:
+      access_control: true
+      encryption: true
+      monitoring: true
+      incident_response: true
+      
+    availability:
+      uptime_monitoring: true
+      backup_procedures: true
+      disaster_recovery: true
+      capacity_planning: true
+      
+    processing_integrity:
+      data_validation: true
+      error_handling: true
+      audit_trails: true
+      change_management: true
+      
+    confidentiality:
+      data_classification: true
+      access_restrictions: true
+      encryption_at_rest: true
+      encryption_in_transit: true
+      
+    privacy:
+      data_minimization: true
+      purpose_limitation: true
+      consent_management: true
+      data_subject_rights: true

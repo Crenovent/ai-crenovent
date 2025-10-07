@@ -12,13 +12,19 @@ import json
 import csv
 import io
 import asyncio
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import uuid
 import hashlib
+import os
 try:
     import jwt
 except ImportError:
     jwt = None
+
+try:
+    import httpx
+except ImportError:
+    httpx = None
 
 from dsl.hub.execution_hub import ExecutionHub
 from dsl.hub.hub_router import get_execution_hub
@@ -106,8 +112,16 @@ async def execute_onboarding_workflow(
         logger.info(f"🚀 Starting onboarding workflow execution: {execution_id}")
         
         # Parse CSV file
+        logger.info(f"📁 Processing CSV file: {file.filename} (size: {file.size if hasattr(file, 'size') else 'unknown'})")
         csv_content = await file.read()
+        logger.info(f"📊 CSV content size: {len(csv_content)} bytes")
         csv_data = parse_csv_content(csv_content)
+        logger.info(f"📋 Parsed CSV data: {len(csv_data)} users")
+        
+        if csv_data:
+            logger.info(f"📋 First user sample: {csv_data[0]}")
+        else:
+            logger.warning("⚠️ No CSV data parsed!")
         
         if not csv_data:
             raise HTTPException(status_code=400, detail="No valid user data found in CSV")
@@ -345,14 +359,18 @@ async def execute_workflow_background(
 def parse_csv_content(csv_content: bytes) -> List[Dict[str, Any]]:
     """Parse CSV content and return list of dictionaries"""
     try:
+        logger.info(f"🔍 CSV parsing: Input size {len(csv_content)} bytes")
+        
         # Decode bytes to string
         csv_string = csv_content.decode('utf-8-sig')  # Handle BOM if present
+        logger.info(f"🔍 CSV parsing: Decoded string length {len(csv_string)} chars")
         
         # Parse CSV
         csv_reader = csv.DictReader(io.StringIO(csv_string))
+        logger.info(f"🔍 CSV parsing: Headers found: {csv_reader.fieldnames}")
         
         users_data = []
-        for row in csv_reader:
+        for i, row in enumerate(csv_reader):
             # Clean up the row data
             cleaned_row = {}
             for key, value in row.items():
@@ -363,12 +381,16 @@ def parse_csv_content(csv_content: bytes) -> List[Dict[str, Any]]:
             
             if cleaned_row:  # Only add non-empty rows
                 users_data.append(cleaned_row)
+                if i < 3:  # Log first 3 rows for debugging
+                    logger.info(f"🔍 CSV parsing: Row {i+1}: {cleaned_row}")
         
         logger.info(f"📊 Parsed {len(users_data)} users from CSV")
         return users_data
         
     except Exception as e:
         logger.error(f"❌ CSV parsing failed: {e}")
+        import traceback
+        logger.error(f"❌ CSV parsing traceback: {traceback.format_exc()}")
         return []
 
 async def save_users_to_database(
@@ -503,6 +525,22 @@ async def save_users_to_database(
                             access_token = f"temp_access_{user_id}"
                             refresh_token = f"temp_refresh_{user_id}"
                         
+                        # Generate set password token for invite email
+                        import uuid
+                        set_password_token = str(uuid.uuid4())
+                        set_password_token_hash = hashlib.sha256(set_password_token.encode()).hexdigest()
+                        
+                        # Store set password token in database
+                        await conn.execute(
+                            """
+                            INSERT INTO password_reset_tokens 
+                            (tenant_id, tenant_email, token_hash, status, expires_at)
+                            VALUES ($1, $2, $3, 'active', $4)
+                            """,
+                            tenant_id, user_data['email'], set_password_token_hash, 
+                            datetime.now() + timedelta(hours=24)  # 24 hours expiration
+                        )
+                        
                         user_data = {
                             'user_id': user_id,
                             'username': user.get('Name', '').strip(),  # PostgreSQL uses 'username' not 'name'
@@ -580,6 +618,19 @@ async def save_users_to_database(
                                 'action': 'inserted'
                             })
                             logger.info(f"✅ Inserted user: {user_data['username']} ({user_data['email']})")
+                            
+                            # Send invite email with set password link
+                            try:
+                                await send_invite_email(
+                                    user_data['email'], 
+                                    user_data['username'], 
+                                    set_password_token, 
+                                    tenant_id
+                                )
+                                logger.info(f"📧 Invite email sent to: {user_data['email']}")
+                            except Exception as email_error:
+                                logger.error(f"❌ Failed to send invite email to {user_data['email']}: {email_error}")
+                                # Don't fail the user creation if email fails
                         
                         inserted.add(name_key)
                         
@@ -798,4 +849,48 @@ async def health_check():
             'error': str(e),
             'timestamp': datetime.utcnow().isoformat()
         }
+
+async def send_invite_email(email: str, username: str, set_password_token: str, tenant_id: int):
+    """
+    Send invite email with set password link to newly created user
+    Calls the TypeScript backend's email service
+    """
+    try:
+        if not httpx:
+            logger.warning("httpx not available, skipping email send")
+            return
+            
+        # Get TypeScript backend URL from environment
+        backend_url = os.getenv('BACKEND_BASE_URL', 'http://localhost:3000')
+        
+        # Create set password URL
+        set_password_url = f"{backend_url}/auth/set-password?token={set_password_token}"
+        
+        # Prepare email data
+        email_data = {
+            "to": email,
+            "username": username,
+            "set_password_token": set_password_token,
+            "set_password_url": set_password_url,
+            "tenant_id": tenant_id
+        }
+        
+        # Send email via TypeScript backend
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                f"{backend_url}/api/email/send-set-password",
+                json=email_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                logger.info(f"✅ Invite email sent successfully to {email}")
+                return True
+            else:
+                logger.error(f"❌ Email service returned {response.status_code}: {response.text}")
+                return False
+                
+    except Exception as e:
+        logger.error(f"❌ Failed to send invite email to {email}: {e}")
+        return False
 

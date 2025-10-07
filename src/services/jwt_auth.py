@@ -81,7 +81,35 @@ class JWTAuthService:
                 return None
                 
             # Decode and validate token (matches your backend format)
-            payload = jwt.decode(token, self.secret, algorithms=[self.algorithm])
+            # Try multiple audience options: frontend, ai-backend, then no audience
+            payload = None
+            audiences_to_try = ['crenovent-frontend', 'crenovent-ai-backend']
+            
+            for audience in audiences_to_try:
+                try:
+                    payload = jwt.decode(token, self.secret, algorithms=[self.algorithm], audience=audience)
+                    self.logger.info(f"✅ AI Service: JWT validated with audience: {audience}")
+                    break
+                except jwt.InvalidAudienceError:
+                    self.logger.info(f"🔄 AI Service: Token audience validation failed for {audience}, trying next...")
+                    continue
+                except Exception as e:
+                    self.logger.error(f"❌ AI Service: JWT validation failed for {audience}: {e}")
+                    continue
+            
+            # If all audiences failed, try without audience validation (legacy fallback)
+            if not payload:
+                self.logger.info("🔄 AI Service: All audience validations failed, trying without audience (legacy fallback)")
+                try:
+                    payload = jwt.decode(token, self.secret, algorithms=[self.algorithm])
+                    self.logger.info("✅ AI Service: JWT validated without audience (legacy fallback)")
+                except Exception as e:
+                    self.logger.error(f"❌ AI Service: All JWT validation attempts failed: {e}")
+                    raise e
+            
+            if not payload:
+                self.logger.error("❌ AI Service: No payload extracted from JWT")
+                return None
             
             # Log the raw payload for debugging
             self.logger.info(f"🔍 AI Service: Raw JWT payload keys: {list(payload.keys())}")
@@ -95,6 +123,7 @@ class JWTAuthService:
                 tenant_from_profile = None
             
             # Return user information matching the exact JWT structure from Node.js backend
+            # Handle both frontend tokens and service tokens
             user_data = {
                 'user_id': payload.get('user_id') or payload.get('id'),  # Handle both formats
                 'username': payload.get('username'),
@@ -108,7 +137,10 @@ class JWTAuthService:
                 'is_activated': payload.get('is_activated', True),
                 'teams': payload.get('teams', []),
                 'has_teams': payload.get('has_teams', False),
-                'isLoggedIn': payload.get('isLoggedIn', True)
+                'isLoggedIn': payload.get('isLoggedIn', True),
+                # Service token specific fields
+                'service': payload.get('service'),
+                'target_service': payload.get('target_service')
             }
             
             self.logger.info(f"✅ AI Service: JWT validated for user: {user_data.get('user_id')} (tenant: {user_data.get('tenant_id')}, email: {user_data.get('email')})")
@@ -116,6 +148,11 @@ class JWTAuthService:
             
         except jwt.ExpiredSignatureError:
             self.logger.warning("❌ AI Service: JWT token expired")
+            return None
+        except jwt.InvalidAudienceError as e:
+            self.logger.warning(f"❌ AI Service: Invalid JWT audience - {str(e)}")
+            self.logger.warning(f"❌ AI Service: Token received: {token[:50]}...")
+            self.logger.warning(f"❌ AI Service: Using secret: {self.secret[:20]}...")
             return None
         except jwt.InvalidTokenError as e:
             self.logger.warning(f"❌ AI Service: Invalid JWT token - {str(e)}")

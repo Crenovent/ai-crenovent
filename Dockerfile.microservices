@@ -1,0 +1,49 @@
+# Dockerfile for AI Microservices
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy microservices source code
+COPY src/microservices/ ./src/microservices/
+
+# Create startup script
+RUN echo '#!/bin/bash\n\
+case "$SERVICE_NAME" in\n\
+    "ai-orchestrator")\n\
+        python src/microservices/orchestrator.py\n\
+        ;;\n\
+    "agent-registry")\n\
+        python src/microservices/agent_registry.py\n\
+        ;;\n\
+    "routing-orchestrator")\n\
+        python src/microservices/routing_orchestrator.py\n\
+        ;;\n\
+    "kpi-exporter")\n\
+        python src/microservices/kpi_exporter.py\n\
+        ;;\n\
+    "confidence-thresholds")\n\
+        python src/microservices/confidence_thresholds.py\n\
+        ;;\n\
+    "model-audit")\n\
+        python src/microservices/model_audit.py\n\
+        ;;\n\
+    *)\n\
+        echo "Unknown service: $SERVICE_NAME"\n\
+        exit 1\n\
+        ;;\n\
+esac' > /app/start.sh && chmod +x /app/start.sh
+
+EXPOSE 8001 8002 8003 8004 8005 8006
+
+CMD ["/app/start.sh"]

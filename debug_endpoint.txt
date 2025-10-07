@@ -497,3 +497,51 @@ execution_mode: sync
 workflow_config: {"enable_region_assignment":true,"enable_segment_assignment":true,"enable_territory_assignment":true,"enable_area_assignment":true,"enable_district_assignment":true,"enable_smart_location_mapping":true,"create_hierarchical_structure":true,"assign_heads_by_geography":true,"region_distribution_strategy":"smart_location"}
 file.filename: salesforce_user_hierarchy.csv
 ==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================

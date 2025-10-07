@@ -17585,3 +17585,805 @@ Input location_info: {'address': 'Singapore'}
 Available regions: ['global']
 Converted user_data: {'Address': 'Singapore', 'Location': 'Singapore'}
 Calling geolocation service...
+=== OnboardingRBAAgent._execute_rba_logic CALLED ===
+Context keys: ['users_data', 'workflow_config', 'tenant_id', 'user_id']
+Config keys: ['enable_smart_location_mapping', 'enable_module_assignment', 'industry', 'default_user_role', 'assignment_strategy', 'confidence_threshold']
+==================================================
+=== OnboardingRBAAgent location mapping check ===
+enable_smart_location_mapping: True
+Config keys: ['enable_smart_location_mapping', 'enable_module_assignment', 'industry', 'default_user_role', 'assignment_strategy', 'confidence_threshold']
+Smart location mapping is ENABLED, executing...
+Calling SmartLocationMapperRBAAgent._execute_rba_logic
+=== SmartLocationMapperRBAAgent._execute_rba_logic CALLED ===
+Context keys: ['users_data', 'workflow_config', 'tenant_id', 'user_id']
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+=== COLUMN DETECTION DEBUG ===
+Available columns: ['Full Name', 'Email', 'Manager Email', 'Department', 'Job Title', 'Location', 'Employee ID', 'Start Date', 'Role', 'User Type', 'Profile']
+Detected location columns: {'address': ['Location'], 'city': [], 'state': [], 'country': [], 'postal_code': [], 'office': []}
+  address: ['Location']
+=== COLUMN DETECTION DEBUG ===
+Available columns: ['Full Name', 'Email', 'Manager Email', 'Department', 'Job Title', 'Location', 'Employee ID', 'Start Date', 'Role', 'User Type', 'Profile']
+Detected location columns: {'address': ['Location'], 'city': [], 'state': [], 'country': [], 'postal_code': [], 'office': []}
+  address: ['Location']
+Processing user Sarah Chen (row 0)
+Raw row data: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+Extracted location info: {'address': 'San Francisco'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'San Francisco'}
+Available regions: ['global']
+Converted user_data: {'Address': 'San Francisco', 'Location': 'San Francisco'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'San Francisco', 'full_location': 'San Francisco'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'San Francisco'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-SAN', 'district_name': 'San Francisco', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'San Francisco'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Michael Rodriguez (row 1)
+Raw row data: {'Full Name': 'Michael Rodriguez', 'Email': 'michael.rodriguez@acmecorp.com', 'Manager Email': 'sarah.chen@acmecorp.com', 'Department': 'Sales', 'Job Title': 'VP Sales - Americas', 'Location': 'New York', 'Employee ID': 'NY002', 'Start Date': '2020-03-10', 'Role': 'Sales Manager', 'User Type': 'Standard User', 'Profile': 'Sales Manager'}
+Extracted location info: {'address': 'New York'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'New York'}
+Available regions: ['global']
+Converted user_data: {'Address': 'New York', 'Location': 'New York'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'New York', 'full_location': 'New York'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'New York'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-NEW', 'district_name': 'New York', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'New York'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Jennifer Wang (row 2)
+Raw row data: {'Full Name': 'Jennifer Wang', 'Email': 'jennifer.wang@acmecorp.com', 'Manager Email': 'sarah.chen@acmecorp.com', 'Department': 'Sales', 'Job Title': 'VP Sales - EMEA', 'Location': 'London', 'Employee ID': 'LD003', 'Start Date': '2020-05-20', 'Role': 'Sales Manager', 'User Type': 'Standard User', 'Profile': 'Sales Manager'}
+Extracted location info: {'address': 'London'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'London'}
+Available regions: ['global']
+Converted user_data: {'Address': 'London', 'Location': 'London'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'London', 'full_location': 'London'}, 'hierarchy': {'country_code': 'GB', 'country': 'United Kingdom', 'city': 'London'}, 'country_code': 'GB', 'region': 'emea', 'territories': {'district': 'EMEA-LON', 'district_name': 'London', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'city': 'London'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user David Kim (row 3)
+Raw row data: {'Full Name': 'David Kim', 'Email': 'david.kim@acmecorp.com', 'Manager Email': 'sarah.chen@acmecorp.com', 'Department': 'Sales', 'Job Title': 'VP Sales - APAC', 'Location': 'Singapore', 'Employee ID': 'SG004', 'Start Date': '2020-07-12', 'Role': 'Sales Manager', 'User Type': 'Standard User', 'Profile': 'Sales Manager'}
+Extracted location info: {'address': 'Singapore'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Singapore'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Singapore', 'Location': 'Singapore'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Singapore', 'full_location': 'Singapore'}, 'hierarchy': {'country_code': 'SG', 'country': 'Singapore'}, 'country_code': 'SG', 'region': 'apac', 'territories': {}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Singapore'}}
+SUCCESS: Assigned region 'apac' with confidence 0.95
+Processing user Lisa Thompson (row 4)
+Raw row data: {'Full Name': 'Lisa Thompson', 'Email': 'lisa.thompson@acmecorp.com', 'Manager Email': 'michael.rodriguez@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Director - East', 'Location': 'New York', 'Employee ID': 'NY005', 'Start Date': '2021-02-01', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'New York'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'New York'}
+Available regions: ['global']
+Converted user_data: {'Address': 'New York', 'Location': 'New York'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'New York', 'full_location': 'New York'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'New York'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-NEW', 'district_name': 'New York', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'New York'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Robert Johnson (row 5)
+Raw row data: {'Full Name': 'Robert Johnson', 'Email': 'robert.johnson@acmecorp.com', 'Manager Email': 'michael.rodriguez@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Director - West', 'Location': 'Los Angeles', 'Employee ID': 'LA006', 'Start Date': '2021-03-15', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Los Angeles'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Los Angeles'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Los Angeles', 'Location': 'Los Angeles'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Los Angeles', 'full_location': 'Los Angeles'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'Los Angeles'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-LOS', 'district_name': 'Los Angeles', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'Los Angeles'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Emily Davis (row 6)
+Raw row data: {'Full Name': 'Emily Davis', 'Email': 'emily.davis@acmecorp.com', 'Manager Email': 'jennifer.wang@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Director - UK', 'Location': 'London', 'Employee ID': 'LD007', 'Start Date': '2021-04-20', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'London'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'London'}
+Available regions: ['global']
+Converted user_data: {'Address': 'London', 'Location': 'London'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'London', 'full_location': 'London'}, 'hierarchy': {'country_code': 'GB', 'country': 'United Kingdom', 'city': 'London'}, 'country_code': 'GB', 'region': 'emea', 'territories': {'district': 'EMEA-LON', 'district_name': 'London', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'city': 'London'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user James Wilson (row 7)
+Raw row data: {'Full Name': 'James Wilson', 'Email': 'james.wilson@acmecorp.com', 'Manager Email': 'jennifer.wang@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Director - DACH', 'Location': 'Berlin', 'Employee ID': 'BE008', 'Start Date': '2021-06-10', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Berlin'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Berlin'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Berlin', 'Location': 'Berlin'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Berlin', 'full_location': 'Berlin'}, 'hierarchy': {'country_code': 'DE', 'country': 'Germany', 'city': 'Berlin'}, 'country_code': 'DE', 'region': 'emea', 'territories': {'district': 'EMEA-BER', 'district_name': 'Berlin', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Germany', 'city': 'Berlin'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Anna Patel (row 8)
+Raw row data: {'Full Name': 'Anna Patel', 'Email': 'anna.patel@acmecorp.com', 'Manager Email': 'david.kim@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Director - ANZ', 'Location': 'Sydney', 'Employee ID': 'SY009', 'Start Date': '2021-08-05', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Sydney'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Sydney'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Sydney', 'Location': 'Sydney'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Sydney', 'full_location': 'Sydney'}, 'hierarchy': {'country_code': 'AU', 'country': 'Australia', 'city': 'Sydney'}, 'country_code': 'AU', 'region': 'apac', 'territories': {'district': 'APAC-SYD', 'district_name': 'Sydney', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Australia', 'city': 'Sydney'}}
+SUCCESS: Assigned region 'apac' with confidence 0.95
+Processing user Kevin Zhang (row 9)
+Raw row data: {'Full Name': 'Kevin Zhang', 'Email': 'kevin.zhang@acmecorp.com', 'Manager Email': 'david.kim@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Director - SEA', 'Location': 'Singapore', 'Employee ID': 'SG010', 'Start Date': '2021-09-20', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Singapore'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Singapore'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Singapore', 'Location': 'Singapore'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Singapore', 'full_location': 'Singapore'}, 'hierarchy': {'country_code': 'SG', 'country': 'Singapore'}, 'country_code': 'SG', 'region': 'apac', 'territories': {}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Singapore'}}
+SUCCESS: Assigned region 'apac' with confidence 0.95
+Processing user Mark Stevens (row 10)
+Raw row data: {'Full Name': 'Mark Stevens', 'Email': 'mark.stevens@acmecorp.com', 'Manager Email': 'lisa.thompson@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Senior Account Executive', 'Location': 'Boston', 'Employee ID': 'BT011', 'Start Date': '2022-01-10', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Boston'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Boston'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Boston', 'Location': 'Boston'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Boston', 'full_location': 'Boston'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'Boston'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-BOS', 'district_name': 'Boston', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'Boston'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Rachel Green (row 11)
+Raw row data: {'Full Name': 'Rachel Green', 'Email': 'rachel.green@acmecorp.com', 'Manager Email': 'lisa.thompson@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Senior Account Executive', 'Location': 'New York', 'Employee ID': 'NY012', 'Start Date': '2022-02-15', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'New York'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'New York'}
+Available regions: ['global']
+Converted user_data: {'Address': 'New York', 'Location': 'New York'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'New York', 'full_location': 'New York'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'New York'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-NEW', 'district_name': 'New York', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'New York'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Thomas Brown (row 12)
+Raw row data: {'Full Name': 'Thomas Brown', 'Email': 'thomas.brown@acmecorp.com', 'Manager Email': 'robert.johnson@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Senior Account Executive', 'Location': 'San Francisco', 'Employee ID': 'SF013', 'Start Date': '2022-03-20', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'San Francisco'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'San Francisco'}
+Available regions: ['global']
+Converted user_data: {'Address': 'San Francisco', 'Location': 'San Francisco'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'San Francisco', 'full_location': 'San Francisco'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'San Francisco'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-SAN', 'district_name': 'San Francisco', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'San Francisco'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Jessica Miller (row 13)
+Raw row data: {'Full Name': 'Jessica Miller', 'Email': 'jessica.miller@acmecorp.com', 'Manager Email': 'robert.johnson@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Senior Account Executive', 'Location': 'Los Angeles', 'Employee ID': 'LA014', 'Start Date': '2022-04-25', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Los Angeles'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Los Angeles'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Los Angeles', 'Location': 'Los Angeles'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Los Angeles', 'full_location': 'Los Angeles'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'Los Angeles'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-LOS', 'district_name': 'Los Angeles', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'Los Angeles'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Daniel Garcia (row 14)
+Raw row data: {'Full Name': 'Daniel Garcia', 'Email': 'daniel.garcia@acmecorp.com', 'Manager Email': 'emily.davis@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Manchester', 'Employee ID': 'MN015', 'Start Date': '2022-05-30', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Manchester'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Manchester'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Manchester', 'Location': 'Manchester'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Manchester', 'full_location': 'Manchester'}, 'hierarchy': {'country_code': 'GB', 'country': 'United Kingdom', 'city': 'Manchester'}, 'country_code': 'GB', 'region': 'emea', 'territories': {'district': 'EMEA-MAN', 'district_name': 'Manchester', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'city': 'Manchester'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Sophie Martinez (row 15)
+Raw row data: {'Full Name': 'Sophie Martinez', 'Email': 'sophie.martinez@acmecorp.com', 'Manager Email': 'emily.davis@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Birmingham', 'Employee ID': 'BM016', 'Start Date': '2022-07-08', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Birmingham'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Birmingham'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Birmingham', 'Location': 'Birmingham'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Birmingham', 'full_location': 'Birmingham'}, 'hierarchy': {'country_code': 'GB', 'country': 'United Kingdom', 'city': 'Birmingham'}, 'country_code': 'GB', 'region': 'emea', 'territories': {'district': 'EMEA-BIR', 'district_name': 'Birmingham', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'city': 'Birmingham'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Oliver Schmidt (row 16)
+Raw row data: {'Full Name': 'Oliver Schmidt', 'Email': 'oliver.schmidt@acmecorp.com', 'Manager Email': 'james.wilson@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Munich', 'Employee ID': 'MU017', 'Start Date': '2022-08-12', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Munich'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Munich'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Munich', 'Location': 'Munich'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Munich', 'full_location': 'Munich'}, 'hierarchy': {'country_code': 'DE', 'country': 'Germany', 'city': 'Munich'}, 'country_code': 'DE', 'region': 'emea', 'territories': {'district': 'EMEA-MUN', 'district_name': 'Munich', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Germany', 'city': 'Munich'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Hans Mueller (row 17)
+Raw row data: {'Full Name': 'Hans Mueller', 'Email': 'hans.mueller@acmecorp.com', 'Manager Email': 'james.wilson@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Frankfurt', 'Employee ID': 'FR018', 'Start Date': '2022-09-18', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Frankfurt'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Frankfurt'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Frankfurt', 'Location': 'Frankfurt'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Frankfurt', 'full_location': 'Frankfurt'}, 'hierarchy': {'country_code': 'DE', 'country': 'Germany', 'city': 'Frankfurt'}, 'country_code': 'DE', 'region': 'emea', 'territories': {'district': 'EMEA-FRA', 'district_name': 'Frankfurt', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Germany', 'city': 'Frankfurt'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Emma Taylor (row 18)
+Raw row data: {'Full Name': 'Emma Taylor', 'Email': 'emma.taylor@acmecorp.com', 'Manager Email': 'anna.patel@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Melbourne', 'Employee ID': 'ML019', 'Start Date': '2022-10-22', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Melbourne'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Melbourne'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Melbourne', 'Location': 'Melbourne'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Melbourne', 'full_location': 'Melbourne'}, 'hierarchy': {'country_code': 'AU', 'country': 'Australia', 'city': 'Melbourne'}, 'country_code': 'AU', 'region': 'apac', 'territories': {'district': 'APAC-MEL', 'district_name': 'Melbourne', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Australia', 'city': 'Melbourne'}}
+SUCCESS: Assigned region 'apac' with confidence 0.95
+Processing user Jack Wilson (row 19)
+Raw row data: {'Full Name': 'Jack Wilson', 'Email': 'jack.wilson@acmecorp.com', 'Manager Email': 'anna.patel@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Brisbane', 'Employee ID': 'BR020', 'Start Date': '2022-11-28', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Brisbane'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Brisbane'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Brisbane', 'Location': 'Brisbane'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Brisbane', 'full_location': 'Brisbane'}, 'hierarchy': {'country_code': 'AU', 'country': 'Australia', 'city': 'Brisbane'}, 'country_code': 'AU', 'region': 'apac', 'territories': {'district': 'APAC-BRI', 'district_name': 'Brisbane', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Australia', 'city': 'Brisbane'}}
+SUCCESS: Assigned region 'apac' with confidence 0.95
+Processing user Ryan Tan (row 20)
+Raw row data: {'Full Name': 'Ryan Tan', 'Email': 'ryan.tan@acmecorp.com', 'Manager Email': 'kevin.zhang@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Bangkok', 'Employee ID': 'BK021', 'Start Date': '2023-01-15', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Bangkok'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Bangkok'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Bangkok', 'Location': 'Bangkok'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Bangkok', 'full_location': 'Bangkok'}, 'hierarchy': {'country_code': 'TH', 'country': 'Thailand', 'city': 'Bangkok'}, 'country_code': 'TH', 'region': 'apac', 'territories': {'district': 'APAC-BAN', 'district_name': 'Bangkok', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Thailand', 'city': 'Bangkok'}}
+SUCCESS: Assigned region 'apac' with confidence 0.95
+Processing user Maya Lim (row 21)
+Raw row data: {'Full Name': 'Maya Lim', 'Email': 'maya.lim@acmecorp.com', 'Manager Email': 'kevin.zhang@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Kuala Lumpur', 'Employee ID': 'KL022', 'Start Date': '2023-02-20', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Kuala Lumpur'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Kuala Lumpur'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Kuala Lumpur', 'Location': 'Kuala Lumpur'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Kuala Lumpur', 'full_location': 'Kuala Lumpur'}, 'hierarchy': {'country_code': 'MY', 'country': 'Malaysia', 'city': 'Kuala Lumpur'}, 'country_code': 'MY', 'region': 'apac', 'territories': {'district': 'APAC-KUA', 'district_name': 'Kuala Lumpur', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Malaysia', 'city': 'Kuala Lumpur'}}
+SUCCESS: Assigned region 'apac' with confidence 0.95
+Processing user Alex Johnson (row 22)
+Raw row data: {'Full Name': 'Alex Johnson', 'Email': 'alex.johnson@acmecorp.com', 'Manager Email': 'mark.stevens@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Junior Account Executive', 'Location': 'Hartford', 'Employee ID': 'HT023', 'Start Date': '2023-03-25', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Hartford'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Hartford'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Hartford', 'Location': 'Hartford'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Hartford', 'full_location': 'Hartford'}, 'hierarchy': {}, 'country_code': None, 'region': None, 'territories': {}, 'confidence': 0.0, 'method': 'none', 'admin_levels': {}}
+FAILED: No region or low confidence. Region: None, Confidence: 0.0
+Falling back to manual region mapping...
+No matches found, defaulting to 'global'
+Processing user Chloe Davis (row 23)
+Raw row data: {'Full Name': 'Chloe Davis', 'Email': 'chloe.davis@acmecorp.com', 'Manager Email': 'rachel.green@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Junior Account Executive', 'Location': 'Newark', 'Employee ID': 'NW024', 'Start Date': '2023-04-30', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Newark'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Newark'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Newark', 'Location': 'Newark'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Newark', 'full_location': 'Newark'}, 'hierarchy': {}, 'country_code': None, 'region': None, 'territories': {}, 'confidence': 0.0, 'method': 'none', 'admin_levels': {}}
+FAILED: No region or low confidence. Region: None, Confidence: 0.0
+Falling back to manual region mapping...
+No matches found, defaulting to 'global'
+Processing user Noah Williams (row 24)
+Raw row data: {'Full Name': 'Noah Williams', 'Email': 'noah.williams@acmecorp.com', 'Manager Email': 'thomas.brown@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Junior Account Executive', 'Location': 'San Jose', 'Employee ID': 'SJ025', 'Start Date': '2023-05-15', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'San Jose'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'San Jose'}
+Available regions: ['global']
+Converted user_data: {'Address': 'San Jose', 'Location': 'San Jose'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'San Jose', 'full_location': 'San Jose'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'San Jose'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-SAN', 'district_name': 'San Jose', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'San Jose'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Grace Lee (row 25)
+Raw row data: {'Full Name': 'Grace Lee', 'Email': 'grace.lee@acmecorp.com', 'Manager Email': 'jessica.miller@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Junior Account Executive', 'Location': 'Pasadena', 'Employee ID': 'PA026', 'Start Date': '2023-06-20', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Pasadena'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Pasadena'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Pasadena', 'Location': 'Pasadena'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Pasadena', 'full_location': 'Pasadena'}, 'hierarchy': {}, 'country_code': None, 'region': None, 'territories': {}, 'confidence': 0.0, 'method': 'none', 'admin_levels': {}}
+FAILED: No region or low confidence. Region: None, Confidence: 0.0
+Falling back to manual region mapping...
+No matches found, defaulting to 'global'
+Processing user Ethan Moore (row 26)
+Raw row data: {'Full Name': 'Ethan Moore', 'Email': 'ethan.moore@acmecorp.com', 'Manager Email': 'daniel.garcia@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Development Rep', 'Location': 'Liverpool', 'Employee ID': 'LV027', 'Start Date': '2023-07-25', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Liverpool'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Liverpool'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Liverpool', 'Location': 'Liverpool'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Liverpool', 'full_location': 'Liverpool'}, 'hierarchy': {'country_code': 'GB', 'country': 'United Kingdom', 'city': 'Liverpool'}, 'country_code': 'GB', 'region': 'emea', 'territories': {'district': 'EMEA-LIV', 'district_name': 'Liverpool', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'city': 'Liverpool'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Zoe Clark (row 27)
+Raw row data: {'Full Name': 'Zoe Clark', 'Email': 'zoe.clark@acmecorp.com', 'Manager Email': 'sophie.martinez@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Development Rep', 'Location': 'Coventry', 'Employee ID': 'CV028', 'Start Date': '2023-08-30', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Coventry'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Coventry'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Coventry', 'Location': 'Coventry'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Coventry', 'full_location': 'Coventry'}, 'hierarchy': {'country_code': 'GB', 'country': 'United Kingdom', 'city': 'Coventry'}, 'country_code': 'GB', 'region': 'emea', 'territories': {'district': 'EMEA-COV', 'district_name': 'Coventry', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'city': 'Coventry'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Lucas Weber (row 28)
+Raw row data: {'Full Name': 'Lucas Weber', 'Email': 'lucas.weber@acmecorp.com', 'Manager Email': 'oliver.schmidt@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Development Rep', 'Location': 'Stuttgart', 'Employee ID': 'ST029', 'Start Date': '2023-09-05', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Stuttgart'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Stuttgart'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Stuttgart', 'Location': 'Stuttgart'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Stuttgart', 'full_location': 'Stuttgart'}, 'hierarchy': {'country_code': 'DE', 'country': 'Germany', 'city': 'Stuttgart'}, 'country_code': 'DE', 'region': 'emea', 'territories': {'district': 'EMEA-STU', 'district_name': 'Stuttgart', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Germany', 'city': 'Stuttgart'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Mia Fischer (row 29)
+Raw row data: {'Full Name': 'Mia Fischer', 'Email': 'mia.fischer@acmecorp.com', 'Manager Email': 'hans.mueller@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Development Rep', 'Location': 'Cologne', 'Employee ID': 'CL030', 'Start Date': '2023-10-10', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Cologne'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Cologne'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Cologne', 'Location': 'Cologne'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Cologne', 'full_location': 'Cologne'}, 'hierarchy': {'country_code': 'DE', 'country': 'Germany', 'city': 'Cologne'}, 'country_code': 'DE', 'region': 'emea', 'territories': {'district': 'EMEA-COL', 'district_name': 'Cologne', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Germany', 'city': 'Cologne'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Test Guy (row 30)
+Raw row data: {'Full Name': 'Test Guy', 'Email': 'wohepac855@inilas.com', 'Manager Email': 'hans.mueller@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Development Rep', 'Location': 'Cologne', 'Employee ID': 'CL031', 'Start Date': '2023-10-10', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Cologne'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Cologne'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Cologne', 'Location': 'Cologne'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Cologne', 'full_location': 'Cologne'}, 'hierarchy': {'country_code': 'DE', 'country': 'Germany', 'city': 'Cologne'}, 'country_code': 'DE', 'region': 'emea', 'territories': {'district': 'EMEA-COL', 'district_name': 'Cologne', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Germany', 'city': 'Cologne'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+SmartLocationMapperRBAAgent result: True
+=== USER PROCESSING LOOP ===
+Total users to process: 31
+Processing user 1/31: Unknown
+Successfully processed user Unknown
+Processing user 2/31: Unknown
+Successfully processed user Unknown
+Processing user 3/31: Unknown
+Successfully processed user Unknown
+Processing user 4/31: Unknown
+Successfully processed user Unknown
+Processing user 5/31: Unknown
+Successfully processed user Unknown
+Processing user 6/31: Unknown
+Successfully processed user Unknown
+Processing user 7/31: Unknown
+Successfully processed user Unknown
+Processing user 8/31: Unknown
+Successfully processed user Unknown
+Processing user 9/31: Unknown
+Successfully processed user Unknown
+Processing user 10/31: Unknown
+Successfully processed user Unknown
+Processing user 11/31: Unknown
+Successfully processed user Unknown
+Processing user 12/31: Unknown
+Successfully processed user Unknown
+Processing user 13/31: Unknown
+Successfully processed user Unknown
+Processing user 14/31: Unknown
+Successfully processed user Unknown
+Processing user 15/31: Unknown
+Successfully processed user Unknown
+Processing user 16/31: Unknown
+Successfully processed user Unknown
+Processing user 17/31: Unknown
+Successfully processed user Unknown
+Processing user 18/31: Unknown
+Successfully processed user Unknown
+Processing user 19/31: Unknown
+Successfully processed user Unknown
+Processing user 20/31: Unknown
+Successfully processed user Unknown
+Processing user 21/31: Unknown
+Successfully processed user Unknown
+Processing user 22/31: Unknown
+Successfully processed user Unknown
+Processing user 23/31: Unknown
+Successfully processed user Unknown
+Processing user 24/31: Unknown
+Successfully processed user Unknown
+Processing user 25/31: Unknown
+Successfully processed user Unknown
+Processing user 26/31: Unknown
+Successfully processed user Unknown
+Processing user 27/31: Unknown
+Successfully processed user Unknown
+Processing user 28/31: Unknown
+Successfully processed user Unknown
+Processing user 29/31: Unknown
+Successfully processed user Unknown
+Processing user 30/31: Unknown
+Successfully processed user Unknown
+Processing user 31/31: Unknown
+Successfully processed user Unknown
+=== OnboardingRBAAgent._execute_rba_logic CALLED ===
+Context keys: ['users_data', 'workflow_config', 'tenant_id', 'user_id']
+Config keys: ['enable_smart_location_mapping', 'enable_module_assignment', 'industry', 'default_user_role', 'assignment_strategy', 'confidence_threshold']
+==================================================
+=== OnboardingRBAAgent location mapping check ===
+enable_smart_location_mapping: True
+Config keys: ['enable_smart_location_mapping', 'enable_module_assignment', 'industry', 'default_user_role', 'assignment_strategy', 'confidence_threshold']
+Smart location mapping is ENABLED, executing...
+Calling SmartLocationMapperRBAAgent._execute_rba_logic
+=== SmartLocationMapperRBAAgent._execute_rba_logic CALLED ===
+Context keys: ['users_data', 'workflow_config', 'tenant_id', 'user_id']
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+=== COLUMN DETECTION DEBUG ===
+Available columns: ['Full Name', 'Email', 'Manager Email', 'Department', 'Job Title', 'Location', 'Employee ID', 'Start Date', 'Role', 'User Type', 'Profile']
+Detected location columns: {'address': ['Location'], 'city': [], 'state': [], 'country': [], 'postal_code': [], 'office': []}
+  address: ['Location']
+=== COLUMN DETECTION DEBUG ===
+Available columns: ['Full Name', 'Email', 'Manager Email', 'Department', 'Job Title', 'Location', 'Employee ID', 'Start Date', 'Role', 'User Type', 'Profile']
+Detected location columns: {'address': ['Location'], 'city': [], 'state': [], 'country': [], 'postal_code': [], 'office': []}
+  address: ['Location']
+Processing user Sarah Chen (row 0)
+Raw row data: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+Extracted location info: {'address': 'San Francisco'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'San Francisco'}
+Available regions: ['global']
+Converted user_data: {'Address': 'San Francisco', 'Location': 'San Francisco'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'San Francisco', 'full_location': 'San Francisco'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'San Francisco'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-SAN', 'district_name': 'San Francisco', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'San Francisco'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Michael Rodriguez (row 1)
+Raw row data: {'Full Name': 'Michael Rodriguez', 'Email': 'michael.rodriguez@acmecorp.com', 'Manager Email': 'sarah.chen@acmecorp.com', 'Department': 'Sales', 'Job Title': 'VP Sales - Americas', 'Location': 'New York', 'Employee ID': 'NY002', 'Start Date': '2020-03-10', 'Role': 'Sales Manager', 'User Type': 'Standard User', 'Profile': 'Sales Manager'}
+Extracted location info: {'address': 'New York'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'New York'}
+Available regions: ['global']
+Converted user_data: {'Address': 'New York', 'Location': 'New York'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'New York', 'full_location': 'New York'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'New York'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-NEW', 'district_name': 'New York', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'New York'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Jennifer Wang (row 2)
+Raw row data: {'Full Name': 'Jennifer Wang', 'Email': 'jennifer.wang@acmecorp.com', 'Manager Email': 'sarah.chen@acmecorp.com', 'Department': 'Sales', 'Job Title': 'VP Sales - EMEA', 'Location': 'London', 'Employee ID': 'LD003', 'Start Date': '2020-05-20', 'Role': 'Sales Manager', 'User Type': 'Standard User', 'Profile': 'Sales Manager'}
+Extracted location info: {'address': 'London'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'London'}
+Available regions: ['global']
+Converted user_data: {'Address': 'London', 'Location': 'London'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'London', 'full_location': 'London'}, 'hierarchy': {'country_code': 'GB', 'country': 'United Kingdom', 'city': 'London'}, 'country_code': 'GB', 'region': 'emea', 'territories': {'district': 'EMEA-LON', 'district_name': 'London', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'city': 'London'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user David Kim (row 3)
+Raw row data: {'Full Name': 'David Kim', 'Email': 'david.kim@acmecorp.com', 'Manager Email': 'sarah.chen@acmecorp.com', 'Department': 'Sales', 'Job Title': 'VP Sales - APAC', 'Location': 'Singapore', 'Employee ID': 'SG004', 'Start Date': '2020-07-12', 'Role': 'Sales Manager', 'User Type': 'Standard User', 'Profile': 'Sales Manager'}
+Extracted location info: {'address': 'Singapore'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Singapore'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Singapore', 'Location': 'Singapore'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Singapore', 'full_location': 'Singapore'}, 'hierarchy': {'country_code': 'SG', 'country': 'Singapore'}, 'country_code': 'SG', 'region': 'apac', 'territories': {}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Singapore'}}
+SUCCESS: Assigned region 'apac' with confidence 0.95
+Processing user Lisa Thompson (row 4)
+Raw row data: {'Full Name': 'Lisa Thompson', 'Email': 'lisa.thompson@acmecorp.com', 'Manager Email': 'michael.rodriguez@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Director - East', 'Location': 'New York', 'Employee ID': 'NY005', 'Start Date': '2021-02-01', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'New York'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'New York'}
+Available regions: ['global']
+Converted user_data: {'Address': 'New York', 'Location': 'New York'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'New York', 'full_location': 'New York'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'New York'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-NEW', 'district_name': 'New York', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'New York'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Robert Johnson (row 5)
+Raw row data: {'Full Name': 'Robert Johnson', 'Email': 'robert.johnson@acmecorp.com', 'Manager Email': 'michael.rodriguez@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Director - West', 'Location': 'Los Angeles', 'Employee ID': 'LA006', 'Start Date': '2021-03-15', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Los Angeles'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Los Angeles'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Los Angeles', 'Location': 'Los Angeles'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Los Angeles', 'full_location': 'Los Angeles'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'Los Angeles'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-LOS', 'district_name': 'Los Angeles', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'Los Angeles'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Emily Davis (row 6)
+Raw row data: {'Full Name': 'Emily Davis', 'Email': 'emily.davis@acmecorp.com', 'Manager Email': 'jennifer.wang@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Director - UK', 'Location': 'London', 'Employee ID': 'LD007', 'Start Date': '2021-04-20', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'London'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'London'}
+Available regions: ['global']
+Converted user_data: {'Address': 'London', 'Location': 'London'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'London', 'full_location': 'London'}, 'hierarchy': {'country_code': 'GB', 'country': 'United Kingdom', 'city': 'London'}, 'country_code': 'GB', 'region': 'emea', 'territories': {'district': 'EMEA-LON', 'district_name': 'London', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'city': 'London'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user James Wilson (row 7)
+Raw row data: {'Full Name': 'James Wilson', 'Email': 'james.wilson@acmecorp.com', 'Manager Email': 'jennifer.wang@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Director - DACH', 'Location': 'Berlin', 'Employee ID': 'BE008', 'Start Date': '2021-06-10', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Berlin'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Berlin'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Berlin', 'Location': 'Berlin'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Berlin', 'full_location': 'Berlin'}, 'hierarchy': {'country_code': 'DE', 'country': 'Germany', 'city': 'Berlin'}, 'country_code': 'DE', 'region': 'emea', 'territories': {'district': 'EMEA-BER', 'district_name': 'Berlin', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Germany', 'city': 'Berlin'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Anna Patel (row 8)
+Raw row data: {'Full Name': 'Anna Patel', 'Email': 'anna.patel@acmecorp.com', 'Manager Email': 'david.kim@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Director - ANZ', 'Location': 'Sydney', 'Employee ID': 'SY009', 'Start Date': '2021-08-05', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Sydney'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Sydney'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Sydney', 'Location': 'Sydney'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Sydney', 'full_location': 'Sydney'}, 'hierarchy': {'country_code': 'AU', 'country': 'Australia', 'city': 'Sydney'}, 'country_code': 'AU', 'region': 'apac', 'territories': {'district': 'APAC-SYD', 'district_name': 'Sydney', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Australia', 'city': 'Sydney'}}
+SUCCESS: Assigned region 'apac' with confidence 0.95
+Processing user Kevin Zhang (row 9)
+Raw row data: {'Full Name': 'Kevin Zhang', 'Email': 'kevin.zhang@acmecorp.com', 'Manager Email': 'david.kim@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Director - SEA', 'Location': 'Singapore', 'Employee ID': 'SG010', 'Start Date': '2021-09-20', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Singapore'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Singapore'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Singapore', 'Location': 'Singapore'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Singapore', 'full_location': 'Singapore'}, 'hierarchy': {'country_code': 'SG', 'country': 'Singapore'}, 'country_code': 'SG', 'region': 'apac', 'territories': {}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Singapore'}}
+SUCCESS: Assigned region 'apac' with confidence 0.95
+Processing user Mark Stevens (row 10)
+Raw row data: {'Full Name': 'Mark Stevens', 'Email': 'mark.stevens@acmecorp.com', 'Manager Email': 'lisa.thompson@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Senior Account Executive', 'Location': 'Boston', 'Employee ID': 'BT011', 'Start Date': '2022-01-10', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Boston'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Boston'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Boston', 'Location': 'Boston'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Boston', 'full_location': 'Boston'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'Boston'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-BOS', 'district_name': 'Boston', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'Boston'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Rachel Green (row 11)
+Raw row data: {'Full Name': 'Rachel Green', 'Email': 'rachel.green@acmecorp.com', 'Manager Email': 'lisa.thompson@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Senior Account Executive', 'Location': 'New York', 'Employee ID': 'NY012', 'Start Date': '2022-02-15', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'New York'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'New York'}
+Available regions: ['global']
+Converted user_data: {'Address': 'New York', 'Location': 'New York'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'New York', 'full_location': 'New York'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'New York'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-NEW', 'district_name': 'New York', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'New York'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Thomas Brown (row 12)
+Raw row data: {'Full Name': 'Thomas Brown', 'Email': 'thomas.brown@acmecorp.com', 'Manager Email': 'robert.johnson@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Senior Account Executive', 'Location': 'San Francisco', 'Employee ID': 'SF013', 'Start Date': '2022-03-20', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'San Francisco'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'San Francisco'}
+Available regions: ['global']
+Converted user_data: {'Address': 'San Francisco', 'Location': 'San Francisco'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'San Francisco', 'full_location': 'San Francisco'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'San Francisco'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-SAN', 'district_name': 'San Francisco', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'San Francisco'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Jessica Miller (row 13)
+Raw row data: {'Full Name': 'Jessica Miller', 'Email': 'jessica.miller@acmecorp.com', 'Manager Email': 'robert.johnson@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Senior Account Executive', 'Location': 'Los Angeles', 'Employee ID': 'LA014', 'Start Date': '2022-04-25', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Los Angeles'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Los Angeles'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Los Angeles', 'Location': 'Los Angeles'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Los Angeles', 'full_location': 'Los Angeles'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'Los Angeles'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-LOS', 'district_name': 'Los Angeles', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'Los Angeles'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Daniel Garcia (row 14)
+Raw row data: {'Full Name': 'Daniel Garcia', 'Email': 'daniel.garcia@acmecorp.com', 'Manager Email': 'emily.davis@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Manchester', 'Employee ID': 'MN015', 'Start Date': '2022-05-30', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Manchester'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Manchester'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Manchester', 'Location': 'Manchester'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Manchester', 'full_location': 'Manchester'}, 'hierarchy': {'country_code': 'GB', 'country': 'United Kingdom', 'city': 'Manchester'}, 'country_code': 'GB', 'region': 'emea', 'territories': {'district': 'EMEA-MAN', 'district_name': 'Manchester', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'city': 'Manchester'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Sophie Martinez (row 15)
+Raw row data: {'Full Name': 'Sophie Martinez', 'Email': 'sophie.martinez@acmecorp.com', 'Manager Email': 'emily.davis@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Birmingham', 'Employee ID': 'BM016', 'Start Date': '2022-07-08', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Birmingham'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Birmingham'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Birmingham', 'Location': 'Birmingham'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Birmingham', 'full_location': 'Birmingham'}, 'hierarchy': {'country_code': 'GB', 'country': 'United Kingdom', 'city': 'Birmingham'}, 'country_code': 'GB', 'region': 'emea', 'territories': {'district': 'EMEA-BIR', 'district_name': 'Birmingham', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'city': 'Birmingham'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Oliver Schmidt (row 16)
+Raw row data: {'Full Name': 'Oliver Schmidt', 'Email': 'oliver.schmidt@acmecorp.com', 'Manager Email': 'james.wilson@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Munich', 'Employee ID': 'MU017', 'Start Date': '2022-08-12', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Munich'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Munich'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Munich', 'Location': 'Munich'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Munich', 'full_location': 'Munich'}, 'hierarchy': {'country_code': 'DE', 'country': 'Germany', 'city': 'Munich'}, 'country_code': 'DE', 'region': 'emea', 'territories': {'district': 'EMEA-MUN', 'district_name': 'Munich', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Germany', 'city': 'Munich'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Hans Mueller (row 17)
+Raw row data: {'Full Name': 'Hans Mueller', 'Email': 'hans.mueller@acmecorp.com', 'Manager Email': 'james.wilson@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Frankfurt', 'Employee ID': 'FR018', 'Start Date': '2022-09-18', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Frankfurt'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Frankfurt'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Frankfurt', 'Location': 'Frankfurt'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Frankfurt', 'full_location': 'Frankfurt'}, 'hierarchy': {'country_code': 'DE', 'country': 'Germany', 'city': 'Frankfurt'}, 'country_code': 'DE', 'region': 'emea', 'territories': {'district': 'EMEA-FRA', 'district_name': 'Frankfurt', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Germany', 'city': 'Frankfurt'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Emma Taylor (row 18)
+Raw row data: {'Full Name': 'Emma Taylor', 'Email': 'emma.taylor@acmecorp.com', 'Manager Email': 'anna.patel@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Melbourne', 'Employee ID': 'ML019', 'Start Date': '2022-10-22', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Melbourne'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Melbourne'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Melbourne', 'Location': 'Melbourne'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Melbourne', 'full_location': 'Melbourne'}, 'hierarchy': {'country_code': 'AU', 'country': 'Australia', 'city': 'Melbourne'}, 'country_code': 'AU', 'region': 'apac', 'territories': {'district': 'APAC-MEL', 'district_name': 'Melbourne', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Australia', 'city': 'Melbourne'}}
+SUCCESS: Assigned region 'apac' with confidence 0.95
+Processing user Jack Wilson (row 19)
+Raw row data: {'Full Name': 'Jack Wilson', 'Email': 'jack.wilson@acmecorp.com', 'Manager Email': 'anna.patel@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Brisbane', 'Employee ID': 'BR020', 'Start Date': '2022-11-28', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Brisbane'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Brisbane'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Brisbane', 'Location': 'Brisbane'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Brisbane', 'full_location': 'Brisbane'}, 'hierarchy': {'country_code': 'AU', 'country': 'Australia', 'city': 'Brisbane'}, 'country_code': 'AU', 'region': 'apac', 'territories': {'district': 'APAC-BRI', 'district_name': 'Brisbane', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Australia', 'city': 'Brisbane'}}
+SUCCESS: Assigned region 'apac' with confidence 0.95
+Processing user Ryan Tan (row 20)
+Raw row data: {'Full Name': 'Ryan Tan', 'Email': 'ryan.tan@acmecorp.com', 'Manager Email': 'kevin.zhang@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Bangkok', 'Employee ID': 'BK021', 'Start Date': '2023-01-15', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Bangkok'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Bangkok'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Bangkok', 'Location': 'Bangkok'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Bangkok', 'full_location': 'Bangkok'}, 'hierarchy': {'country_code': 'TH', 'country': 'Thailand', 'city': 'Bangkok'}, 'country_code': 'TH', 'region': 'apac', 'territories': {'district': 'APAC-BAN', 'district_name': 'Bangkok', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Thailand', 'city': 'Bangkok'}}
+SUCCESS: Assigned region 'apac' with confidence 0.95
+Processing user Maya Lim (row 21)
+Raw row data: {'Full Name': 'Maya Lim', 'Email': 'maya.lim@acmecorp.com', 'Manager Email': 'kevin.zhang@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Account Executive', 'Location': 'Kuala Lumpur', 'Employee ID': 'KL022', 'Start Date': '2023-02-20', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Kuala Lumpur'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Kuala Lumpur'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Kuala Lumpur', 'Location': 'Kuala Lumpur'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Kuala Lumpur', 'full_location': 'Kuala Lumpur'}, 'hierarchy': {'country_code': 'MY', 'country': 'Malaysia', 'city': 'Kuala Lumpur'}, 'country_code': 'MY', 'region': 'apac', 'territories': {'district': 'APAC-KUA', 'district_name': 'Kuala Lumpur', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Malaysia', 'city': 'Kuala Lumpur'}}
+SUCCESS: Assigned region 'apac' with confidence 0.95
+Processing user Alex Johnson (row 22)
+Raw row data: {'Full Name': 'Alex Johnson', 'Email': 'alex.johnson@acmecorp.com', 'Manager Email': 'mark.stevens@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Junior Account Executive', 'Location': 'Hartford', 'Employee ID': 'HT023', 'Start Date': '2023-03-25', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Hartford'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Hartford'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Hartford', 'Location': 'Hartford'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Hartford', 'full_location': 'Hartford'}, 'hierarchy': {}, 'country_code': None, 'region': None, 'territories': {}, 'confidence': 0.0, 'method': 'none', 'admin_levels': {}}
+FAILED: No region or low confidence. Region: None, Confidence: 0.0
+Falling back to manual region mapping...
+No matches found, defaulting to 'global'
+Processing user Chloe Davis (row 23)
+Raw row data: {'Full Name': 'Chloe Davis', 'Email': 'chloe.davis@acmecorp.com', 'Manager Email': 'rachel.green@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Junior Account Executive', 'Location': 'Newark', 'Employee ID': 'NW024', 'Start Date': '2023-04-30', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Newark'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Newark'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Newark', 'Location': 'Newark'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Newark', 'full_location': 'Newark'}, 'hierarchy': {}, 'country_code': None, 'region': None, 'territories': {}, 'confidence': 0.0, 'method': 'none', 'admin_levels': {}}
+FAILED: No region or low confidence. Region: None, Confidence: 0.0
+Falling back to manual region mapping...
+No matches found, defaulting to 'global'
+Processing user Noah Williams (row 24)
+Raw row data: {'Full Name': 'Noah Williams', 'Email': 'noah.williams@acmecorp.com', 'Manager Email': 'thomas.brown@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Junior Account Executive', 'Location': 'San Jose', 'Employee ID': 'SJ025', 'Start Date': '2023-05-15', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'San Jose'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'San Jose'}
+Available regions: ['global']
+Converted user_data: {'Address': 'San Jose', 'Location': 'San Jose'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'San Jose', 'full_location': 'San Jose'}, 'hierarchy': {'country_code': 'US', 'country': 'United States', 'city': 'San Jose'}, 'country_code': 'US', 'region': 'north_america', 'territories': {'district': 'NORT-SAN', 'district_name': 'San Jose', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'United States', 'city': 'San Jose'}}
+SUCCESS: Assigned region 'north_america' with confidence 0.95
+Processing user Grace Lee (row 25)
+Raw row data: {'Full Name': 'Grace Lee', 'Email': 'grace.lee@acmecorp.com', 'Manager Email': 'jessica.miller@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Junior Account Executive', 'Location': 'Pasadena', 'Employee ID': 'PA026', 'Start Date': '2023-06-20', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Pasadena'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Pasadena'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Pasadena', 'Location': 'Pasadena'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Pasadena', 'full_location': 'Pasadena'}, 'hierarchy': {}, 'country_code': None, 'region': None, 'territories': {}, 'confidence': 0.0, 'method': 'none', 'admin_levels': {}}
+FAILED: No region or low confidence. Region: None, Confidence: 0.0
+Falling back to manual region mapping...
+No matches found, defaulting to 'global'
+Processing user Ethan Moore (row 26)
+Raw row data: {'Full Name': 'Ethan Moore', 'Email': 'ethan.moore@acmecorp.com', 'Manager Email': 'daniel.garcia@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Development Rep', 'Location': 'Liverpool', 'Employee ID': 'LV027', 'Start Date': '2023-07-25', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Liverpool'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Liverpool'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Liverpool', 'Location': 'Liverpool'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Liverpool', 'full_location': 'Liverpool'}, 'hierarchy': {'country_code': 'GB', 'country': 'United Kingdom', 'city': 'Liverpool'}, 'country_code': 'GB', 'region': 'emea', 'territories': {'district': 'EMEA-LIV', 'district_name': 'Liverpool', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'city': 'Liverpool'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Zoe Clark (row 27)
+Raw row data: {'Full Name': 'Zoe Clark', 'Email': 'zoe.clark@acmecorp.com', 'Manager Email': 'sophie.martinez@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Development Rep', 'Location': 'Coventry', 'Employee ID': 'CV028', 'Start Date': '2023-08-30', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Coventry'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Coventry'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Coventry', 'Location': 'Coventry'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Coventry', 'full_location': 'Coventry'}, 'hierarchy': {'country_code': 'GB', 'country': 'United Kingdom', 'city': 'Coventry'}, 'country_code': 'GB', 'region': 'emea', 'territories': {'district': 'EMEA-COV', 'district_name': 'Coventry', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'city': 'Coventry'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Lucas Weber (row 28)
+Raw row data: {'Full Name': 'Lucas Weber', 'Email': 'lucas.weber@acmecorp.com', 'Manager Email': 'oliver.schmidt@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Development Rep', 'Location': 'Stuttgart', 'Employee ID': 'ST029', 'Start Date': '2023-09-05', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Stuttgart'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Stuttgart'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Stuttgart', 'Location': 'Stuttgart'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Stuttgart', 'full_location': 'Stuttgart'}, 'hierarchy': {'country_code': 'DE', 'country': 'Germany', 'city': 'Stuttgart'}, 'country_code': 'DE', 'region': 'emea', 'territories': {'district': 'EMEA-STU', 'district_name': 'Stuttgart', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Germany', 'city': 'Stuttgart'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Mia Fischer (row 29)
+Raw row data: {'Full Name': 'Mia Fischer', 'Email': 'mia.fischer@acmecorp.com', 'Manager Email': 'hans.mueller@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Development Rep', 'Location': 'Cologne', 'Employee ID': 'CL030', 'Start Date': '2023-10-10', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Cologne'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Cologne'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Cologne', 'Location': 'Cologne'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Cologne', 'full_location': 'Cologne'}, 'hierarchy': {'country_code': 'DE', 'country': 'Germany', 'city': 'Cologne'}, 'country_code': 'DE', 'region': 'emea', 'territories': {'district': 'EMEA-COL', 'district_name': 'Cologne', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Germany', 'city': 'Cologne'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+Processing user Test Guy (row 30)
+Raw row data: {'Full Name': 'Test Guy', 'Email': 'wohepac855@inilas.com', 'Manager Email': 'hans.mueller@acmecorp.com', 'Department': 'Sales', 'Job Title': 'Sales Development Rep', 'Location': 'Cologne', 'Employee ID': 'CL031', 'Start Date': '2023-10-10', 'Role': 'Sales User', 'User Type': 'Standard User', 'Profile': 'Sales Rep'}
+Extracted location info: {'address': 'Cologne'}
+=== _assign_user_to_region START ===
+Input location_info: {'address': 'Cologne'}
+Available regions: ['global']
+Converted user_data: {'Address': 'Cologne', 'Location': 'Cologne'}
+Calling geolocation service...
+Geolocation service result: {'location_found': True, 'location_data': {'address': 'Cologne', 'full_location': 'Cologne'}, 'hierarchy': {'country_code': 'DE', 'country': 'Germany', 'city': 'Cologne'}, 'country_code': 'DE', 'region': 'emea', 'territories': {'district': 'EMEA-COL', 'district_name': 'Cologne', 'district_type': 'City'}, 'confidence': 0.95, 'method': 'full_hierarchy_detection', 'admin_levels': {'country': 'Germany', 'city': 'Cologne'}}
+SUCCESS: Assigned region 'emea' with confidence 0.95
+SmartLocationMapperRBAAgent result: True
+=== USER PROCESSING LOOP ===
+Total users to process: 31
+Processing user 1/31: Unknown
+Successfully processed user Unknown
+Processing user 2/31: Unknown
+Successfully processed user Unknown
+Processing user 3/31: Unknown
+Successfully processed user Unknown
+Processing user 4/31: Unknown
+Successfully processed user Unknown
+Processing user 5/31: Unknown
+Successfully processed user Unknown
+Processing user 6/31: Unknown
+Successfully processed user Unknown
+Processing user 7/31: Unknown
+Successfully processed user Unknown
+Processing user 8/31: Unknown
+Successfully processed user Unknown
+Processing user 9/31: Unknown
+Successfully processed user Unknown
+Processing user 10/31: Unknown
+Successfully processed user Unknown
+Processing user 11/31: Unknown
+Successfully processed user Unknown
+Processing user 12/31: Unknown
+Successfully processed user Unknown
+Processing user 13/31: Unknown
+Successfully processed user Unknown
+Processing user 14/31: Unknown
+Successfully processed user Unknown
+Processing user 15/31: Unknown
+Successfully processed user Unknown
+Processing user 16/31: Unknown
+Successfully processed user Unknown
+Processing user 17/31: Unknown
+Successfully processed user Unknown
+Processing user 18/31: Unknown
+Successfully processed user Unknown
+Processing user 19/31: Unknown
+Successfully processed user Unknown
+Processing user 20/31: Unknown
+Successfully processed user Unknown
+Processing user 21/31: Unknown
+Successfully processed user Unknown
+Processing user 22/31: Unknown
+Successfully processed user Unknown
+Processing user 23/31: Unknown
+Successfully processed user Unknown
+Processing user 24/31: Unknown
+Successfully processed user Unknown
+Processing user 25/31: Unknown
+Successfully processed user Unknown
+Processing user 26/31: Unknown
+Successfully processed user Unknown
+Processing user 27/31: Unknown
+Successfully processed user Unknown
+Processing user 28/31: Unknown
+Successfully processed user Unknown
+Processing user 29/31: Unknown
+Successfully processed user Unknown
+Processing user 30/31: Unknown
+Successfully processed user Unknown
+Processing user 31/31: Unknown
+Successfully processed user Unknown

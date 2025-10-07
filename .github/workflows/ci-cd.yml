@@ -1,0 +1,496 @@
+# CI/CD Pipeline Configuration for RevAI Pro Platform
+# GitHub Actions workflow for automated testing, building, and deployment
+
+name: RevAI Pro CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * *'  # Daily security scans at 2 AM
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  VERSION: ${{ github.sha }}
+
+jobs:
+  # Code Quality and Security Checks
+  quality-checks:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.microservices.txt
+        pip install -r requirements.test.txt
+
+    - name: Code formatting check (Black)
+      run: black --check --diff src/
+
+    - name: Import sorting check (isort)
+      run: isort --check-only --diff src/
+
+    - name: Linting (Flake8)
+      run: flake8 src/
+
+    - name: Type checking (MyPy)
+      run: mypy src/
+
+    - name: Security scan (Bandit)
+      run: bandit -r src/ -f json -o reports/bandit-report.json
+
+    - name: Dependency vulnerability scan (Safety)
+      run: safety check --json --output reports/safety-report.json
+
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: reports/
+
+  # Unit Tests
+  unit-tests:
+    runs-on: ubuntu-latest
+    needs: quality-checks
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.microservices.txt
+        pip install -r requirements.test.txt
+
+    - name: Run unit tests
+      run: |
+        python run_tests.py --test-types unit --parallel
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+        REDIS_URL: redis://localhost:6379
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: unit-test-results
+        path: reports/
+
+  # Integration Tests
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+      kafka:
+        image: confluentinc/cp-kafka:latest
+        env:
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        ports:
+          - 9092:9092
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.microservices.txt
+        pip install -r requirements.test.txt
+
+    - name: Start microservices
+      run: |
+        # Start all microservices in background
+        python -m uvicorn src.microservices.orchestrator:app --host 0.0.0.0 --port 8001 &
+        python -m uvicorn src.microservices.agent_registry:app --host 0.0.0.0 --port 8002 &
+        python -m uvicorn src.microservices.routing_orchestrator:app --host 0.0.0.0 --port 8003 &
+        python -m uvicorn src.microservices.kpi_exporter:app --host 0.0.0.0 --port 8004 &
+        python -m uvicorn src.microservices.confidence_thresholds:app --host 0.0.0.0 --port 8005 &
+        python -m uvicorn src.microservices.model_audit:app --host 0.0.0.0 --port 8006 &
+        python -m uvicorn src.microservices.calendar_automation:app --host 0.0.0.0 --port 8007 &
+        python -m uvicorn src.microservices.letsmeet_automation:app --host 0.0.0.0 --port 8008 &
+        python -m uvicorn src.microservices.cruxx_automation:app --host 0.0.0.0 --port 8009 &
+        python -m uvicorn src.microservices.run_trace_schema:app --host 0.0.0.0 --port 8010 &
+        python -m uvicorn src.microservices.dlq_replay_tooling:app --host 0.0.0.0 --port 8011 &
+        python -m uvicorn src.microservices.metrics_exporter:app --host 0.0.0.0 --port 8012 &
+        python -m uvicorn src.microservices.event_bus_schema_registry:app --host 0.0.0.0 --port 8013 &
+        
+        # Wait for services to start
+        sleep 30
+
+    - name: Run integration tests
+      run: |
+        python run_tests.py --test-types integration
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+        REDIS_URL: redis://localhost:6379
+        KAFKA_BROKERS: localhost:9092
+
+    - name: Upload integration test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: integration-test-results
+        path: reports/
+
+  # Performance Tests
+  performance-tests:
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.microservices.txt
+        pip install -r requirements.test.txt
+
+    - name: Start microservices
+      run: |
+        # Start microservices for performance testing
+        python -m uvicorn src.microservices.orchestrator:app --host 0.0.0.0 --port 8001 &
+        python -m uvicorn src.microservices.event_bus_schema_registry:app --host 0.0.0.0 --port 8013 &
+        sleep 30
+
+    - name: Run performance tests
+      run: |
+        python run_tests.py --test-types performance
+
+    - name: Upload performance test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-test-results
+        path: reports/
+
+  # Security Tests
+  security-tests:
+    runs-on: ubuntu-latest
+    needs: performance-tests
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.microservices.txt
+        pip install -r requirements.test.txt
+
+    - name: Start microservices
+      run: |
+        # Start microservices for security testing
+        python -m uvicorn src.microservices.orchestrator:app --host 0.0.0.0 --port 8001 &
+        python -m uvicorn src.microservices.calendar_automation:app --host 0.0.0.0 --port 8007 &
+        sleep 30
+
+    - name: Run security tests
+      run: |
+        python run_tests.py --test-types security
+
+    - name: Upload security test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-test-results
+        path: reports/
+
+  # Build Docker Images
+  build-images:
+    runs-on: ubuntu-latest
+    needs: security-tests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        service:
+          - ai-orchestrator:8001
+          - agent-registry:8002
+          - routing-orchestrator:8003
+          - kpi-exporter:8004
+          - confidence-thresholds:8005
+          - model-audit:8006
+          - calendar-automation:8007
+          - letsmeet-automation:8008
+          - cruxx-automation:8009
+          - run-trace-schema:8010
+          - dlq-replay-tooling:8011
+          - metrics-exporter:8012
+          - event-bus-schema-registry:8013
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract service name and port
+      id: extract
+      run: |
+        SERVICE_NAME=$(echo "${{ matrix.service }}" | cut -d: -f1)
+        SERVICE_PORT=$(echo "${{ matrix.service }}" | cut -d: -f2)
+        echo "service_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
+        echo "service_port=$SERVICE_PORT" >> $GITHUB_OUTPUT
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile.microservices
+        push: true
+        tags: |
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ steps.extract.outputs.service_name }}:${{ env.VERSION }}
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ steps.extract.outputs.service_name }}:latest
+        build-args: |
+          SERVICE_NAME=${{ steps.extract.outputs.service_name }}
+          SERVICE_PORT=${{ steps.extract.outputs.service_port }}
+
+  # Deploy to Staging
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: build-images
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+
+    - name: Configure kubectl
+      run: |
+        echo "${{ secrets.KUBE_CONFIG_STAGING }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+
+    - name: Deploy to staging
+      run: |
+        export KUBECONFIG=kubeconfig
+        export VERSION=${{ env.VERSION }}
+        export ENVIRONMENT=staging
+        export REGISTRY=${{ env.REGISTRY }}
+        export IMAGE_NAME=${{ env.IMAGE_NAME }}
+        
+        # Update image tags in deployment files
+        sed -i "s|IMAGE_TAG|$VERSION|g" k8s/deployment-staging.yaml
+        
+        # Apply Kubernetes manifests
+        kubectl apply -f k8s/deployment-staging.yaml
+        kubectl apply -f k8s/monitoring-setup.yaml
+        kubectl apply -f k8s/security-configuration.yaml
+        
+        # Wait for deployment to complete
+        kubectl rollout status deployment/revai-pro-staging -n revai-staging --timeout=300s
+
+    - name: Run smoke tests
+      run: |
+        export KUBECONFIG=kubeconfig
+        python run_tests.py --smoke-only
+
+  # Deploy to Production
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: build-images
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+
+    - name: Configure kubectl
+      run: |
+        echo "${{ secrets.KUBE_CONFIG_PRODUCTION }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+
+    - name: Create backup before deployment
+      run: |
+        export KUBECONFIG=kubeconfig
+        ./scripts/backup-production.sh backup
+
+    - name: Deploy to production
+      run: |
+        export KUBECONFIG=kubeconfig
+        export VERSION=${{ env.VERSION }}
+        export ENVIRONMENT=production
+        export REGISTRY=${{ env.REGISTRY }}
+        export IMAGE_NAME=${{ env.IMAGE_NAME }}
+        
+        # Run production deployment script
+        ./scripts/deploy-production.sh deploy
+
+    - name: Run health checks
+      run: |
+        export KUBECONFIG=kubeconfig
+        ./scripts/deploy-production.sh health-check
+
+    - name: Run smoke tests
+      run: |
+        export KUBECONFIG=kubeconfig
+        python run_tests.py --smoke-only
+
+    - name: Notify deployment success
+      if: success()
+      run: |
+        curl -X POST "${{ secrets.SLACK_WEBHOOK }}" \
+          -H "Content-Type: application/json" \
+          -d '{"text":"✅ RevAI Pro production deployment successful! Version: ${{ env.VERSION }}"}' \
+          --silent --show-error || true
+
+    - name: Rollback on failure
+      if: failure()
+      run: |
+        export KUBECONFIG=kubeconfig
+        ./scripts/deploy-production.sh rollback
+        
+        # Notify rollback
+        curl -X POST "${{ secrets.SLACK_WEBHOOK }}" \
+          -H "Content-Type: application/json" \
+          -d '{"text":"❌ RevAI Pro production deployment failed! Rollback initiated."}' \
+          --silent --show-error || true
+
+  # Security Scanning
+  security-scanning:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+    - name: Run CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        languages: python
+
+  # Notification
+  notify:
+    runs-on: ubuntu-latest
+    needs: [quality-checks, unit-tests, integration-tests, performance-tests, security-tests]
+    if: always()
+    steps:
+    - name: Notify test results
+      run: |
+        if [[ "${{ needs.quality-checks.result }}" == "success" && 
+              "${{ needs.unit-tests.result }}" == "success" && 
+              "${{ needs.integration-tests.result }}" == "success" && 
+              "${{ needs.performance-tests.result }}" == "success" && 
+              "${{ needs.security-tests.result }}" == "success" ]]; then
+          STATUS="✅ All tests passed"
+          COLOR="good"
+        else
+          STATUS="❌ Some tests failed"
+          COLOR="danger"
+        fi
+        
+        curl -X POST "${{ secrets.SLACK_WEBHOOK }}" \
+          -H "Content-Type: application/json" \
+          -d "{\"text\":\"$STATUS - RevAI Pro CI/CD Pipeline\", \"color\":\"$COLOR\"}" \
+          --silent --show-error || true
