@@ -1,0 +1,32 @@
+Contact Name,Email ID,Reporting Manager,Department,Designation,Territory,Lead Source,Deal Value,Pipeline Stage,Account Type
+Patricia Williams,patricia.williams@innovatetech.com,,Sales,Chief Revenue Officer,Global,Referral,10000000,Closed Won,Enterprise
+Marcus Johnson,marcus.johnson@innovatetech.com,patricia.williams@innovatetech.com,Sales,VP Sales - Americas,North America,Inbound,4000000,Negotiation,Enterprise
+Elena Rodriguez,elena.rodriguez@innovatetech.com,patricia.williams@innovatetech.com,Sales,VP Sales - Europe,Europe,Partner,3500000,Proposal,Enterprise
+Raj Patel,raj.patel@innovatetech.com,patricia.williams@innovatetech.com,Sales,VP Sales - APAC,Asia Pacific,Direct,3000000,Discovery,Enterprise
+Carmen Silva,carmen.silva@innovatetech.com,marcus.johnson@innovatetech.com,Sales,Regional Sales Manager,Northeast,Inbound,1500000,Qualified,Enterprise
+Trevor Adams,trevor.adams@innovatetech.com,marcus.johnson@innovatetech.com,Sales,Regional Sales Manager,Southeast,Outbound,1400000,Demo,Enterprise
+Nicole Chen,nicole.chen@innovatetech.com,marcus.johnson@innovatetech.com,Sales,Regional Sales Manager,West Coast,Webinar,1600000,Proposal,Enterprise
+Antoine Dubois,antoine.dubois@innovatetech.com,elena.rodriguez@innovatetech.com,Sales,Regional Sales Manager,France,Trade Show,1200000,Negotiation,Enterprise
+Klaus Weber,klaus.weber@innovatetech.com,elena.rodriguez@innovatetech.com,Sales,Regional Sales Manager,DACH,Cold Email,1100000,Discovery,Enterprise
+Hiroshi Tanaka,hiroshi.tanaka@innovatetech.com,raj.patel@innovatetech.com,Sales,Regional Sales Manager,Japan,Partner,1300000,Demo,Enterprise
+Priya Sharma,priya.sharma@innovatetech.com,raj.patel@innovatetech.com,Sales,Regional Sales Manager,India,Direct,1000000,Qualified,Enterprise
+Brandon Mitchell,brandon.mitchell@innovatetech.com,carmen.silva@innovatetech.com,Sales,Senior Account Executive,Boston,Inbound,600000,Proposal,Mid-Market
+Ashley Thompson,ashley.thompson@innovatetech.com,carmen.silva@innovatetech.com,Sales,Senior Account Executive,New York,Social Media,550000,Demo,Mid-Market
+Jordan Davis,jordan.davis@innovatetech.com,trevor.adams@innovatetech.com,Sales,Senior Account Executive,Atlanta,Referral,580000,Negotiation,Mid-Market
+Samantha Lee,samantha.lee@innovatetech.com,trevor.adams@innovatetech.com,Sales,Senior Account Executive,Miami,Content Marketing,520000,Discovery,Mid-Market
+Derek Wong,derek.wong@innovatetech.com,nicole.chen@innovatetech.com,Sales,Senior Account Executive,San Francisco,SEO,620000,Qualified,Mid-Market
+Melissa Garcia,melissa.garcia@innovatetech.com,nicole.chen@innovatetech.com,Sales,Senior Account Executive,Los Angeles,PPC,580000,Demo,Mid-Market
+Pierre Martin,pierre.martin@innovatetech.com,antoine.dubois@innovatetech.com,Sales,Account Executive,Paris,Trade Show,350000,Proposal,Mid-Market
+Sophie Laurent,sophie.laurent@innovatetech.com,antoine.dubois@innovatetech.com,Sales,Account Executive,Lyon,Email Marketing,320000,Discovery,Mid-Market
+Hans Mueller,hans.mueller@innovatetech.com,klaus.weber@innovatetech.com,Sales,Account Executive,Berlin,Cold Call,380000,Demo,Mid-Market
+Anna Schmidt,anna.schmidt@innovatetech.com,klaus.weber@innovatetech.com,Sales,Account Executive,Munich,LinkedIn,340000,Qualified,Mid-Market
+Kenji Nakamura,kenji.nakamura@innovatetech.com,hiroshi.tanaka@innovatetech.com,Sales,Account Executive,Tokyo,Partner,360000,Negotiation,Mid-Market
+Yuki Sato,yuki.sato@innovatetech.com,hiroshi.tanaka@innovatetech.com,Sales,Account Executive,Osaka,Direct,330000,Proposal,Mid-Market
+Arjun Kumar,arjun.kumar@innovatetech.com,priya.sharma@innovatetech.com,Sales,Account Executive,Mumbai,Webinar,340000,Discovery,Mid-Market
+Sneha Gupta,sneha.gupta@innovatetech.com,priya.sharma@innovatetech.com,Sales,Account Executive,Bangalore,Inbound,320000,Demo,Mid-Market
+Tyler Johnson,tyler.johnson@innovatetech.com,brandon.mitchell@innovatetech.com,Sales,Junior Account Executive,Cambridge,Cold Email,180000,Qualified,SMB
+Maya Patel,maya.patel@innovatetech.com,ashley.thompson@innovatetech.com,Sales,Junior Account Executive,Brooklyn,Social Media,170000,Discovery,SMB
+Cameron Brown,cameron.brown@innovatetech.com,jordan.davis@innovatetech.com,Sales,Junior Account Executive,Savannah,Referral,190000,Demo,SMB
+Isabella Martinez,isabella.martinez@innovatetech.com,samantha.lee@innovatetech.com,Sales,Junior Account Executive,Tampa,Content,160000,Qualified,SMB
+Ethan Liu,ethan.liu@innovatetech.com,derek.wong@innovatetech.com,Sales,Sales Development Rep,San Jose,LinkedIn,120000,Prospecting,SMB
+Zoe Anderson,zoe.anderson@innovatetech.com,melissa.garcia@innovatetech.com,Sales,Sales Development Rep,Pasadena,Cold Call,110000,Lead,SMB

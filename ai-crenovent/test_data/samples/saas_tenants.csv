@@ -1,0 +1,4 @@
+tenant_id,tenant_name,industry_code,region_code,compliance_requirements,status,created_at,metadata
+1001,SaaS Demo Company 2,SaaS,EU,"[""SOX"", ""GDPR""]",active,2025-03-01T14:25:03.939954,"{""demo"": true, ""created_by"": ""sample_generator""}"
+1004,SaaS Demo Company 5,SaaS,APAC,"[""SOX"", ""GDPR""]",active,2025-07-24T14:25:03.939982,"{""demo"": true, ""created_by"": ""sample_generator""}"
+1005,SaaS Demo Company 6,SaaS,EU,"[""SOX"", ""GDPR""]",active,2025-03-13T14:25:03.940011,"{""demo"": true, ""created_by"": ""sample_generator""}"

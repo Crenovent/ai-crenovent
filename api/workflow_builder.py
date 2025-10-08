@@ -3,7 +3,7 @@ Workflow Builder Core API
 FastAPI endpoints for drag-and-drop workflow creation and execution
 """
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Body
 from typing import Dict, Any
 from datetime import datetime
 import logging

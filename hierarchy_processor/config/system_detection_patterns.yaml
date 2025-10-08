@@ -1,0 +1,199 @@
+metadata:
+  name: "System Detection Patterns"
+  description: "Configurable patterns for detecting source systems (CRM/HRMS/ERP)"
+  version: "1.0"
+  last_updated: "2024-10-08"
+  coverage: "Major CRM, HRMS, and ERP systems worldwide"
+
+# System detection patterns - each system has keywords that help identify it
+system_patterns:
+  
+  # ========================================================================
+  # CRM SYSTEMS
+  # ========================================================================
+  
+  salesforce:
+    keywords: ['contact name', 'email id', 'territory', 'account', 'opportunity', 'lead source', 'deal value', 'pipeline stage', 'account type', 'lead status', 'campaign', 'forecast category']
+    priority: 95
+    category: 'crm'
+    description: 'Salesforce CRM - World leader'
+    
+  hubspot:
+    keywords: ['contact owner', 'deal stage', 'deal amount', 'company name', 'contact source', 'lifecycle stage', 'lead status', 'deal probability', 'close date', 'deal type', 'hubspot owner']
+    priority: 90
+    category: 'crm'
+    description: 'HubSpot CRM - Inbound marketing leader'
+    
+  zoho:
+    keywords: ['lead owner', 'deal owner', 'account owner', 'contact owner', 'lead source', 'deal stage', 'account type', 'industry', 'annual revenue', 'rating', 'zoho owner']
+    priority: 85
+    category: 'crm'
+    description: 'Zoho CRM - Comprehensive business suite'
+    
+  dynamics365:
+    keywords: ['dynamics owner', 'business unit', 'opportunity', 'account manager', 'sales stage', 'estimated revenue', 'probability', 'customer', 'prospect', 'qualified lead']
+    priority: 85
+    category: 'crm'
+    description: 'Microsoft Dynamics 365 CRM'
+    
+  pipedrive:
+    keywords: ['deal title', 'deal value', 'deal stage', 'pipeline', 'person name', 'organization name', 'deal owner', 'expected close date', 'deal probability', 'activity']
+    priority: 80
+    category: 'crm'
+    description: 'Pipedrive CRM - Sales pipeline focused'
+    
+  freshsales:
+    keywords: ['deal amount', 'deal stage', 'sales account', 'contact email', 'lead score', 'deal owner', 'sales owner', 'territory', 'deal source', 'qualification status']
+    priority: 75
+    category: 'crm'
+    description: 'Freshworks CRM (Freshsales)'
+    
+  insightly:
+    keywords: ['opportunity name', 'opportunity value', 'opportunity stage', 'contact info', 'organization', 'project', 'task', 'milestone', 'pipeline']
+    priority: 70
+    category: 'crm'
+    description: 'Insightly CRM - Project management integrated'
+    
+  copper:
+    keywords: ['person', 'company', 'opportunity', 'lead', 'deal value', 'close date', 'stage', 'assignee', 'copper owner', 'pipeline']
+    priority: 70
+    category: 'crm'
+    description: 'Copper CRM (formerly ProsperWorks)'
+    
+  # ========================================================================
+  # HRMS/HCM SYSTEMS
+  # ========================================================================
+  
+  bamboohr:
+    keywords: ['full name', 'manager email', 'location', 'employee id', 'job title', 'department', 'hire date', 'employment status', 'work email', 'direct reports', 'employee number']
+    priority: 95
+    category: 'hrms'
+    description: 'BambooHR - Leading HR software'
+    
+  workday:
+    keywords: ['worker', 'position', 'organization', 'cost center', 'supervisory organization', 'worker type', 'time type', 'pay group', 'location', 'business unit']
+    priority: 90
+    category: 'hrms'
+    description: 'Workday HCM - Enterprise HR solution'
+    
+  adp:
+    keywords: ['associate', 'pay group', 'home department', 'position code', 'employee class', 'work location', 'supervisor', 'job code', 'pay rate', 'hire date']
+    priority: 85
+    category: 'hrms'
+    description: 'ADP Workforce Now - Payroll and HR'
+    
+  successfactors:
+    keywords: ['user id', 'manager id', 'division', 'business unit', 'job code', 'position', 'employment status', 'hire date', 'termination date', 'cost center']
+    priority: 85
+    category: 'hrms'
+    description: 'SAP SuccessFactors - Enterprise HCM'
+    
+  peoplesoft:
+    keywords: ['emplid', 'employee id', 'position nbr', 'job code', 'deptid', 'business unit', 'location', 'supervisor id', 'empl status', 'action']
+    priority: 80
+    category: 'hrms'
+    description: 'Oracle PeopleSoft HCM'
+    
+  namely:
+    keywords: ['employee number', 'manager', 'office', 'team', 'division', 'start date', 'employment type', 'job title', 'reports to', 'work location']
+    priority: 75
+    category: 'hrms'
+    description: 'Namely HR platform'
+    
+  zenefits:
+    keywords: ['employee id', 'manager name', 'office location', 'employment status', 'job title', 'department', 'start date', 'employee type', 'work email']
+    priority: 75
+    category: 'hrms'
+    description: 'Zenefits HR platform'
+    
+  gusto:
+    keywords: ['employee id', 'manager', 'work location', 'employment type', 'job title', 'department', 'hire date', 'employee status', 'pay rate']
+    priority: 70
+    category: 'hrms'
+    description: 'Gusto Payroll and HR'
+    
+  rippling:
+    keywords: ['employee id', 'manager email', 'office', 'employment status', 'job title', 'department', 'start date', 'employee type', 'work location']
+    priority: 70
+    category: 'hrms'
+    description: 'Rippling HR and IT platform'
+    
+  # ========================================================================
+  # ERP SYSTEMS
+  # ========================================================================
+  
+  netsuite:
+    keywords: ['subsidiary', 'employee id', 'supervisor', 'department', 'location', 'job title', 'employee status', 'hire date', 'entity id']
+    priority: 80
+    category: 'erp'
+    description: 'Oracle NetSuite ERP'
+    
+  sap:
+    keywords: ['personnel number', 'organizational unit', 'position', 'cost center', 'personnel area', 'employee group', 'employee subgroup', 'company code']
+    priority: 85
+    category: 'erp'
+    description: 'SAP ERP HCM module'
+    
+  # ========================================================================
+  # SPECIALIZED SYSTEMS
+  # ========================================================================
+  
+  greenhouse:
+    keywords: ['candidate', 'job', 'application', 'stage', 'recruiter', 'hiring manager', 'interview', 'offer', 'source']
+    priority: 70
+    category: 'ats'
+    description: 'Greenhouse Applicant Tracking System'
+    
+  lever:
+    keywords: ['candidate name', 'opportunity', 'stage', 'posting', 'hiring manager', 'recruiter', 'interview', 'feedback', 'source']
+    priority: 70
+    category: 'ats'
+    description: 'Lever Applicant Tracking System'
+    
+  jira:
+    keywords: ['assignee', 'reporter', 'project', 'issue type', 'status', 'priority', 'component', 'fix version', 'epic']
+    priority: 60
+    category: 'project_management'
+    description: 'Atlassian Jira - Project management'
+    
+  asana:
+    keywords: ['assignee', 'project', 'task', 'due date', 'status', 'team', 'workspace', 'custom field', 'tag']
+    priority: 60
+    category: 'project_management'
+    description: 'Asana - Team collaboration'
+    
+  monday:
+    keywords: ['person', 'status', 'timeline', 'priority', 'owner', 'board', 'group', 'item', 'update']
+    priority: 60
+    category: 'project_management'
+    description: 'Monday.com - Work management'
+
+# Configuration for system detection
+detection_config:
+  minimum_matches: 2  # Minimum keyword matches to identify a system
+  confidence_threshold: 0.6  # Minimum confidence to accept detection
+  enable_fuzzy_matching: true
+  fuzzy_threshold: 80  # Minimum fuzzy match score
+  
+# Priority weights for different categories
+category_weights:
+  crm: 1.0
+  hrms: 1.0
+  erp: 0.9
+  ats: 0.8
+  project_management: 0.7
+  
+# Fallback detection rules
+fallback_rules:
+  # If no system detected but has these patterns, assume generic type
+  generic_crm:
+    keywords: ['contact', 'lead', 'opportunity', 'deal', 'account', 'customer']
+    minimum_matches: 3
+    
+  generic_hrms:
+    keywords: ['employee', 'manager', 'department', 'job title', 'hire date', 'location']
+    minimum_matches: 3
+    
+  generic_erp:
+    keywords: ['cost center', 'business unit', 'organization', 'subsidiary', 'company code']
+    minimum_matches: 2
