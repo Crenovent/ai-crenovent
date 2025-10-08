@@ -1,0 +1,16 @@
+Full Name,Email Address,Job Title,Reports To Email,Business Unit,Office Location,Employee ID
+John CEO,john.ceo@salesforce-company.com,Chief Executive Officer,,Executive,San Francisco HQ,EMP001
+Sarah VP Sales,sarah.vp@salesforce-company.com,Vice President Sales,john.ceo@salesforce-company.com,Sales,New York Office,EMP002
+Mike VP Eng,mike.vp@salesforce-company.com,Vice President Engineering,john.ceo@salesforce-company.com,Engineering,Austin Office,EMP003
+Lisa VP Marketing,lisa.vp@salesforce-company.com,Vice President Marketing,john.ceo@salesforce-company.com,Marketing,Boston Office,EMP004
+Tom Sales Dir,tom.dir@salesforce-company.com,Sales Director,sarah.vp@salesforce-company.com,Sales,New York Office,EMP005
+Amy Eng Dir,amy.dir@salesforce-company.com,Engineering Director,mike.vp@salesforce-company.com,Engineering,Austin Office,EMP006
+Bob Mkt Dir,bob.dir@salesforce-company.com,Marketing Director,lisa.vp@salesforce-company.com,Marketing,Boston Office,EMP007
+Carol Sales Mgr,carol.mgr@salesforce-company.com,Sales Manager,tom.dir@salesforce-company.com,Sales,New York Office,EMP008
+Dave Eng Mgr,dave.mgr@salesforce-company.com,Engineering Manager,amy.dir@salesforce-company.com,Engineering,Austin Office,EMP009
+Eve Mkt Mgr,eve.mgr@salesforce-company.com,Marketing Manager,bob.dir@salesforce-company.com,Marketing,Boston Office,EMP010
+Frank Sales Rep,frank.rep@salesforce-company.com,Account Executive,carol.mgr@salesforce-company.com,Sales,New York Office,EMP011
+Grace Engineer,grace.eng@salesforce-company.com,Senior Software Engineer,dave.mgr@salesforce-company.com,Engineering,Austin Office,EMP012
+Henry Marketer,henry.mkt@salesforce-company.com,Marketing Specialist,eve.mgr@salesforce-company.com,Marketing,Boston Office,EMP013
+Iris Sales Rep,iris.rep@salesforce-company.com,Sales Representative,carol.mgr@salesforce-company.com,Sales,New York Office,EMP014
+Jack Engineer,jack.eng@salesforce-company.com,Software Engineer,dave.mgr@salesforce-company.com,Engineering,Austin Office,EMP015
