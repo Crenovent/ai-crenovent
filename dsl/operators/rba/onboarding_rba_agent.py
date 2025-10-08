@@ -179,6 +179,9 @@ class OnboardingRBAAgent(EnhancedBaseRBAAgent):
             users_data = context.get('users_data', [])
             workflow_config = context.get('workflow_config', {})
             
+            # Add users_data to workflow_config for hierarchy analysis
+            workflow_config['users_data'] = users_data
+            
             # Step 0: Initialize dynamic field mappings
             if users_data:
                 self.field_mappings = self._initialize_field_mappings(users_data)
@@ -247,7 +250,7 @@ class OnboardingRBAAgent(EnhancedBaseRBAAgent):
                 with open(debug_path, 'a') as f:
                     f.write(f"Smart location mapping is DISABLED\n")
             
-            # Step 2: Process each user through the assignment pipeline
+            # Step 2: Process each user through the assignment pipeline (FIRST PASS - Basic Processing)
             # Store users data for location-based assignment
             self._current_users_data = users_data
             
@@ -267,15 +270,16 @@ class OnboardingRBAAgent(EnhancedBaseRBAAgent):
             
             # Debug: Check user processing loop
             with open(debug_path, 'a') as f:
-                f.write(f"=== USER PROCESSING LOOP ===\n")
+                f.write(f"=== USER PROCESSING LOOP (FIRST PASS) ===\n")
                 f.write(f"Total users to process: {len(users_data)}\n")
             
+            # FIRST PASS: Process all users with basic field assignments (NO hierarchy analysis)
             for i, user in enumerate(users_data):
                 try:
                     with open(debug_path, 'a') as f:
                         f.write(f"Processing user {i+1}/{len(users_data)}: {user.get('Name', 'Unknown')}\n")
                     
-                    processed_user = await self._process_single_user(user, config, workflow_config, location_intelligence)
+                    processed_user = await self._process_single_user_basic(user, config, workflow_config, location_intelligence)
                     
                     with open(debug_path, 'a') as f:
                         f.write(f"Successfully processed user {user.get('Name', 'Unknown')}\n")
@@ -287,8 +291,6 @@ class OnboardingRBAAgent(EnhancedBaseRBAAgent):
                         assignment_stats['regions_assigned'] += 1
                     if processed_user.get('segment_assigned'):
                         assignment_stats['segments_assigned'] += 1
-                    if processed_user.get('modules_assigned'):
-                        assignment_stats['modules_assigned'] += 1
                     if processed_user.get('level_assigned'):
                         assignment_stats['levels_assigned'] += 1
                     if processed_user.get('territory_assigned'):
@@ -305,6 +307,68 @@ class OnboardingRBAAgent(EnhancedBaseRBAAgent):
                     validation_errors.append({
                         'user': user.get('Name', 'Unknown'),
                         'error': str(e)
+                    })
+            
+            # SECOND PASS: Analyze hierarchy and assign modules based on correct hierarchy
+            self.logger.info("🔍 SECOND PASS: Analyzing hierarchy and assigning modules...")
+            print("🔍 SECOND PASS: Analyzing hierarchy and assigning modules...")
+            
+            for i, processed_user in enumerate(processed_users):
+                try:
+                    email = self._get_field_value(processed_user, 'email')
+                    name = self._get_field_value(processed_user, 'name')
+                    
+                    if email:
+                        # Now analyze hierarchy with complete user data
+                        has_direct_reports = self._user_has_direct_reports(email, workflow_config)
+                        is_leaf_node = self._is_leaf_node_in_hierarchy(email, workflow_config)
+                        
+                        # Update the processed user with correct hierarchy info
+                        processed_user['has_direct_reports'] = has_direct_reports
+                        processed_user['is_leaf_node'] = is_leaf_node
+                        
+                        self.logger.info(f"👥 {name}: has_direct_reports={has_direct_reports}, is_leaf_node={is_leaf_node}")
+                        print(f"👥 {name}: has_direct_reports={has_direct_reports}, is_leaf_node={is_leaf_node}")
+                        
+                        # Now assign modules based on correct hierarchy
+                        if config.get('enable_module_assignment', True):
+                            try:
+                                # Get industry from workflow config (tenant-level setting)
+                                industry = workflow_config.get('industry', 'saas')  # Default to SaaS
+                                title = self._get_field_value(processed_user, 'title')
+                                role_function = self._get_field_value(processed_user, 'department')
+                                
+                                self.logger.info(f"🎯 Assigning modules for {name} based on correct hierarchy")
+                                print(f"🎯 Assigning modules for {name} based on correct hierarchy")
+                                
+                                # Use centralized module assignment with correct hierarchy
+                                assigned_modules = centralized_module_assignment.assign_modules(
+                                    user_role=workflow_config.get('default_user_role', 'user'),
+                                    job_title=title,
+                                    role_function=role_function,
+                                    industry=industry,
+                                    has_direct_reports=has_direct_reports,  # Now correct!
+                                    is_leaf_node=is_leaf_node  # Now correct!
+                                )
+                                
+                                processed_user['Modules'] = ','.join(assigned_modules)
+                                processed_user['modules_assigned'] = True
+                                assignment_stats['modules_assigned'] += 1
+                                
+                                self.logger.info(f"✅ {name}: Modules assigned based on correct hierarchy = {assigned_modules}")
+                                print(f"✅ {name}: Modules assigned based on correct hierarchy = {assigned_modules}")
+                                
+                            except Exception as e:
+                                self.logger.error(f"❌ ERROR in module assignment for {name}: {str(e)}")
+                                print(f"❌ ERROR in module assignment for {name}: {str(e)}")
+                                # Fallback to basic modules
+                                processed_user['Modules'] = 'Calendar'
+                        
+                except Exception as e:
+                    self.logger.error(f"❌ Failed to analyze hierarchy for user {processed_user.get('Name', 'Unknown')}: {e}")
+                    validation_errors.append({
+                        'user': processed_user.get('Name', 'Unknown'),
+                        'error': f"Hierarchy analysis failed: {str(e)}"
                     })
             
             # Calculate confidence scores and statistics
@@ -349,21 +413,33 @@ class OnboardingRBAAgent(EnhancedBaseRBAAgent):
                 'assignment_statistics': {}
             }
     
-    async def _process_single_user(self, user: Dict[str, Any], config: Dict[str, Any], workflow_config: Dict[str, Any], location_intelligence: Dict[str, Any] = None) -> Dict[str, Any]:
-        """Process a single user through the field assignment pipeline"""
+    async def _process_single_user_basic(self, user: Dict[str, Any], config: Dict[str, Any], workflow_config: Dict[str, Any], location_intelligence: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Process a single user through basic field assignment pipeline (NO hierarchy analysis)"""
         processed_user = user.copy()
         location_intelligence = location_intelligence or {}
         
         # DEBUG: Log entry into user processing
         user_name = user.get('Name', user.get('name', 'Unknown'))
-        self.logger.info(f"🚀 STARTING _process_single_user for {user_name}")
-        print(f"🚀 STARTING _process_single_user for {user_name}")  # Force print to console
+        self.logger.info(f"🚀 STARTING _process_single_user_basic for {user_name}")
+        print(f"🚀 STARTING _process_single_user_basic for {user_name}")  # Force print to console
         
         # Extract user information using dynamic field mappings
         name = self._get_field_value(user, 'name')
         title = self._get_field_value(user, 'title')  # Maps to JobTitle
         email = self._get_field_value(user, 'email')
         role_function = self._get_field_value(user, 'department')
+        
+        # PRESERVE MANAGER RELATIONSHIPS FROM CSV
+        manager_email = self._get_field_value(user, 'manager_email')
+        if manager_email:
+            processed_user['Manager Email'] = manager_email
+            processed_user['Reports To Email'] = manager_email
+            processed_user['Reporting Email'] = manager_email
+            self.logger.info(f"👥 Preserved manager relationship for {name}: {manager_email}")
+            print(f"👥 Preserved manager relationship for {name}: {manager_email}")
+        else:
+            self.logger.info(f"👤 No manager for {name} (top-level or root)")
+            print(f"👤 No manager for {name} (top-level or root)")
         
         # Debug config to see what's being passed
         with open('debug_config.txt', 'a') as f:
@@ -447,49 +523,7 @@ class OnboardingRBAAgent(EnhancedBaseRBAAgent):
                     processed_user['district_assigned'] = True
                     self.logger.debug(f"👤 {name}: Assigned district = {assigned_district}")
         
-        # 5. Module Access Assignment - Using Centralized Logic
-        print(f"🔍 REACHED MODULE ASSIGNMENT SECTION for {name}")  # Force print to console
-        self.logger.info(f"🔍 MODULE ASSIGNMENT DEBUG: enable_module_assignment = {config.get('enable_module_assignment', True)}")
-        print(f"🔍 MODULE ASSIGNMENT DEBUG: enable_module_assignment = {config.get('enable_module_assignment', True)}")  # Force print
-        if config.get('enable_module_assignment', True):
-            print(f"🎯 ENTERING CENTRALIZED MODULE ASSIGNMENT for {name}")  # Force print
-            self.logger.info(f"🎯 ENTERING CENTRALIZED MODULE ASSIGNMENT for {name}")
-            try:
-                # ALWAYS use centralized module assignment - ignore existing modules
-                # Get industry from workflow config (tenant-level setting)
-                industry = workflow_config.get('industry', 'saas')  # Default to SaaS
-                print(f"🏭 Industry for {name}: {industry}")  # Force print
-            
-                # Detect leadership status
-                has_direct_reports = self._user_has_direct_reports(email, workflow_config)
-                is_leaf_node = self._is_leaf_node_in_hierarchy(email, workflow_config)
-                print(f"👥 Leadership for {name}: has_direct_reports={has_direct_reports}, is_leaf_node={is_leaf_node}")
-                
-                # Use centralized module assignment
-                print(f"🚀 Calling centralized_module_assignment.assign_modules for {name}")
-                assigned_modules = centralized_module_assignment.assign_modules(
-                    user_role=workflow_config.get('default_user_role', 'user'),
-                    job_title=title,
-                    role_function=role_function,
-                    industry=industry,
-                    has_direct_reports=has_direct_reports,
-                    is_leaf_node=is_leaf_node
-                )
-                print(f"✅ Module assignment successful for {name}: {len(assigned_modules)} modules")
-                
-                processed_user['Modules'] = ','.join(assigned_modules)
-                processed_user['modules_assigned'] = True
-                self.logger.debug(f"👤 {name}: Assigned modules using centralized logic = {assigned_modules}")
-                self.logger.info(f"🎯 {name}: NEW CENTRALIZED MODULES = {assigned_modules}")
-                print(f"🎯 {name}: NEW CENTRALIZED MODULES = {assigned_modules}")
-                
-            except Exception as e:
-                self.logger.error(f"❌ ERROR in centralized module assignment for {name}: {str(e)}")
-                print(f"❌ ERROR in centralized module assignment for {name}: {str(e)}")
-                import traceback
-                print(f"❌ TRACEBACK: {traceback.format_exc()}")
-                # Fallback to basic modules
-                processed_user['Modules'] = 'Calendar'
+        # NOTE: Module assignment is now handled in the SECOND PASS after hierarchy analysis
         
         # Add hierarchical location metadata for frontend (minimal work for frontend)
         if hasattr(self, '_location_results'):
@@ -544,6 +578,180 @@ class OnboardingRBAAgent(EnhancedBaseRBAAgent):
         processed_user['requires_review'] = confidence_result['requires_review']
         processed_user['field_confidences'] = confidence_result['field_confidences']
         processed_user['low_confidence_fields'] = confidence_result['low_confidence_fields']
+        
+        # Ensure Name field is set for validation
+        processed_user['Name'] = name
+        
+        return processed_user
+
+    async def _process_single_user(self, user: Dict[str, Any], config: Dict[str, Any], workflow_config: Dict[str, Any], location_intelligence: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Process a single user through the field assignment pipeline"""
+        processed_user = user.copy()
+        location_intelligence = location_intelligence or {}
+        
+        # DEBUG: Log entry into user processing
+        user_name = user.get('Name', user.get('name', 'Unknown'))
+        self.logger.info(f"🚀 STARTING _process_single_user for {user_name}")
+        print(f"🚀 STARTING _process_single_user for {user_name}")  # Force print to console
+        
+        # Extract user information using dynamic field mappings
+        name = self._get_field_value(user, 'name')
+        title = self._get_field_value(user, 'title')  # Maps to JobTitle
+        email = self._get_field_value(user, 'email')
+        role_function = self._get_field_value(user, 'department')
+        
+        # PRESERVE MANAGER RELATIONSHIPS FROM CSV
+        manager_email = self._get_field_value(user, 'manager_email')
+        if manager_email:
+            processed_user['Manager Email'] = manager_email
+            processed_user['Reports To Email'] = manager_email
+            processed_user['Reporting Email'] = manager_email
+            self.logger.info(f"👥 Preserved manager relationship for {name}: {manager_email}")
+            print(f"👥 Preserved manager relationship for {name}: {manager_email}")
+        else:
+            self.logger.info(f"👤 No manager for {name} (top-level or root)")
+            print(f"👤 No manager for {name} (top-level or root)")
+        
+        # Debug config to see what's being passed
+        with open('debug_config.txt', 'a') as f:
+            f.write(f"=== Processing user: {name} ===\n")
+            f.write(f"Config: {config}\n")
+            f.write(f"enable_region_assignment: {config.get('enable_region_assignment')}\n")
+            f.write(f"User data: {user}\n")
+            f.write("=" * 50 + "\n")
+        
+        # Only assign fields that are missing or empty (preserve existing data)
+        preserve_existing = config.get('preserve_existing_data', True)
+        
+        # 1. Region Assignment (with Smart Location Integration)
+        if config.get('enable_region_assignment', True):
+            # Write debug to file to see what's happening (Windows compatible)
+            import os
+            debug_path = os.path.join(os.getcwd(), 'debug_region.txt')
+            with open(debug_path, 'a') as f:
+                f.write(f"Region assignment enabled for {name}\n")
+                f.write(f"{name} user data: {user}\n")
+                f.write(f"{name} config: {config}\n")
+            
+            existing_region = user.get('Region', '').strip()
+            
+            if not preserve_existing or not user.get('Region') or user.get('Region', '').strip() == '':
+                with open(debug_path, 'a') as f:
+                    f.write(f"Assigning new region for {name}\n")
+                
+                assigned_region = self._assign_region_smart(name, title, email, config, location_intelligence)
+                
+                with open(debug_path, 'a') as f:
+                    f.write(f"{name} assigned region: {assigned_region}\n")
+                
+                processed_user['Region'] = assigned_region
+                processed_user['region_assigned'] = True
+                processed_user['location_based'] = self._is_location_based_assignment(name, email, location_intelligence)
+            else:
+                with open(debug_path, 'a') as f:
+                    f.write(f"Preserving existing region for {name}: {existing_region}\n")
+                self.logger.debug(f"👤 {name}: Assigned region = {assigned_region}")
+        
+        # 2. Level Inference
+        if config.get('enable_level_inference', True):
+            if not preserve_existing or not user.get('Level') or user.get('Level', '').strip() == '':
+                assigned_level = self._infer_level(title, role_function)
+                processed_user['Level'] = assigned_level
+                processed_user['level_assigned'] = True
+                self.logger.debug(f"👤 {name}: Assigned level = {assigned_level}")
+        
+        # 3. Segment Assignment (depends on level)
+        if config.get('enable_segment_assignment', True):
+            if not preserve_existing or not user.get('Segment') or user.get('Segment', '').strip() == '':
+                user_level = processed_user.get('Level', 'L4')
+                assigned_segment = self._assign_segment(title, role_function, user_level)
+                processed_user['Segment'] = assigned_segment
+                processed_user['segment_assigned'] = True
+                self.logger.debug(f"👤 {name}: Assigned segment = {assigned_segment}")
+        
+        # 4. Territory Assignment (with Smart Location Integration)
+        if not preserve_existing or not user.get('Territory') or user.get('Territory', '').strip() == '':
+            assigned_territory = self._assign_territory_smart(name, processed_user.get('Region', 'north_america'), location_intelligence)
+            processed_user['Territory'] = assigned_territory
+            processed_user['territory_assigned'] = True
+            self.logger.debug(f"👤 {name}: Assigned territory = {assigned_territory}")
+        
+        # 4b. Area Assignment (if hierarchical structure enabled)
+        if config.get('create_hierarchical_structure', True):
+            if not preserve_existing or not user.get('Area') or user.get('Area', '').strip() == '':
+                assigned_area = self._assign_area_from_location(name, email, location_intelligence)
+                if assigned_area:
+                    processed_user['Area'] = assigned_area
+                    processed_user['area_assigned'] = True
+                    self.logger.debug(f"👤 {name}: Assigned area = {assigned_area}")
+        
+        # 4c. District Assignment (if hierarchical structure enabled)
+        if config.get('create_hierarchical_structure', True):
+            if not preserve_existing or not user.get('District') or user.get('District', '').strip() == '':
+                assigned_district = self._assign_district_from_location(name, email, location_intelligence)
+                if assigned_district:
+                    processed_user['District'] = assigned_district
+                    processed_user['district_assigned'] = True
+                    self.logger.debug(f"👤 {name}: Assigned district = {assigned_district}")
+        
+        # NOTE: Module assignment is now handled in the SECOND PASS after hierarchy analysis
+        
+        # Add hierarchical location metadata for frontend (minimal work for frontend)
+        if hasattr(self, '_location_results'):
+            location_result = self._location_results.get(email)
+            if location_result:
+                # Add hierarchical admin levels with proper country-specific naming
+                admin_levels = location_result.get('admin_levels', {})
+                if admin_levels:
+                    processed_user['admin_levels'] = admin_levels
+                
+                # Add territory metadata with human-readable names
+                territories = location_result.get('territories', {})
+                if territories:
+                    processed_user['territory_metadata'] = {
+                        'territory_name': territories.get('territory_name'),
+                        'territory_type': territories.get('territory_type'),
+                        'area_name': territories.get('area_name'),
+                        'area_type': territories.get('area_type'),
+                        'district_name': territories.get('district_name'),
+                        'district_type': territories.get('district_type')
+                    }
+                
+                # Add geolocation metadata
+                processed_user['geolocation_metadata'] = {
+                    'country_code': location_result.get('country_code'),
+                    'detection_method': location_result.get('method'),
+                    'confidence': location_result.get('confidence')
+                }
+        
+        # Calculate confidence scores for all assignments
+        assignments = {
+            'region': processed_user.get('Region'),
+            'segment': processed_user.get('Segment'),
+            'level': processed_user.get('Level'),
+            'territory': processed_user.get('Territory'),
+            'area': processed_user.get('Area'),
+            'district': processed_user.get('District'),
+            'modules': processed_user.get('Modules')
+        }
+        
+        # Filter out None assignments
+        assignments = {k: v for k, v in assignments.items() if v is not None}
+        
+        # Calculate confidence using company profile context
+        confidence_result = self.confidence_engine.calculate_assignment_confidence(
+            user, assignments, getattr(self, '_current_company_profile', {})
+        )
+        
+        # Add confidence information to processed user
+        processed_user['confidence_score'] = confidence_result['overall_confidence']
+        processed_user['confidence_level'] = confidence_result['confidence_level']
+        processed_user['requires_review'] = confidence_result['requires_review']
+        processed_user['field_confidences'] = confidence_result['field_confidences']
+        processed_user['low_confidence_fields'] = confidence_result['low_confidence_fields']
+        
+        # Ensure Name field is set for validation
+        processed_user['Name'] = name
         
         return processed_user
     
@@ -669,9 +877,21 @@ class OnboardingRBAAgent(EnhancedBaseRBAAgent):
     def _user_has_direct_reports(self, email: str, workflow_config: Dict[str, Any]) -> bool:
         """Check if user has direct reports by looking at the CSV data"""
         try:
-            # This would need to be implemented based on your hierarchy data structure
-            # For now, return False as a placeholder
+            # Get all users from the workflow config
+            users_data = workflow_config.get('users_data', [])
+            
+            # Check if any user reports to this email
+            for user in users_data:
+                manager_email = self._get_field_value(user, 'manager_email')
+                if manager_email and manager_email.lower() == email.lower():
+                    self.logger.info(f"👥 Found direct report: {self._get_field_value(user, 'name')} reports to {email}")
+                    print(f"👥 Found direct report: {self._get_field_value(user, 'name')} reports to {email}")
+                    return True
+            
+            self.logger.info(f"👤 No direct reports found for {email}")
+            print(f"👤 No direct reports found for {email}")
             return False
+            
         except Exception as e:
             self.logger.warning(f"Could not determine direct reports for {email}: {e}")
             return False
@@ -679,12 +899,22 @@ class OnboardingRBAAgent(EnhancedBaseRBAAgent):
     def _is_leaf_node_in_hierarchy(self, email: str, workflow_config: Dict[str, Any]) -> bool:
         """Check if user is a leaf node (IC) in the hierarchy"""
         try:
-            # This would need to be implemented based on your hierarchy data structure
-            # For now, assume leaf node unless proven otherwise
-            return True
+            # A leaf node is someone who has no direct reports
+            has_reports = self._user_has_direct_reports(email, workflow_config)
+            is_leaf = not has_reports
+            
+            if is_leaf:
+                self.logger.info(f"🍃 {email} is a leaf node (no direct reports)")
+                print(f"🍃 {email} is a leaf node (no direct reports)")
+            else:
+                self.logger.info(f"🌳 {email} is a manager (has direct reports)")
+                print(f"🌳 {email} is a manager (has direct reports)")
+            
+            return is_leaf
+            
         except Exception as e:
             self.logger.warning(f"Could not determine hierarchy position for {email}: {e}")
-            return True
+            return True  # Default to leaf node
     
     def _assign_region_from_location_data(self, name: str, title: str, email: str, config: Dict[str, Any]) -> Optional[str]:
         """Extract region from user's location data using ultra-dynamic hierarchical geolocation service"""

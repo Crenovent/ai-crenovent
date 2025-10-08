@@ -545,3 +545,351 @@ execution_mode: sync
 workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
 file.filename: salesforce_user_hierarchy.csv
 ==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1257110614
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1257110614
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1257110614
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1257110614
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1257110614
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1257110614
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1257110614
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1257110614
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1257110614
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1257110614
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1257110614
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1257110614
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1257110614
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1257110614
+execution_mode: sync
+workflow_config: {"enable_smart_location_mapping":true,"enable_module_assignment":true,"industry":"saas","default_user_role":"user","assignment_strategy":"smart_location","confidence_threshold":0.7}
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 48
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================

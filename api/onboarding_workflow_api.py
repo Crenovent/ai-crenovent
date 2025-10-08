@@ -36,6 +36,50 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/onboarding", tags=["Onboarding Workflow"])
 
+def generate_service_token(authenticated_user: Dict[str, Any]) -> str:
+    """
+    Generate JWT token for service-to-service communication
+    This token will be used by AI backend to authenticate with TS backend
+    """
+    try:
+        import jwt
+        import time
+        
+        # Get JWT secret from environment (same as TS backend)
+        jwt_secret = os.getenv('JWT_SECRET', 'your-secret-key')
+        
+        # Extract user info from authenticated_user object
+        # The user object from require_auth has 'user_id' and 'tenant_id' fields (UUID strings)
+        user_id = authenticated_user.get('user_id') or authenticated_user.get('id', '0')
+        tenant_id = authenticated_user.get('tenant_id', '0')
+        email = authenticated_user.get('email', 'service@crenovent.com')
+        role = authenticated_user.get('role', 'admin')
+        
+        logger.info(f"🔐 [SERVICE-AUTH] Extracted from authenticated_user: user_id={user_id}, tenant_id={tenant_id}, email={email}, role={role}")
+        
+        payload = {
+            'id': user_id,  # Use the UUID string from user_id field
+            'tenant_id': tenant_id,
+            'email': email,
+            'role': role,
+            'service': 'ai-backend',
+            'target_service': 'ts-backend',
+            'iat': int(time.time()),
+            'exp': int(time.time()) + (15 * 60)  # 15 minutes
+        }
+        
+        logger.info(f"🔐 [SERVICE-AUTH] Generating service token for: userId: {user_id}, tenantId: {tenant_id}, email: {email}, role: {role}, service: {payload['service']}, target_service: {payload['target_service']}")
+        
+        token = jwt.encode(payload, jwt_secret, algorithm='HS256')
+        
+        logger.info("✅ [SERVICE-AUTH] Service token generated successfully")
+        return token
+        
+    except Exception as e:
+        logger.error(f"❌ [SERVICE-AUTH] Failed to generate service token: {e}")
+        raise Exception(f"Service token generation failed: {str(e)}")
+
+
 # Workflow execution status tracking
 workflow_status = {}
 
@@ -395,277 +439,164 @@ def parse_csv_content(csv_content: bytes) -> List[Dict[str, Any]]:
 
 async def save_users_to_database(
     processed_users: List[Dict[str, Any]], 
-    tenant_id: int, 
+    tenant_id: str, 
     authenticated_user: Dict[str, Any]
 ) -> Dict[str, Any]:
     """
-    Save processed users to database with the same logic as Node.js backend
-    Replicates the functionality from crenovent-backend/controller/register/index.js
+    Save processed users to database by calling the TypeScript backend
+    Uses the existing bulkImportUsers endpoint instead of direct database access
     """
     try:
-        # Ensure connection pool is available with retry logic
-        max_retries = 3
-        for attempt in range(max_retries):
-            try:
-                if not pool_manager.postgres_pool:
-                    logger.info(f"🔄 Attempt {attempt + 1}: Initializing connection pool...")
-                    await pool_manager.initialize()
-                
-                # Test the pool connection
-                async with pool_manager.postgres_pool.acquire() as test_conn:
-                    await test_conn.fetchval("SELECT 1")
-                    logger.info("✅ Connection pool test successful")
-                    break
-                    
-            except Exception as e:
-                logger.warning(f"⚠️ Connection attempt {attempt + 1} failed: {e}")
-                if attempt == max_retries - 1:
-                    raise Exception(f"Failed to establish database connection after {max_retries} attempts: {e}")
-                await asyncio.sleep(2)  # Wait before retry
+        logger.info(f"🚀 Calling TypeScript backend to save {len(processed_users)} users")
         
-        inserted_users = []
-        errors = []
+        # Get TypeScript backend URL from environment
+        nodejs_backend_url = os.getenv('NODEJS_BACKEND_URL', 'http://localhost:8080')
         
-        logger.info(f"🔍 Database save: PostgreSQL pool status: {pool_manager.postgres_pool is not None}")
+        # Convert processed users to the format expected by bulkImportUsers
+        users_for_import = []
+        for user in processed_users:
+            # DEBUG: Log all available fields in the processed user data
+            logger.info(f"🔍 [DEBUG] Processing user: {user.get('Name', 'Unknown')}")
+            logger.info(f"🔍 [DEBUG] Available fields: {list(user.keys())}")
+            logger.info(f"🔍 [DEBUG] Manager Email field: '{user.get('Manager Email', 'NOT_FOUND')}'")
+            logger.info(f"🔍 [DEBUG] Reports To Email field: '{user.get('Reports To Email', 'NOT_FOUND')}'")
+            logger.info(f"🔍 [DEBUG] Reporting Email field: '{user.get('Reporting Email', 'NOT_FOUND')}'")
+            
+            # Extract user data
+            email = user.get('Email', '').strip().lower()
+            full_name = user.get('Name', '').strip()
+            
+            # Split name into first and last name
+            name_parts = full_name.split(' ', 1)
+            first_name = name_parts[0] if name_parts else ''
+            last_name = name_parts[1] if len(name_parts) > 1 else ''
+            
+            # Handle manager relationship - try multiple field names
+            manager_email = (user.get('Reports To Email') or 
+                           user.get('Reporting Email') or 
+                           user.get('Manager Email') or
+                           user.get('manager_email') or
+                           user.get('ManagerEmail', '')).strip().lower()
+            
+            logger.info(f"🔍 [DEBUG] Extracted manager_email: '{manager_email}'")
+            
+            # Convert modules to string if it's a list
+            modules_data = user.get('Modules', '')
+            if isinstance(modules_data, list):
+                modules_string = ', '.join(modules_data)
+            else:
+                modules_string = str(modules_data).strip()
+                        
+            user_data = {
+                'email': email,
+                'name': f"{first_name} {last_name}".strip(),  # Combine first and last name
+                'firstName': first_name,
+                'lastName': last_name,
+                'jobTitle': user.get('Job Title', ''),
+                'department': user.get('Department', ''),
+                'location': user.get('Location', ''),
+                'employeeId': user.get('Employee ID', ''),
+                'startDate': user.get('Start Date', ''),
+                'role': user.get('Role', ''),
+                'userType': user.get('User Type', 'Standard User'),
+                'profile': user.get('Profile', ''),
+                'reportingEmail': manager_email,  # Fixed: Use reportingEmail instead of managerEmail
+                'region': user.get('Region', ''),
+                'segment': user.get('Segment', ''),
+                'territory': user.get('Territory', ''),
+                'area': user.get('Area', ''),
+                'district': user.get('District', ''),
+                'level': user.get('Level', ''),
+                'modules': modules_string
+            }
+            users_for_import.append(user_data)
         
-        async with pool_manager.postgres_pool.acquire() as conn:
-            # Start transaction
-            async with conn.transaction():
-                logger.info(f"🚀 Starting database transaction for {len(processed_users)} users")
-                logger.info(f"🔍 Database save: Connection acquired successfully")
+        # Prepare the request payload
+        # Use the original UUID string from authenticated_user instead of converted integer
+        original_tenant_id = authenticated_user.get('tenant_id', str(tenant_id))
+        # Ensure it's always a string for headers
+        original_tenant_id = str(original_tenant_id)
+        logger.info(f"🔐 [SERVICE-AUTH] Using original tenant_id UUID: {original_tenant_id} (instead of integer: {tenant_id})")
+        
+        payload = {
+            'users': users_for_import,
+            'tenantId': original_tenant_id,  # Use UUID string, not integer
+            'sendInviteEmails': True  # Enable email sending
+        }
+        
+        # Generate service token for authentication
+        # Use the original authenticated user object (contains UUID strings)
+        if authenticated_user is None:
+            # This should not happen since user is passed from the endpoint
+            logger.error("❌ [SERVICE-AUTH] No authenticated_user provided - this should not happen")
+            raise Exception("No authenticated user provided for service token generation")
+        
+        logger.info(f"🔐 [SERVICE-AUTH] Using authenticated_user: {authenticated_user}")
+        service_token = generate_service_token(authenticated_user)
+        
+        # Call TypeScript backend bulkImportUsers endpoint
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {service_token}',
+            'x-tenant-id': original_tenant_id  # Use UUID string, not integer
+        }
+        
+        logger.info(f"📡 Calling {nodejs_backend_url}/api/auth/bulk-import")
+        
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(
+                f"{nodejs_backend_url}/api/auth/bulk-import",
+                json=payload,
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                logger.info(f"✅ TypeScript backend response: {result}")
                 
-                # Create user map for hierarchy building (same as Node.js)
-                user_map = {}
-                for user in processed_users:
-                    name_key = user.get("Name", "").strip().lower() if user.get("Name") else ""
-                    if name_key:
-                        user_map[name_key] = user
-                
-                logger.info(f"🗺️ Created user map with {len(user_map)} entries")
-                
-                # Insert users with hierarchy logic (same as Node.js)
-                inserted = set()
-                
-                async def insert_user_recursively(user_name: str, row_idx: int):
-                    """Recursive user insertion with hierarchy support"""
-                    name_key = user_name.strip().lower() if user_name else ""
-                    if not name_key or name_key in inserted:
-                        return
-                    
-                    user = user_map.get(name_key)
-                    if not user:
-                        return
-                    
-                    try:
-                        # Extract user data (same fields as Node.js)
-                        # Handle modules properly - convert from list to string if needed
-                        modules_data = user.get('Modules', '')
-                        if isinstance(modules_data, list):
-                            modules_string = ', '.join(modules_data)
-                        elif isinstance(modules_data, str) and ',' in modules_data:
-                            # Already a comma-separated string, keep as is
-                            modules_string = modules_data.strip()
-                        else:
-                            modules_string = str(modules_data).strip()
-                        
-                        logger.info(f"🔍 DEBUG Database Save - User: {user.get('Name', 'Unknown')}")
-                        logger.info(f"🔍 DEBUG Database Save - Raw modules: {modules_data} (type: {type(modules_data)})")
-                        logger.info(f"🔍 DEBUG Database Save - Converted modules string: {modules_string}")
-                        logger.info(f"🔍 DEBUG Database Save - Modules string length: {len(modules_string)}")
-                        if isinstance(modules_data, list):
-                            logger.info(f"🔍 DEBUG Database Save - Original list length: {len(modules_data)}")
-                            logger.info(f"🔍 DEBUG Database Save - First 3 modules: {modules_data[:3]}")
-                        
-                        # Create profile JSON with all user data
-                        profile = {
-                            'role_title': user.get('Role Title', user.get('Role', '')).strip(),
-                            'team': user.get('Team', '').strip(),
-                            'department': user.get('Department', '').strip(),
-                            'location': user.get('Location', user.get('Office Location', '')).strip(),
-                            'employee_number': user.get('Employee Number', '').strip(),
-                            'hire_date': user.get('Hire Date', '').strip(),
-                            'user_status': user.get('User Status', 'Active').strip(),
-                            'permissions': user.get('Permissions', '').strip(),
-                            'user_type': user.get('User Type', 'Standard User').strip(),
-                            'region': user.get('Region', '').strip(),
-                            'segment': user.get('Segment', '').strip(),
-                            'territory': user.get('Territory', '').strip(),
-                            'area': user.get('Area', '').strip(),
-                            'district': user.get('District', '').strip(),
-                            'level': user.get('Level', '').strip(),
-                            'modules': modules_string,
-                            'tenant_id': tenant_id
-                        }
-                        
-                        # Create password hash (temporary)
-                        temp_password = f"temp_{user.get('Email', '').strip().lower()}"
-                        password_hash = hashlib.sha256(temp_password.encode()).hexdigest()
-                        
-                        # Generate user_id (unique identifier)
-                        user_id = abs(hash(user.get('Email', '').strip().lower())) % (10**9)
-                        
-                        # Create expiration date (1 year from now, same as Node.js)
-                        today = datetime.now()
-                        expiration_date = date(today.year + 1, today.month, today.day)
-                        
-                        # Generate JWT tokens (same as Node.js)
-                        JWT_SECRET = "your-secret-key"  # Should be from environment
-                        if jwt:
-                            access_token = jwt.encode(
-                                {'id': user_id, 'username': user.get('Name', '').strip()},
-                                JWT_SECRET,
-                                algorithm='HS256'
-                            )
-                            refresh_token = jwt.encode(
-                                {'id': user_id, 'username': user.get('Name', '').strip()},
-                                JWT_SECRET,
-                                algorithm='HS256'
-                            )
-                        else:
-                            access_token = f"temp_access_{user_id}"
-                            refresh_token = f"temp_refresh_{user_id}"
-                        
-                        # Generate set password token for invite email
-                        import uuid
-                        set_password_token = str(uuid.uuid4())
-                        set_password_token_hash = hashlib.sha256(set_password_token.encode()).hexdigest()
-                        
-                        # Store set password token in database
-                        await conn.execute(
-                            """
-                            INSERT INTO password_reset_tokens 
-                            (tenant_id, tenant_email, token_hash, status, expires_at)
-                            VALUES ($1, $2, $3, 'active', $4)
-                            """,
-                            tenant_id, user_data['email'], set_password_token_hash, 
-                            datetime.now() + timedelta(hours=24)  # 24 hours expiration
-                        )
-                        
-                        user_data = {
-                            'user_id': user_id,
-                            'username': user.get('Name', '').strip(),  # PostgreSQL uses 'username' not 'name'
-                            'email': user.get('Email', '').strip().lower(),
-                            'tenant_id': tenant_id,
-                            'is_activated': True,
-                            'profile': json.dumps(profile),  # Store as JSON string
-                            'password': password_hash,  # Hashed password
-                            'expiration_date': expiration_date,  # Proper date object
-                            'access_token': access_token,  # JWT token
-                            'refresh_token': refresh_token  # JWT refresh token
-                        }
-                        
-                        # Handle manager relationship
-                        manager_email = (user.get('Reports To Email') or 
-                                       user.get('Reporting Email') or 
-                                       user.get('Manager Email', '')).strip().lower()
-                        
-                        reports_to = None
-                        if manager_email and manager_email != user_data['email']:
-                            # Find manager in database
-                            manager_result = await conn.fetchrow(
-                                "SELECT user_id FROM users WHERE email = $1 AND tenant_id = $2",
-                                manager_email, tenant_id
-                            )
-                            if manager_result:
-                                reports_to = manager_result['user_id']
-                        
-                        user_data['reports_to'] = reports_to
-                        
-                        # Check if user already exists
-                        existing_user = await conn.fetchrow(
-                            "SELECT user_id FROM users WHERE email = $1 AND tenant_id = $2",
-                            user_data['email'], tenant_id
-                        )
-                        
-                        if existing_user:
-                            # Update existing user with correct PostgreSQL columns
-                            await conn.execute("""
-                                UPDATE users SET 
-                                    username = $1, profile = $2, reports_to = $3,
-                                    updated_at = CURRENT_TIMESTAMP
-                                WHERE user_id = $4 AND tenant_id = $5
-                            """, 
-                                user_data['username'], user_data['profile'], reports_to, 
-                                existing_user['user_id'], tenant_id
-                            )
-                            inserted_users.append({
-                                'user_id': existing_user['user_id'],
-                                'name': user_data['username'],
-                                'email': user_data['email'],
-                                'action': 'updated'
-                            })
-                            logger.info(f"✅ Updated user: {user_data['username']} ({user_data['email']})")
-                        else:
-                            # Insert new user with correct PostgreSQL columns (matching Node.js exactly)
-                            new_user_id = await conn.fetchval("""
-                                INSERT INTO users (
-                                    user_id, username, email, tenant_id, reports_to, is_activated, 
-                                    profile, password, expiration_date, access_token, refresh_token, 
-                                    created_at, updated_at
-                                ) VALUES (
-                                    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-                                ) RETURNING user_id
-                            """,
-                                user_data['user_id'], user_data['username'], user_data['email'], 
-                                user_data['tenant_id'], reports_to, user_data['is_activated'],
-                                user_data['profile'], user_data['password'], user_data['expiration_date'],
-                                user_data['access_token'], user_data['refresh_token']
-                            )
-                            inserted_users.append({
-                                'user_id': new_user_id,
-                                'name': user_data['username'],
-                                'email': user_data['email'],
-                                'action': 'inserted'
-                            })
-                            logger.info(f"✅ Inserted user: {user_data['username']} ({user_data['email']})")
-                            
-                            # Send invite email with set password link
-                            try:
-                                await send_invite_email(
-                                    user_data['email'], 
-                                    user_data['username'], 
-                                    set_password_token, 
-                                    tenant_id
-                                )
-                                logger.info(f"📧 Invite email sent to: {user_data['email']}")
-                            except Exception as email_error:
-                                logger.error(f"❌ Failed to send invite email to {user_data['email']}: {email_error}")
-                                # Don't fail the user creation if email fails
-                        
-                        inserted.add(name_key)
-                        
-                    except Exception as user_error:
-                        error_msg = f"Failed to save user {user.get('Name', 'Unknown')}: {str(user_error)}"
-                        logger.error(f"❌ {error_msg}")
-                        errors.append({
-                            'user': user.get('Name', 'Unknown'),
-                            'email': user.get('Email', ''),
-                            'error': str(user_error)
-                        })
-                
-                # Process all users
-                for i, user in enumerate(processed_users):
-                    user_name = user.get('Name', '').strip()
-                    if user_name:
-                        await insert_user_recursively(user_name, i)
-                
-                logger.info(f"🎯 Database transaction completed: {len(inserted_users)} users processed")
+                # Convert the response to match expected format
+                return {
+                    "success": True,
+                    "message": "Users saved successfully via TypeScript backend",
+                    "users_saved": len(users_for_import),
+                    "database_operations": {
+                        "users_created": result.get('created', 0),
+                        "users_updated": result.get('updated', 0),
+                        "errors": result.get('errors', [])
+                    },
+                    "timestamp": datetime.now().isoformat()
+                }
+            else:
+                error_msg = f"TypeScript backend returned status {response.status_code}: {response.text}"
+                logger.error(f"❌ {error_msg}")
         
         return {
-            'success': True,
-            'inserted_count': len(inserted_users),
-            'error_count': len(errors),
-            'inserted_users': inserted_users,
-            'errors': errors
+            "success": False,
+            "message": "Failed to save users via TypeScript backend",
+            "error": error_msg,
+            "users_saved": 0,
+            "database_operations": {
+                "users_created": 0,
+                "users_updated": 0,
+                "errors": [error_msg]
+            },
+            "timestamp": datetime.now().isoformat()
         }
         
     except Exception as e:
-        logger.error(f"❌ Database save operation failed: {e}")
+        error_msg = f"Error calling TypeScript backend: {str(e)}"
+        logger.error(f"❌ {error_msg}")
         return {
-            'success': False,
-            'inserted_count': 0,
-            'error_count': 1,
-            'errors': [{'error': str(e)}]
+            "success": False,
+            "message": "Failed to save users",
+            "error": error_msg,
+            "users_saved": 0,
+            "database_operations": {
+                "users_created": 0,
+                "users_updated": 0,
+                "errors": [error_msg]
+            },
+            "timestamp": datetime.now().isoformat()
         }
 
 @router.get("/test-endpoint")
@@ -675,24 +606,87 @@ async def test_endpoint():
     return {"status": "success", "message": "Test endpoint working"}
 
 @router.post("/complete-setup")
-async def complete_onboarding_setup(
-    processed_users: str = Form(..., description="JSON string of processed users"),
-    tenant_id: str = Form(..., description="Tenant ID")
-):
+async def complete_onboarding_setup(request: dict):
     """
     Complete onboarding setup by saving processed users to database
     This endpoint is called by the "Complete Setup" button
     """
     logger.info("🚀 COMPLETE SETUP ENDPOINT CALLED!")
-    logger.info(f"🔍 Complete Setup called with tenant_id: {tenant_id}")
-    logger.info(f"📥 RAW INPUT: {len(processed_users)} characters")
-    logger.info(f"📥 RAW DATA PREVIEW: {processed_users[:200]}...")
     
     try:
+        # Extract data from request body
+        processed_users = request.get('processed_users')
+        tenant_id = request.get('tenant_id')
+        
+        logger.info(f"🔍 Complete Setup called with tenant_id: {tenant_id}")
+        logger.info(f"📥 RAW INPUT: {len(processed_users) if processed_users else 0} characters")
+        logger.info(f"📥 RAW DATA PREVIEW: {processed_users[:200] if processed_users else 'None'}...")
+        
+        if not processed_users or not tenant_id:
+            logger.error("❌ Missing required fields: processed_users or tenant_id")
+            return {
+                "success": False,
+                "error": "Missing required fields: processed_users and tenant_id"
+            }
+        
+        # Validate tenant_id (should be a UUID string)
+        import uuid
+        try:
+            # Try to parse as UUID
+            tenant_uuid = uuid.UUID(tenant_id)
+            logger.info(f"✅ Valid tenant_id UUID: {tenant_uuid}")
+        except (ValueError, TypeError):
+            logger.error(f"❌ Invalid tenant_id UUID format: {tenant_id}")
+            return {
+                "success": False,
+                "error": "Invalid tenant ID UUID format provided"
+            }
+        
         # Parse JSON
         logger.info("🔍 Parsing JSON data...")
-        users_data = json.loads(processed_users)
-        logger.info(f"✅ Parsed {len(users_data)} users from JSON")
+        try:
+            users_data = json.loads(processed_users)
+            if not isinstance(users_data, list):
+                raise ValueError("Processed users must be a list")
+            logger.info(f"✅ Parsed {len(users_data)} users from JSON")
+        except json.JSONDecodeError as e:
+            logger.error(f"❌ JSON PARSE ERROR: {e}")
+            return {
+                "success": False,
+                "error": f"Invalid JSON format: {str(e)}"
+            }
+        except ValueError as e:
+            logger.error(f"❌ DATA VALIDATION ERROR: {e}")
+            return {
+                "success": False,
+                "error": f"Data validation error: {str(e)}"
+            }
+        
+        # Validate users data
+        if not users_data:
+            logger.error("❌ No users data provided")
+            return {
+                "success": False,
+                "error": "No users data provided"
+            }
+        
+        # Validate required fields for each user
+        for i, user in enumerate(users_data):
+            if not isinstance(user, dict):
+                logger.error(f"❌ User {i+1} is not a valid object")
+                return {
+                    "success": False,
+                    "error": f"User {i+1} is not a valid object"
+                }
+            
+            required_fields = ['Name', 'Email']
+            for field in required_fields:
+                if not user.get(field) or not str(user.get(field)).strip():
+                    logger.error(f"❌ User {i+1} missing required field: {field}")
+                    return {
+                        "success": False,
+                        "error": f"User {i+1} missing required field: {field}"
+                    }
         
         # **CRITICAL MODULES DEBUG**
         if users_data:
@@ -712,11 +706,11 @@ async def complete_onboarding_setup(
         logger.info(f"💾 Starting database save for {len(users_data)} users...")
         try:
             # Mock user for database save (temporarily bypass auth)
-            mock_user = {"user_id": 1370, "tenant_id": int(tenant_id)}
+            mock_user = {"user_id": "c0d323a5-0e78-4936-bfe4-0da5e16ce185", "tenant_id": tenant_id}
             
             database_result = await save_users_to_database(
                 users_data, 
-                int(tenant_id), 
+                tenant_id, 
                 mock_user
             )
             logger.info(f"✅ Database save completed: {database_result}")
@@ -741,11 +735,11 @@ async def complete_onboarding_setup(
                 "tenant_id": tenant_id
             }
         
-    except json.JSONDecodeError as e:
-        logger.error(f"❌ JSON PARSE ERROR: {e}")
+    except Exception as e:
+        logger.error(f"❌ Unexpected error in complete setup: {e}")
         return {
             "success": False,
-            "error": f"JSON parse error: {str(e)}"
+            "error": f"Unexpected error: {str(e)}"
         }
 
 @router.get("/agent-config")
@@ -850,47 +844,4 @@ async def health_check():
             'timestamp': datetime.utcnow().isoformat()
         }
 
-async def send_invite_email(email: str, username: str, set_password_token: str, tenant_id: int):
-    """
-    Send invite email with set password link to newly created user
-    Calls the TypeScript backend's email service
-    """
-    try:
-        if not httpx:
-            logger.warning("httpx not available, skipping email send")
-            return
-            
-        # Get TypeScript backend URL from environment
-        backend_url = os.getenv('BACKEND_BASE_URL', 'http://localhost:3000')
-        
-        # Create set password URL
-        set_password_url = f"{backend_url}/auth/set-password?token={set_password_token}"
-        
-        # Prepare email data
-        email_data = {
-            "to": email,
-            "username": username,
-            "set_password_token": set_password_token,
-            "set_password_url": set_password_url,
-            "tenant_id": tenant_id
-        }
-        
-        # Send email via TypeScript backend
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(
-                f"{backend_url}/api/email/send-set-password",
-                json=email_data,
-                headers={"Content-Type": "application/json"}
-            )
-            
-            if response.status_code == 200:
-                logger.info(f"✅ Invite email sent successfully to {email}")
-                return True
-            else:
-                logger.error(f"❌ Email service returned {response.status_code}: {response.text}")
-                return False
-                
-    except Exception as e:
-        logger.error(f"❌ Failed to send invite email to {email}: {e}")
-        return False
 

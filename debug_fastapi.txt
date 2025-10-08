@@ -652,3 +652,467 @@ CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com',
 RBA Agent created successfully
 About to call agent._execute_rba_logic
 RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {'enable_smart_location_mapping': True, 'enable_module_assignment': True, 'industry': 'saas', 'default_user_role': 'user', 'assignment_strategy': 'smart_location', 'confidence_threshold': 0.7}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+RBA Agent created successfully
+About to call agent._execute_rba_logic
+RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
