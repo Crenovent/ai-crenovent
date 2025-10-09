@@ -51,13 +51,13 @@ writable_resources := {
     "config"
 }
 
-# Deny access to sensitive resources
+# Deny access to sensitive resources (only for sensitive-data, not regular data)
 deny {
     input.resource == "sensitive-data"
     input.user != "admin"
 }
 
-# Environment-based access control
+# Environment-based access control (only for development)
 allow {
     input.environment == "development"
     valid_users[input.user]
