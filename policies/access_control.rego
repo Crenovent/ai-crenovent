@@ -10,11 +10,12 @@ allow {
     input.user == "admin"
 }
 
-# Allow read access for valid users
+# Allow read access for valid users (explicitly exclude sensitive-data)
 allow {
     input.action == "read"
     valid_users[input.user]
     readable_resources[input.resource]
+    input.resource != "sensitive-data"
 }
 
 # Allow write access for specific users
@@ -51,10 +52,10 @@ writable_resources := {
     "config"
 }
 
-# Deny access to sensitive resources (only for sensitive-data, not regular data)
-deny {
+# Allow admin access to sensitive resources
+allow {
+    input.user == "admin"
     input.resource == "sensitive-data"
-    input.user != "admin"
 }
 
 # Environment-based access control (only for development)
