@@ -70,10 +70,10 @@ jobs:
       working-directory: ./infra/terraform/environments/${{ matrix.environment == 'uat' && 'staging' || matrix.environment }}
       
     - name: Upload Terraform Plan
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: terraform-plan-${{ matrix.environment }}
-        path: ./infra/terraform/environments/${{ matrix.environment }}/tfplan
+        path: ./infra/terraform/environments/${{ matrix.environment == 'uat' && 'staging' || matrix.environment }}/tfplan
 
   terraform-security-scan:
     name: Terraform Security Scan
@@ -107,7 +107,7 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Setup Helm
-      uses: azure/setup-helm@v3
+      uses: azure/setup-helm@v4
       with:
         version: ${{ env.HELM_VERSION }}
         
@@ -252,7 +252,7 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Setup Helm
-      uses: azure/setup-helm@v3
+      uses: azure/setup-helm@v4
       with:
         version: ${{ env.HELM_VERSION }}
         
