@@ -1,0 +1,12 @@
+workflow_purposes:
+  loan_approval:
+    allowed_data_purposes: ["loan_approval", "credit_risk_analysis"]
+  churn_prediction:
+    allowed_data_purposes: ["retention_analytics", "customer_feedback"]
+  fraud_detection:
+    allowed_data_purposes: ["fraud_prevention", "claims_validation"]
+  hr_performance_model:
+    allowed_data_purposes: ["employee_performance", "hr_analytics"]
+defaults:
+  deny_on_mismatch: true
+  log_to_evidence: true

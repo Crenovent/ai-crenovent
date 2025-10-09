@@ -84,7 +84,7 @@ class DSLWorkflow:
             step_ids.add(step.id)
             
             # Check step type is supported
-            if step.type not in ['query', 'decision', 'ml_decision', 'agent_call', 'notify', 'governance', 'policy_query']:
+            if step.type not in ['query', 'decision', 'ml_decision', 'ml_predict', 'ml_score', 'ml_classify', 'ml_explain', 'agent_call', 'notify', 'governance', 'policy_query']:
                 errors.append(f"Unsupported step type: {step.type}")
                 
         return errors
@@ -119,7 +119,7 @@ class DSLParser:
                         "required": ["id", "type", "params"],
                         "properties": {
                             "id": {"type": "string"},
-                            "type": {"type": "string", "enum": ["query", "decision", "ml_decision", "agent_call", "notify", "governance", "policy_query"]},
+                            "type": {"type": "string", "enum": ["query", "decision", "ml_decision", "ml_predict", "ml_score", "ml_classify", "ml_explain", "agent_call", "notify", "governance", "policy_query"]},
                             "params": {"type": "object"},
                             "outputs": {"type": "object"},
                             "governance": {"type": "object"}

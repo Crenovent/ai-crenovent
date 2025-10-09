@@ -1,0 +1,16 @@
+rules:
+  - if:
+      industry: ["banking", "insurance"]
+      model_type: ["credit_scoring", "claim_risk"]
+      uses_pii: true
+    then: high
+
+  - if:
+      industry: ["saas"]
+      model_type: ["lead_ranking"]
+      uses_pii: false
+    then: medium
+
+  - if:
+      industry: ["internal_analytics"]
+    then: low

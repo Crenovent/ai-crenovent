@@ -1,0 +1,14 @@
+tenants:
+  tenant_acme:
+    region: "IN"
+    data_center: "ap-south-1"
+    allow_cross_border: false
+  tenant_eubank:
+    region: "EU"
+    data_center: "eu-central-1"
+    allow_cross_border: false
+  tenant_globalco:
+    region: "US"
+    data_center: "us-east-1"
+    allow_cross_border: true
+    allowed_regions: ["EU"]

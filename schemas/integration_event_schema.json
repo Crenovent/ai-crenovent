@@ -1,0 +1,232 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RBIA Integration Event Schema",
+  "description": "Standardized event schema for all RBIA integration events (Task 4.5.8)",
+  "type": "object",
+  "required": [
+    "event_id",
+    "event_type",
+    "workflow_id",
+    "tenant_id",
+    "timestamp",
+    "outcome"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this event"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "workflow.started",
+        "workflow.completed",
+        "workflow.failed",
+        "decision.made",
+        "override.triggered",
+        "fallback.activated",
+        "integration.called",
+        "integration.success",
+        "integration.failed",
+        "compliance.checked",
+        "evidence.generated"
+      ],
+      "description": "Type of integration event"
+    },
+    "workflow_id": {
+      "type": "string",
+      "description": "Identifier of the workflow generating this event"
+    },
+    "node_id": {
+      "type": "string",
+      "description": "Specific node/step within the workflow (optional for workflow-level events)"
+    },
+    "tenant_id": {
+      "type": "string",
+      "description": "Tenant identifier for multi-tenant isolation"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "User who initiated the workflow (if applicable)"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when event occurred"
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["success", "failure", "partial", "pending"],
+      "description": "Outcome of the event"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Confidence score for ML decisions (0.0 to 1.0)"
+    },
+    "integration_type": {
+      "type": "string",
+      "enum": [
+        "crm",
+        "billing",
+        "contract",
+        "marketing",
+        "forecast",
+        "compensation",
+        "dashboard",
+        "knowledge_graph",
+        "external_api"
+      ],
+      "description": "Type of integration involved"
+    },
+    "integration_name": {
+      "type": "string",
+      "description": "Specific integration name (e.g., 'salesforce', 'hubspot', 'stripe')"
+    },
+    "execution_time_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Execution time in milliseconds"
+    },
+    "data": {
+      "type": "object",
+      "description": "Event-specific data payload",
+      "properties": {
+        "input": {
+          "type": "object",
+          "description": "Input data for the event"
+        },
+        "output": {
+          "type": "object",
+          "description": "Output data from the event"
+        },
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": { "type": "string" },
+            "message": { "type": "string" },
+            "stack_trace": { "type": "string" }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata",
+      "properties": {
+        "environment": {
+          "type": "string",
+          "enum": ["local", "development", "staging", "production"]
+        },
+        "region": {
+          "type": "string",
+          "description": "Deployment region (for residency compliance)"
+        },
+        "industry": {
+          "type": "string",
+          "description": "Industry overlay applied"
+        },
+        "compliance_frameworks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["SOX", "GDPR", "HIPAA", "DPDP", "RBI", "CCPA"]
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "description": "Governance and compliance tracking",
+      "properties": {
+        "policy_pack_id": { "type": "string" },
+        "evidence_pack_id": { "type": "string" },
+        "override_id": { "type": "string" },
+        "trust_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "bias_check_passed": { "type": "boolean" },
+        "drift_detected": { "type": "boolean" }
+      }
+    },
+    "tracing": {
+      "type": "object",
+      "description": "Distributed tracing information",
+      "properties": {
+        "trace_id": { "type": "string" },
+        "span_id": { "type": "string" },
+        "parent_span_id": { "type": "string" },
+        "correlation_id": { "type": "string" }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "properties": {
+        "latency_ms": { "type": "integer" },
+        "tokens_used": { "type": "integer" },
+        "cost_usd": { "type": "number" },
+        "cache_hit": { "type": "boolean" }
+      }
+    }
+  },
+  "examples": [
+    {
+      "event_id": "evt_123e4567-e89b-12d3-a456-426614174000",
+      "event_type": "decision.made",
+      "workflow_id": "wf_churn_prediction",
+      "node_id": "node_ml_inference",
+      "tenant_id": "tenant_001",
+      "user_id": "user_cro_123",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "outcome": "success",
+      "confidence": 0.87,
+      "integration_type": "crm",
+      "integration_name": "salesforce",
+      "execution_time_ms": 1500,
+      "data": {
+        "input": {
+          "customer_id": "cust_456",
+          "account_health": "yellow"
+        },
+        "output": {
+          "churn_risk": "high",
+          "recommended_action": "immediate_intervention"
+        }
+      },
+      "metadata": {
+        "environment": "production",
+        "region": "us-east-1",
+        "industry": "saas",
+        "compliance_frameworks": ["SOX"],
+        "tags": ["customer_success", "churn_prevention"]
+      },
+      "governance": {
+        "policy_pack_id": "pp_sox_001",
+        "evidence_pack_id": "ep_2024_001",
+        "trust_score": 0.92,
+        "bias_check_passed": true,
+        "drift_detected": false
+      },
+      "tracing": {
+        "trace_id": "trace_abc123",
+        "span_id": "span_def456",
+        "correlation_id": "corr_workflow_001"
+      },
+      "performance": {
+        "latency_ms": 1500,
+        "tokens_used": 250,
+        "cost_usd": 0.005,
+        "cache_hit": false
+      }
+    }
+  ]
+}
+

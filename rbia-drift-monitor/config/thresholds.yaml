@@ -1,0 +1,6 @@
+data_drift:
+  psi_threshold: 0.2    # Population Stability Index
+  ks_threshold: 0.1     # Kolmogorov-Smirnov test statistic
+prediction_drift:
+  psi_threshold: 0.15
+  alert_only_threshold: 0.1
