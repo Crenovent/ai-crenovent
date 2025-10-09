@@ -1,4 +1,5 @@
 name: Infrastructure CI/CD Pipeline
+# Trigger: Testing Azure permissions after Contributor role assignment
 
 on:
   push:
