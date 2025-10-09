@@ -19,7 +19,6 @@ import logging
 import re
 import base64
 from datetime import datetime
-import os
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +35,7 @@ class SecretViolation:
     masked_value: str  # Partially masked for reporting
     expected: str
     actual: str
-    autofix_available: bool = False 
+    autofix_available: bool = False
     suggested_vault_reference: Optional[str] = None
     remediation_steps: List[str] = field(default_factory=list)
 
@@ -690,22 +689,6 @@ def create_test_nodes_with_secrets():
     return nodes
 
 
-def create_test_manifest_with_secrets():
-    """Create test manifest with secret exposures"""
-    return {
-        'workflow_id': 'test_secrets_workflow',
-        'version': '1.0.0',
-        'created_at': '2024-01-15T10:00:00Z',
-        'deployment_config': {
-            'aws_access_key_id': os.getenv("AWS_ACCESS_KEY_ID"),  # AWS access key
-            'aws_secret_access_key': os.getenv("AWS_SECRET_ACCESS_KEY"),  # AWS secret
-            'SLACK_WEBHOOK' : os.getenv("SLACK_WEBHOOK_URL"),
-        },
-        'database_config': {
-            'url': 'mysql://root:password@localhost:3306/mydb',  # MySQL with password
-            'backup_url': 'vault://databases/mysql/backup-connection'  # Proper vault reference
-        }
-    }
 
 def run_secrets_redaction_tests():
     """Run secrets redaction validation tests"""
