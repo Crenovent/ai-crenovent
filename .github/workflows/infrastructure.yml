@@ -27,6 +27,10 @@ env:
   TF_VERSION: '1.9.2'
   HELM_VERSION: '3.12.0'
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   terraform-plan:
     name: Terraform Plan
@@ -50,9 +54,10 @@ jobs:
       uses: azure/login@v1
       with:
         client-id: '396fc791-ac50-45cc-932d-84e846e85421'
-        #client-secret: 'dgV8Q~tUuvGXo.BsRuN1tZKCQGR3iHx6HS3rwc4~'
         tenant-id: '6c258b97-993a-429b-9124-c210e957ef7e'
         subscription-id: '0a19726d-3c64-454b-b0d3-58f055e9d39a'
+        enable-AzPSSession: false
+        allow-no-subscriptions: false
 
         
     - name: Terraform Format Check
