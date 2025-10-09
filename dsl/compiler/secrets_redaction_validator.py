@@ -19,6 +19,7 @@ import logging
 import re
 import base64
 from datetime import datetime
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -688,6 +689,7 @@ def create_test_nodes_with_secrets():
     
     return nodes
 
+
 def create_test_manifest_with_secrets():
     """Create test manifest with secret exposures"""
     return {
@@ -697,7 +699,7 @@ def create_test_manifest_with_secrets():
         'deployment_config': {
             'aws_access_key_id': 'AKIAIOSFODNN7EXAMPLE',  # AWS access key
             'aws_secret_access_key': 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',  # AWS secret
-            'slack_webhook': 'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX'  # Slack webhook
+            'SLACK_WEBHOOK' : os.getenv("SLACK_WEBHOOK_URL"),
         },
         'database_config': {
             'url': 'mysql://root:password@localhost:3306/mydb',  # MySQL with password
