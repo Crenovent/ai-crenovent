@@ -29,6 +29,12 @@ locals {
   }
 }
 
+# Import existing resource group
+import {
+  to = azurerm_resource_group.main
+  id = "/subscriptions/0a19726d-3c64-454b-b0d3-58f055e9d39a/resourceGroups/rg-revai-prod"
+}
+
 # Resource Group
 resource "azurerm_resource_group" "main" {
   name     = "rg-revai-${local.environment}"
