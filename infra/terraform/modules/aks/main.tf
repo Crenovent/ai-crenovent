@@ -62,14 +62,14 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   default_node_pool {
     name                = "system"
-    node_count         = var.node_count
-    vm_size            = var.vm_size
-    vnet_subnet_id     = azurerm_subnet.aks.id
+    node_count          = var.node_count
+    vm_size             = var.vm_size
+    vnet_subnet_id      = azurerm_subnet.aks.id
     enable_auto_scaling = var.enable_auto_scaling
-    min_count          = var.min_count
-    max_count          = var.max_count
-    os_disk_size_gb    = 50
-    type               = "VirtualMachineScaleSets"
+    min_count           = var.min_count
+    max_count           = var.max_count
+    os_disk_size_gb     = 50
+    type                = "VirtualMachineScaleSets"
   }
 
   identity {
@@ -77,11 +77,11 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   network_profile {
-    network_plugin    = "azure"
-    network_policy    = "azure"
-    service_cidr      = "10.1.0.0/16"
-    dns_service_ip   = "10.1.0.10"
-    pod_cidr         = var.pod_subnet_address_prefixes[0]
+    network_plugin = "azure"
+    network_policy = "azure"
+    service_cidr   = "10.1.0.0/16"
+    dns_service_ip = "10.1.0.10"
+    pod_cidr       = var.pod_subnet_address_prefixes[0]
   }
 
   # Enable monitoring
@@ -113,15 +113,15 @@ resource "azurerm_kubernetes_cluster_node_pool" "app" {
   count                 = var.enable_app_node_pool ? 1 : 0
   name                  = "app"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
-  vm_size              = var.app_vm_size
-  node_count           = var.app_node_count
+  vm_size               = var.app_vm_size
+  node_count            = var.app_node_count
   enable_auto_scaling   = true
-  min_count            = var.app_min_count
-  max_count            = var.app_max_count
-  os_disk_size_gb      = 100
-  vnet_subnet_id       = azurerm_subnet.aks.id
-  node_taints          = ["workload=app:NoSchedule"]
-  tags                 = var.tags
+  min_count             = var.app_min_count
+  max_count             = var.app_max_count
+  os_disk_size_gb       = 100
+  vnet_subnet_id        = azurerm_subnet.aks.id
+  node_taints           = ["workload=app:NoSchedule"]
+  tags                  = var.tags
 }
 
 # Outputs

@@ -48,14 +48,14 @@ resource "random_pet" "name" {
 locals {
   # Naming convention: {environment}-{service}-{region}-{suffix}
   name_prefix = "${var.environment}-${random_pet.name.id}-${random_integer.suffix.result}"
-  
+
   # Common tags
   common_tags = {
-    Environment   = var.environment
-    Project       = "RevAI"
-    ManagedBy     = "Terraform"
-    Owner         = var.owner
-    CostCenter    = var.cost_center
-    Compliance    = var.compliance_level
+    Environment = var.environment
+    Project     = "RevAI"
+    ManagedBy   = "Terraform"
+    Owner       = var.owner
+    CostCenter  = var.cost_center
+    Compliance  = var.compliance_level
   }
 }

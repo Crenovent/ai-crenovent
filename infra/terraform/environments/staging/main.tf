@@ -17,7 +17,7 @@ provider "azurerm" {
 locals {
   environment = "staging"
   location    = "West Europe"
-  
+
   common_tags = {
     Environment = local.environment
     Project     = "RevAI"
