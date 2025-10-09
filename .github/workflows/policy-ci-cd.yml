@@ -145,27 +145,19 @@ jobs:
       run: |
         echo "Generating policy documentation..."
         mkdir -p docs
-        
-        # Generate policy overview
-        cat > docs/policies.md << 'EOF'
-# Policy Pack Documentation
-
-## Overview
-This document describes the policies in this policy pack.
-
-## Policies
-
-EOF
-        
-        # Add each policy to documentation
+        echo "# Policy Pack Documentation" > docs/policies.md
+        echo "" >> docs/policies.md
+        echo "## Overview" >> docs/policies.md
+        echo "This document describes the policies in this policy pack." >> docs/policies.md
+        echo "" >> docs/policies.md
+        echo "## Policies" >> docs/policies.md
+        echo "" >> docs/policies.md
         if [ -d "policies" ]; then
           for policy in policies/*.rego; do
             if [ -f "$policy" ]; then
               policy_name=$(basename "$policy" .rego)
               echo "### $policy_name" >> docs/policies.md
               echo "" >> docs/policies.md
-              
-              # Extract comments and add to docs
               grep "^//" "$policy" | sed 's/^\/\/ /- /' >> docs/policies.md || true
               echo "" >> docs/policies.md
             fi
