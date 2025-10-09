@@ -405,6 +405,11 @@ async def _check_budgets_for_tenant(tenant_id: str, model_id: Optional[str] = No
         
         # Determine appropriate actions
         if status == BudgetStatus.EMERGENCY:
+            # Check for budget exhaustion (100% utilization) - Task 6.4.14
+            utilization = (total_spend / budget.budget_amount_usd) * 100
+            if utilization >= 100.0:
+                await _trigger_budget_exhaustion_fallback(tenant_id, budget, total_spend)
+            
             await _apply_throttle_policy(tenant_id, budget.model_id, budget.throttle_at_emergency, 
                                        f"Emergency budget threshold exceeded: {total_spend:.2f} / {budget.budget_amount_usd:.2f}")
             await _send_cost_alert(budget, total_spend, AlertSeverity.EMERGENCY, None)
@@ -731,6 +736,29 @@ async def reset_budget_period(budget_id: str):
         "new_period_end": budget.current_period_end,
         "throttle_policies_cleared": True
     }
+
+async def _trigger_budget_exhaustion_fallback(
+    tenant_id: str, 
+    budget: 'CostBudget', 
+    current_spend: float
+):
+    """Trigger fallback when budget is exhausted - Task 6.4.14"""
+    try:
+        fallback_data = {
+            "request_id": f"budget_exhaustion_{uuid.uuid4()}",
+            "tenant_id": tenant_id,
+            "workflow_id": "cost_management",
+            "current_system": "rbia",
+            "error_type": "budget_exhaustion",
+            "error_message": f"Budget exhausted: ${current_spend:.2f} / ${budget.budget_amount_usd:.2f}",
+            "budget_id": budget.budget_id,
+            "utilization_percent": (current_spend / budget.budget_amount_usd) * 100
+        }
+        
+        logger.warning(f"Triggering budget exhaustion fallback: {json.dumps(fallback_data)}")
+        
+    except Exception as fallback_error:
+        logger.error(f"Failed to trigger budget exhaustion fallback: {fallback_error}")
 
 @app.get("/health")
 async def health_check():

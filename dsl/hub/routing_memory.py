@@ -297,6 +297,9 @@ class RoutingMemorySystem:
             if self.stats.total_requests > 0 else 0
         )
         
+        # Check for cache collapse (hit rate crash) - Task 6.4.25
+        self._check_cache_collapse_sync(cache_hit_rate)
+        
         # Estimate cost savings (assuming $0.0003 per LLM call)
         llm_calls_avoided = self.stats.cache_hits
         estimated_savings = llm_calls_avoided * 0.0003
@@ -329,6 +332,80 @@ class RoutingMemorySystem:
             self.cache.clear()
             self.embeddings_cache.clear()
             self.logger.info("🧹 Cleared entire routing cache")
+    
+    def _check_cache_collapse_sync(self, current_hit_rate: float):
+        """Check for cache collapse and trigger fallback - Task 6.4.25 (sync version)"""
+        try:
+            # Define cache collapse threshold (hit rate drops below 30%)
+            CACHE_COLLAPSE_THRESHOLD = 30.0
+            MIN_REQUESTS_FOR_CHECK = 10  # Only check if we have enough data
+            
+            if (self.stats.total_requests >= MIN_REQUESTS_FOR_CHECK and 
+                current_hit_rate < CACHE_COLLAPSE_THRESHOLD):
+                
+                logger.warning(f"Cache collapse detected: hit rate {current_hit_rate}% < {CACHE_COLLAPSE_THRESHOLD}%")
+                
+                # Trigger cache collapse fallback
+                self._trigger_cache_collapse_fallback_sync(current_hit_rate)
+                
+        except Exception as e:
+            logger.error(f"Failed to check cache collapse: {e}")
+    
+    def _trigger_cache_collapse_fallback_sync(self, hit_rate: float):
+        """Trigger fallback when cache collapse occurs (sync version)"""
+        try:
+            fallback_data = {
+                "request_id": f"cache_collapse_{int(time.time())}",
+                "tenant_id": "system",
+                "workflow_id": "routing_cache",
+                "current_system": "rbia",
+                "error_type": "cache_collapse",
+                "error_message": f"Cache hit rate crashed to {hit_rate}%",
+                "cache_hit_rate": hit_rate,
+                "total_requests": self.stats.total_requests
+            }
+            
+            logger.warning(f"Triggering cache collapse fallback: {json.dumps(fallback_data)}")
+            
+        except Exception as fallback_error:
+            logger.error(f"Failed to trigger cache collapse fallback: {fallback_error}")
+    
+    async def _check_cache_collapse(self, current_hit_rate: float):
+        """Check for cache collapse and trigger fallback - Task 6.4.25"""
+        try:
+            # Define cache collapse threshold (hit rate drops below 30%)
+            CACHE_COLLAPSE_THRESHOLD = 30.0
+            MIN_REQUESTS_FOR_CHECK = 10  # Only check if we have enough data
+            
+            if (self.stats.total_requests >= MIN_REQUESTS_FOR_CHECK and 
+                current_hit_rate < CACHE_COLLAPSE_THRESHOLD):
+                
+                logger.warning(f"Cache collapse detected: hit rate {current_hit_rate}% < {CACHE_COLLAPSE_THRESHOLD}%")
+                
+                # Trigger cache collapse fallback
+                await self._trigger_cache_collapse_fallback(current_hit_rate)
+                
+        except Exception as e:
+            logger.error(f"Failed to check cache collapse: {e}")
+    
+    async def _trigger_cache_collapse_fallback(self, hit_rate: float):
+        """Trigger fallback when cache collapse occurs"""
+        try:
+            fallback_data = {
+                "request_id": f"cache_collapse_{int(time.time())}",
+                "tenant_id": "system",
+                "workflow_id": "routing_cache",
+                "current_system": "rbia",
+                "error_type": "cache_collapse",
+                "error_message": f"Cache hit rate crashed to {hit_rate}%",
+                "cache_hit_rate": hit_rate,
+                "total_requests": self.stats.total_requests
+            }
+            
+            logger.warning(f"Triggering cache collapse fallback: {json.dumps(fallback_data)}")
+            
+        except Exception as fallback_error:
+            logger.error(f"Failed to trigger cache collapse fallback: {fallback_error}")
     
     async def warm_cache(self, tenant_id: str = "1300"):
         """Warm cache with common workflow patterns for faster responses"""

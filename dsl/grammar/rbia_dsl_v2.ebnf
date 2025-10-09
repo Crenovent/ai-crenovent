@@ -30,16 +30,22 @@ step_body = "id" ":" identifier
           "fallback" ":" fallback_block? ;
 
 (* Step Types - Backward Compatible + New ML Types *)
-step_type = traditional_step | ml_step ;
+step_type = traditional_step | ml_step | control_flow_step ;
 traditional_step = "query" | "decision" | "action" | "notify" | "governance" | "agent_call" ;
 ml_step = "ml_node" | "ml_predict" | "ml_score" | "ml_classify" | "ml_explain" ;
+control_flow_step = "match" | "when" ;
 
 (* ML Node Specific Grammar *)
 params_block = "{" param_list "}" ;
 param_list = param ( "," param )* ;
 param = param_name ":" param_value ;
 param_name = identifier ;
-param_value = string | number | boolean | object | array | ml_config ;
+param_value = string | number | boolean | object | array | ml_config | feature_ref ;
+
+(* Feature Reference Syntax *)
+feature_ref = feature_namespace "." feature_name ;
+feature_namespace = identifier ;
+feature_name = identifier ;
 
 (* ML Configuration Block *)
 ml_config = "{" ml_param_list "}" ;
@@ -87,10 +93,12 @@ fallback_type = "rba_rule" | "default_action" | "human_escalation" | "previous_s
 (* Trigger Conditions *)
 trigger_conditions = "[" condition_list "]" ;
 condition_list = condition_expr ( "," condition_expr )* ;
-condition_expr = confidence_condition | error_condition | timeout_condition ;
+condition_expr = confidence_condition | error_condition | timeout_condition | ml_predicate_condition ;
 confidence_condition = "confidence" comparison_op number ;
 error_condition = "error" ":" string ;
 timeout_condition = "timeout" ":" number ;
+ml_predicate_condition = "ml_result" comparison_op ml_value | "prediction" comparison_op ml_value ;
+ml_value = number | string | boolean ;
 comparison_op = "<" | "<=" | ">" | ">=" | "==" | "!=" ;
 
 (* Governance Block *)
@@ -136,6 +144,11 @@ array_elements = param_value ( "," param_value )* ;
 object = "{" object_elements? "}" ;
 object_elements = object_pair ( "," object_pair )* ;
 object_pair = string ":" param_value ;
+
+(* Match/When Control Flow *)
+match_block = "{" match_cases "}" ;
+match_cases = match_case ( "," match_case )* ;
+match_case = "when" ":" condition_expr "then" ":" "[" identifier_list "]" ;
 
 (* Utility Lists *)
 identifier_list = identifier ( "," identifier )* ;

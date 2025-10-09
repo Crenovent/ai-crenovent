@@ -19,6 +19,23 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+class FeatureReferenceValidator:
+    """Validator for feature.namespace.name syntax"""
+    
+    def validate_feature_reference(self, feature_ref: str, node_id: str) -> List[str]:
+        """Validate feature reference syntax: feature.bank.credit_score"""
+        errors = []
+        
+        if '.' not in feature_ref:
+            errors.append(f"Feature reference must use namespace.name syntax: {feature_ref}")
+            return errors
+        
+        parts = feature_ref.split('.')
+        if len(parts) != 2:
+            errors.append(f"Feature reference must have exactly one namespace: {feature_ref}")
+        
+        return errors
+
 @dataclass
 class FeatureContractError:
     """Error in feature contract validation"""

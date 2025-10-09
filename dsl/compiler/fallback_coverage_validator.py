@@ -20,6 +20,19 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 @dataclass
+class BuilderWarning:
+    """Builder warning for missing fallback coverage"""
+    warning_id: str
+    node_id: str
+    warning_type: str  # "missing_fallback", "incomplete_coverage", "high_risk_no_fallback"
+    severity: str  # "error", "warning", "info"
+    title: str
+    message: str
+    suggested_action: str
+    blocks_publish: bool = False
+    auto_fix_available: bool = False
+    
+@dataclass
 class FallbackCoverageError:
     """Fallback coverage validation error"""
     error_code: str
@@ -580,6 +593,75 @@ class FallbackCoverageValidator:
             'coverage_by_risk_tier': self._group_coverage_by_risk_tier(),
             'recommendations_summary': self._get_top_recommendations()
         }
+    
+    def generate_builder_warnings(self, ir_graph) -> List[BuilderWarning]:
+        """Generate Builder warnings for missing fallback coverage - Task 6.4.41"""
+        
+        warnings = []
+        
+        # Validate fallback coverage and get errors
+        errors, reports = self.validate_fallback_coverage(ir_graph)
+        
+        for error in errors:
+            warning_type = "missing_fallback"
+            severity = "error" if error.risk_tier == "high" else "warning"
+            blocks_publish = error.risk_tier == "high"
+            
+            if error.error_code == "MISSING_FALLBACK":
+                title = f"Missing Fallback: {error.node_id}"
+                message = f"ML node '{error.node_id}' has no fallback configuration. This creates a risk of system failure if the ML model becomes unavailable."
+                suggested_action = "Add at least one fallback option (RBA rule, human escalation, or safe default)"
+            
+            elif error.error_code == "INCOMPLETE_COVERAGE":
+                warning_type = "incomplete_coverage"
+                title = f"Incomplete Fallback Coverage: {error.node_id}"
+                message = f"ML node '{error.node_id}' has partial fallback coverage but is missing critical fallback types for {error.risk_tier} risk scenarios."
+                suggested_action = "Add recommended fallback types: " + ", ".join(error.expected.split(","))
+            
+            elif error.error_code == "HIGH_RISK_NO_RBA":
+                warning_type = "high_risk_no_fallback"
+                title = f"High-Risk Node Without RBA Fallback: {error.node_id}"
+                message = f"High-risk ML node '{error.node_id}' lacks deterministic RBA fallback. This violates safety requirements."
+                suggested_action = "Add RBA rule fallback for deterministic behavior"
+                blocks_publish = True
+            
+            else:
+                title = f"Fallback Issue: {error.node_id}"
+                message = error.message
+                suggested_action = "Review fallback configuration"
+            
+            warning = BuilderWarning(
+                warning_id=f"fallback_{error.error_code.lower()}_{error.node_id}",
+                node_id=error.node_id,
+                warning_type=warning_type,
+                severity=severity,
+                title=title,
+                message=message,
+                suggested_action=suggested_action,
+                blocks_publish=blocks_publish,
+                auto_fix_available=error.autofix_available
+            )
+            
+            warnings.append(warning)
+        
+        # Check for nodes with low coverage scores
+        for report in reports:
+            if report.coverage_score < 0.7 and not any(w.node_id == report.node_id for w in warnings):
+                warning = BuilderWarning(
+                    warning_id=f"fallback_low_coverage_{report.node_id}",
+                    node_id=report.node_id,
+                    warning_type="incomplete_coverage",
+                    severity="warning",
+                    title=f"Low Fallback Coverage: {report.node_id}",
+                    message=f"Node has low fallback coverage score ({report.coverage_score:.1f}). Consider adding more fallback options.",
+                    suggested_action=f"Add missing fallback types: {', '.join(report.coverage_gaps)}",
+                    blocks_publish=False,
+                    auto_fix_available=True
+                )
+                warnings.append(warning)
+        
+        logger.info(f"Generated {len(warnings)} Builder warnings for fallback coverage")
+        return warnings
     
     def get_detailed_coverage_report(self) -> Dict[str, Any]:
         """Get detailed coverage report for all nodes"""

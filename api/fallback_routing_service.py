@@ -33,6 +33,10 @@ class FallbackTrigger(str, Enum):
     MANUAL_OVERRIDE = "manual_override"
     KILL_SWITCH = "kill_switch"
     SYSTEM_OVERLOAD = "system_overload"
+    EXPLAINABILITY_FAILURE = "explainability_failure"
+    EVIDENCE_WRITE_FAILURE = "evidence_write_failure"
+    CACHE_COLLAPSE = "cache_collapse"
+    PII_PHI_LEAK = "pii_phi_leak"
 
 class FallbackStatus(str, Enum):
     ACTIVE = "active"
@@ -313,6 +317,18 @@ def _evaluate_fallback_rules(request: RoutingRequest, matrix: FallbackMatrix) ->
         
         elif rule.trigger_type == FallbackTrigger.MANUAL_OVERRIDE:
             should_trigger = request.error_type == "manual_override"
+        
+        elif rule.trigger_type == FallbackTrigger.EXPLAINABILITY_FAILURE:
+            should_trigger = request.error_type == "explainability_failure"
+        
+        elif rule.trigger_type == FallbackTrigger.EVIDENCE_WRITE_FAILURE:
+            should_trigger = request.error_type == "evidence_write_failure"
+        
+        elif rule.trigger_type == FallbackTrigger.CACHE_COLLAPSE:
+            should_trigger = request.error_type == "cache_collapse"
+        
+        elif rule.trigger_type == FallbackTrigger.PII_PHI_LEAK:
+            should_trigger = request.error_type == "pii_phi_leak"
         
         if should_trigger:
             # Update rule statistics

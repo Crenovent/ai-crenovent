@@ -43,6 +43,23 @@ class FallbackAction(str, Enum):
     FORCE = "force"              # Automatically switch modes
     ESCALATE = "escalate"        # Escalate to human support
 
+class PolicyBadgeType(str, Enum):
+    COMPLIANCE = "compliance"     # Compliance policy triggered fallback
+    SECURITY = "security"        # Security policy triggered fallback
+    RISK = "risk"                # Risk management policy triggered fallback
+    GOVERNANCE = "governance"    # Governance policy triggered fallback
+
+class MessagePattern(str, Enum):
+    PLAIN = "plain"               # Simple, direct message
+    EXEC_SUMMARY = "exec_summary" # Executive-level summary
+    VERBOSE = "verbose"           # Detailed technical explanation
+
+class UserPersona(str, Enum):
+    EXECUTIVE = "executive"       # CRO, CFO, VP-level
+    MANAGER = "manager"          # RevOps Manager, Team Lead
+    INDIVIDUAL = "individual"    # AE, SDR, individual contributor
+    TECHNICAL = "technical"      # Developer, Admin
+
 class FallbackRule(BaseModel):
     rule_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     tenant_id: str
@@ -426,6 +443,152 @@ def _log_fallback_rationale(fallback_event: FallbackEvent, rule: FallbackRule):
     }
     
     logger.info(f"Fallback rationale: {json.dumps(rationale)}")
+
+def generate_persona_aware_message(
+    trigger: FallbackTrigger,
+    severity: FallbackSeverity,
+    persona: UserPersona,
+    pattern: MessagePattern,
+    context: Dict[str, Any] = None
+) -> str:
+    """Generate persona-aware fallback messages - Task 6.4.38"""
+    
+    context = context or {}
+    
+    # Message templates by persona and pattern
+    message_templates = {
+        UserPersona.EXECUTIVE: {
+            MessagePattern.PLAIN: {
+                FallbackTrigger.LLM_FAILURE: "System temporarily switched to standard interface for reliability.",
+                FallbackTrigger.CONFIDENCE_TOO_LOW: "Switched to guided mode to ensure accuracy.",
+                FallbackTrigger.SYSTEM_OVERLOAD: "Using optimized interface due to high system demand."
+            },
+            MessagePattern.EXEC_SUMMARY: {
+                FallbackTrigger.LLM_FAILURE: "AI system encountered an issue. Automatically switched to proven workflow interface to maintain business continuity.",
+                FallbackTrigger.CONFIDENCE_TOO_LOW: "AI confidence below business standards. Using guided interface to ensure decision quality.",
+                FallbackTrigger.SYSTEM_OVERLOAD: "High system utilization detected. Optimized interface active to maintain performance SLAs."
+            }
+        },
+        UserPersona.MANAGER: {
+            MessagePattern.PLAIN: {
+                FallbackTrigger.LLM_FAILURE: "Conversational AI unavailable. Switched to assisted workflow mode.",
+                FallbackTrigger.CONFIDENCE_TOO_LOW: "AI confidence too low. Using step-by-step guided mode.",
+                FallbackTrigger.SYSTEM_OVERLOAD: "System under high load. Using optimized workflow interface."
+            },
+            MessagePattern.VERBOSE: {
+                FallbackTrigger.LLM_FAILURE: "The conversational AI system encountered a processing error. To ensure continuity, we've automatically switched to the assisted workflow mode where you can complete your tasks using guided steps.",
+                FallbackTrigger.CONFIDENCE_TOO_LOW: "The AI system's confidence in understanding your request is below our quality threshold. We've switched to guided mode to ensure accurate task completion.",
+                FallbackTrigger.SYSTEM_OVERLOAD: "Current system load is high, which may impact AI response times. We've switched to the optimized workflow interface to maintain performance."
+            }
+        },
+        UserPersona.INDIVIDUAL: {
+            MessagePattern.PLAIN: {
+                FallbackTrigger.LLM_FAILURE: "Chat isn't working right now. Let me help you with the step-by-step interface.",
+                FallbackTrigger.CONFIDENCE_TOO_LOW: "I'm not sure I understood correctly. Let's use the guided workflow instead.",
+                FallbackTrigger.SYSTEM_OVERLOAD: "Things are running slow today. Using the faster workflow interface."
+            },
+            MessagePattern.VERBOSE: {
+                FallbackTrigger.LLM_FAILURE: "I'm having trouble with the conversational interface right now. Don't worry - I'll switch you to the guided workflow where you can complete everything step-by-step.",
+                FallbackTrigger.CONFIDENCE_TOO_LOW: "I want to make sure I get this right for you. Let me switch to the guided mode where we can work through this together.",
+                FallbackTrigger.SYSTEM_OVERLOAD: "The system is pretty busy right now, so I'm switching you to the streamlined interface to keep things moving smoothly."
+            }
+        },
+        UserPersona.TECHNICAL: {
+            MessagePattern.VERBOSE: {
+                FallbackTrigger.LLM_FAILURE: f"LLM service failure detected (Error: {context.get('error_code', 'UNKNOWN')}). Fallback routing to deterministic workflow engine. Session context preserved.",
+                FallbackTrigger.CONFIDENCE_TOO_LOW: f"Model confidence score {context.get('confidence', 'N/A')} below threshold {context.get('threshold', '0.7')}. Initiating fallback to rule-based workflow.",
+                FallbackTrigger.SYSTEM_OVERLOAD: f"System load at {context.get('cpu_usage', 'N/A')}%. Activating performance-optimized interface with reduced latency."
+            }
+        }
+    }
+    
+    # Get appropriate message template
+    persona_templates = message_templates.get(persona, message_templates[UserPersona.INDIVIDUAL])
+    pattern_templates = persona_templates.get(pattern, persona_templates.get(MessagePattern.PLAIN, {}))
+    message = pattern_templates.get(trigger, "System switched to alternative interface for optimal performance.")
+    
+    return message
+
+def generate_policy_badge(
+    policy_name: str,
+    policy_type: str,
+    trigger_reason: str,
+    tenant_id: str = None
+) -> Dict[str, Any]:
+    """Generate policy badge for policy-driven fallbacks - Task 6.4.42"""
+    
+    # Determine badge type from policy type
+    badge_type_mapping = {
+        "sox_compliance": PolicyBadgeType.COMPLIANCE,
+        "gdpr_compliance": PolicyBadgeType.COMPLIANCE,
+        "hipaa_compliance": PolicyBadgeType.COMPLIANCE,
+        "pci_compliance": PolicyBadgeType.COMPLIANCE,
+        "security_policy": PolicyBadgeType.SECURITY,
+        "data_security": PolicyBadgeType.SECURITY,
+        "access_control": PolicyBadgeType.SECURITY,
+        "risk_management": PolicyBadgeType.RISK,
+        "operational_risk": PolicyBadgeType.RISK,
+        "credit_risk": PolicyBadgeType.RISK,
+        "governance_policy": PolicyBadgeType.GOVERNANCE,
+        "approval_policy": PolicyBadgeType.GOVERNANCE,
+        "workflow_governance": PolicyBadgeType.GOVERNANCE
+    }
+    
+    badge_type = badge_type_mapping.get(policy_type.lower(), PolicyBadgeType.GOVERNANCE)
+    
+    # Generate badge display properties
+    badge_config = {
+        PolicyBadgeType.COMPLIANCE: {
+            "color": "#1f77b4",      # Blue
+            "icon": "shield-check",
+            "priority": "high",
+            "description": "Compliance policy enforced"
+        },
+        PolicyBadgeType.SECURITY: {
+            "color": "#d62728",      # Red
+            "icon": "security",
+            "priority": "critical",
+            "description": "Security policy enforced"
+        },
+        PolicyBadgeType.RISK: {
+            "color": "#ff7f0e",      # Orange
+            "icon": "warning",
+            "priority": "high",
+            "description": "Risk policy enforced"
+        },
+        PolicyBadgeType.GOVERNANCE: {
+            "color": "#2ca02c",      # Green
+            "icon": "gavel",
+            "priority": "medium",
+            "description": "Governance policy enforced"
+        }
+    }
+    
+    config = badge_config[badge_type]
+    
+    policy_badge = {
+        "badge_id": f"policy_{policy_name.lower().replace(' ', '_')}",
+        "badge_type": badge_type.value,
+        "policy_name": policy_name,
+        "policy_type": policy_type,
+        "trigger_reason": trigger_reason,
+        "display": {
+            "text": f"{policy_name} Policy",
+            "tooltip": f"Fallback triggered by {policy_name}: {trigger_reason}",
+            "color": config["color"],
+            "icon": config["icon"],
+            "priority": config["priority"],
+            "description": config["description"]
+        },
+        "metadata": {
+            "triggered_at": datetime.utcnow().isoformat(),
+            "tenant_id": tenant_id,
+            "is_policy_driven": True,
+            "requires_acknowledgment": badge_type in [PolicyBadgeType.COMPLIANCE, PolicyBadgeType.SECURITY]
+        }
+    }
+    
+    return policy_badge
 
 @app.post("/fallback/user-response/{event_id}")
 async def record_user_response(

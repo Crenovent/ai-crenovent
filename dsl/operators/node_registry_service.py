@@ -127,7 +127,7 @@ class NodeRegistryService:
             self.logger.error(f"Failed to initialize database: {e}")
             raise
     
-    def _load_default_models(self):
+    async def _load_default_models(self):
         """Load default ML models for common use cases"""
         try:
             # Check if models already exist

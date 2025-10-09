@@ -174,6 +174,53 @@ class ExplainabilityService:
             self.logger.error(f"Failed to log explainability data: {e}")
             raise
     
+    async def handle_explainability_failure(
+        self,
+        model_id: str,
+        workflow_id: str,
+        step_id: str,
+        error_message: str,
+        tenant_id: str = ""
+    ):
+        """Handle explainability failure and trigger fallback - Task 6.4.22"""
+        try:
+            logger.error(f"Explainability failure for model {model_id}: {error_message}")
+            
+            # Trigger fallback routing
+            await self._trigger_explainability_fallback(
+                model_id, workflow_id, step_id, error_message, tenant_id
+            )
+            
+        except Exception as e:
+            logger.error(f"Failed to handle explainability failure: {e}")
+    
+    async def _trigger_explainability_fallback(
+        self,
+        model_id: str,
+        workflow_id: str,
+        step_id: str,
+        error_message: str,
+        tenant_id: str
+    ):
+        """Trigger fallback when explainability generation fails"""
+        try:
+            # Create fallback trigger data
+            fallback_data = {
+                "request_id": f"explainability_failure_{uuid.uuid4()}",
+                "tenant_id": tenant_id,
+                "workflow_id": workflow_id,
+                "current_system": "rbia",
+                "error_type": "explainability_failure",
+                "error_message": f"Explainability generation failed: {error_message}",
+                "model_id": model_id,
+                "step_id": step_id
+            }
+            
+            logger.warning(f"Triggering explainability failure fallback: {json.dumps(fallback_data)}")
+            
+        except Exception as fallback_error:
+            logger.error(f"Failed to trigger explainability fallback: {fallback_error}")
+    
     async def get_explanation(
         self, 
         log_id: str
