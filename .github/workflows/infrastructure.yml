@@ -2,7 +2,7 @@ name: Infrastructure CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, dev, uat ]
     paths:
       - 'infra/**'
   pull_request:
@@ -10,6 +10,16 @@ on:
     paths:
       - 'infra/**'
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+        - dev
+        - uat
+        - prod
 
 env:
   TF_VERSION: '1.9.2'
@@ -20,6 +30,9 @@ jobs:
     name: Terraform Plan
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    strategy:
+      matrix:
+        environment: [dev, staging, main]
     
     steps:
     - name: Checkout
@@ -36,21 +49,21 @@ jobs:
       
     - name: Terraform Init
       run: terraform init -backend=false
-      working-directory: ./infra/terraform/environments/dev
+      working-directory: ./infra/terraform/environments/${{ matrix.environment }}
       
     - name: Terraform Validate
       run: terraform validate
-      working-directory: ./infra/terraform/environments/dev
+      working-directory: ./infra/terraform/environments/${{ matrix.environment }}
       
     - name: Terraform Plan
-      run: terraform plan -var-file="dev.tfvars" -out=tfplan
-      working-directory: ./infra/terraform/environments/dev
+      run: terraform plan -var-file="${{ matrix.environment }}.tfvars" -out=tfplan
+      working-directory: ./infra/terraform/environments/${{ matrix.environment }}
       
     - name: Upload Terraform Plan
       uses: actions/upload-artifact@v3
       with:
-        name: terraform-plan
-        path: ./infra/terraform/environments/dev/tfplan
+        name: terraform-plan-${{ matrix.environment }}
+        path: ./infra/terraform/environments/${{ matrix.environment }}/tfplan
 
   terraform-security-scan:
     name: Terraform Security Scan
@@ -102,7 +115,7 @@ jobs:
   terraform-apply-dev:
     name: Terraform Apply (Dev)
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
     environment: dev
     needs: [terraform-plan, terraform-security-scan]
     
@@ -135,11 +148,11 @@ jobs:
         echo "- Region: Central India" >> $GITHUB_STEP_SUMMARY
         echo "- Timestamp: $(date)" >> $GITHUB_STEP_SUMMARY
 
-  terraform-apply-staging:
-    name: Terraform Apply (Staging)
+  terraform-apply-uat:
+    name: Terraform Apply (UAT)
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    environment: staging
+    if: github.ref == 'refs/heads/uat' && github.event_name == 'push'
+    environment: uat
     needs: [terraform-plan, terraform-security-scan]
     
     steps:
@@ -167,14 +180,60 @@ jobs:
     - name: Output Infrastructure Info
       run: |
         echo "## Infrastructure Deployment Complete" >> $GITHUB_STEP_SUMMARY
-        echo "- Environment: Staging" >> $GITHUB_STEP_SUMMARY
+        echo "- Environment: UAT/Staging" >> $GITHUB_STEP_SUMMARY
         echo "- Region: West Europe" >> $GITHUB_STEP_SUMMARY
+        echo "- Timestamp: $(date)" >> $GITHUB_STEP_SUMMARY
+
+  terraform-apply-prod:
+    name: Terraform Apply (Production)
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    needs: [terraform-plan, terraform-security-scan]
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+        
+    - name: Configure Azure Credentials
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+        
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./infra/terraform/environments/prod
+      
+    - name: Terraform Plan (Production)
+      run: terraform plan -var-file="prod.tfvars" -out=tfplan
+      working-directory: ./infra/terraform/environments/prod
+      
+    - name: Manual Approval Required
+      run: |
+        echo "## Production Deployment Approval Required" >> $GITHUB_STEP_SUMMARY
+        echo "This is a production deployment. Manual approval is required." >> $GITHUB_STEP_SUMMARY
+        echo "Please review the Terraform plan and approve the deployment." >> $GITHUB_STEP_SUMMARY
+      
+    - name: Terraform Apply (Production)
+      run: terraform apply tfplan
+      working-directory: ./infra/terraform/environments/prod
+      
+    - name: Output Infrastructure Info
+      run: |
+        echo "## Production Infrastructure Deployment Complete" >> $GITHUB_STEP_SUMMARY
+        echo "- Environment: Production" >> $GITHUB_STEP_SUMMARY
+        echo "- Region: Multiple (India, EU, US)" >> $GITHUB_STEP_SUMMARY
         echo "- Timestamp: $(date)" >> $GITHUB_STEP_SUMMARY
 
   helm-deploy-dev:
     name: Helm Deploy (Dev)
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
     environment: dev
     needs: [terraform-apply-dev]
     
