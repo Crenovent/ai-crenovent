@@ -1,0 +1,21 @@
+apiVersion: v2
+name: orchestrator
+description: RevAI Orchestrator Service Helm Chart
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - revai
+  - orchestrator
+  - ai
+  - automation
+home: https://crenovent.com
+sources:
+  - https://github.com/Crenovent/ai-crenovent
+maintainers:
+  - name: DevOps Team
+    email: devops@crenovent.com
+dependencies: []
+annotations:
+  category: AI/ML
+  licenses: MIT
