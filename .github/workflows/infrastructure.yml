@@ -58,9 +58,10 @@ jobs:
         client-id: '396fc791-ac50-45cc-932d-84e846e85421'
         tenant-id: '6c258b97-993a-429b-9124-c210e957ef7e'
         subscription-id: '0a19726d-3c64-454b-b0d3-58f055e9d39a'
+        client-secret: 'dgV8Q~tUuvGXo.BsRuN1tZKCQGR3iHx6HS3rwc4~'
         enable-AzPSSession: false
         allow-no-subscriptions: false
-        auth-type: 'IDENTITY'
+        auth-type: 'SERVICE_PRINCIPAL'
 
         
     - name: Terraform Format Check
@@ -233,9 +234,10 @@ jobs:
         client-id: '396fc791-ac50-45cc-932d-84e846e85421'
         tenant-id: '6c258b97-993a-429b-9124-c210e957ef7e'
         subscription-id: '0a19726d-3c64-454b-b0d3-58f055e9d39a'
+        client-secret: 'dgV8Q~tUuvGXo.BsRuN1tZKCQGR3iHx6HS3rwc4~'
         enable-AzPSSession: false
         allow-no-subscriptions: false
-        auth-type: 'IDENTITY'
+        auth-type: 'SERVICE_PRINCIPAL'
         
     - name: Terraform Init
       run: terraform init
