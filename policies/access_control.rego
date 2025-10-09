@@ -3,6 +3,8 @@ package policies
 # Default deny
 default allow := false
 
+# Policy version: v1.1 - Fixed syntax errors
+
 # Allow access if user is admin
 allow {
     input.user == "admin"
