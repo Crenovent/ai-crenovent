@@ -1,0 +1,42 @@
+# Default values for keyvault-test
+# This is a YAML-formatted file.
+
+# Namespace for the test service
+namespace: revai-staging
+
+# Key Vault configuration
+keyvault:
+  name: kv-revai-staging
+  secretName: jwt-secret
+  keyName: evidence-signing-key
+
+# Managed Identity configuration
+managedIdentity:
+  clientId: ""  # Will be set during deployment
+  tenantId: "6c258b97-993a-429b-9124-c210e957ef7e"
+
+# Test service configuration
+testService:
+  replicaCount: 1
+  image:
+    repository: mcr.microsoft.com/azure-cli
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8080
+
+# Job configuration
+job:
+  enabled: true
+  restartPolicy: Never
