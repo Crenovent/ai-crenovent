@@ -58,6 +58,12 @@ resource "azurerm_log_analytics_workspace" "main" {
   tags                = local.common_tags
 }
 
+# Import existing Application Insights
+import {
+  to = azurerm_application_insights.main
+  id = "/subscriptions/0a19726d-3c64-454b-b0d3-58f055e9d39a/resourceGroups/rg-revai-prod/providers/Microsoft.Insights/components/ai-revai-prod"
+}
+
 # Application Insights
 resource "azurerm_application_insights" "main" {
   name                = "ai-revai-${local.environment}"
