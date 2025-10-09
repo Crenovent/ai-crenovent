@@ -25,7 +25,7 @@ resource "azurerm_key_vault" "main" {
   location            = azurerm_resource_group.security.location
   resource_group_name = azurerm_resource_group.security.name
   tenant_id           = var.tenant_id
-  sku_name           = var.key_vault_sku
+  sku_name            = var.key_vault_sku
   tags                = var.tags
 
   enabled_for_disk_encryption     = true
@@ -113,16 +113,16 @@ resource "azurerm_policy_assignment" "security_policies" {
 
 # Security Center Contact
 resource "azurerm_security_center_contact" "main" {
-  count         = var.enable_security_center ? 1 : 0
-  email         = var.security_contact_email
-  phone         = var.security_contact_phone
+  count               = var.enable_security_center ? 1 : 0
+  email               = var.security_contact_email
+  phone               = var.security_contact_phone
   alert_notifications = true
   alerts_to_admins    = true
 }
 
 # Security Center Subscription Pricing
 resource "azurerm_security_center_subscription_pricing" "main" {
-  count          = var.enable_security_center ? 1 : 0
+  count         = var.enable_security_center ? 1 : 0
   tier          = var.security_center_tier
   resource_type = "VirtualMachines"
 }

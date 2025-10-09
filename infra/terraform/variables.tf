@@ -51,22 +51,22 @@ variable "compliance_level" {
 variable "aks_config" {
   description = "AKS cluster configuration"
   type = object({
-    kubernetes_version = string
-    node_count        = number
-    vm_size           = string
+    kubernetes_version  = string
+    node_count          = number
+    vm_size             = string
     enable_auto_scaling = bool
-    min_count         = number
-    max_count         = number
-    enable_monitoring = bool
+    min_count           = number
+    max_count           = number
+    enable_monitoring   = bool
   })
   default = {
-    kubernetes_version = "1.28"
-    node_count        = 3
-    vm_size           = "Standard_D4s_v4"
+    kubernetes_version  = "1.28"
+    node_count          = 3
+    vm_size             = "Standard_D4s_v4"
     enable_auto_scaling = true
-    min_count         = 2
-    max_count         = 10
-    enable_monitoring = true
+    min_count           = 2
+    max_count           = 10
+    enable_monitoring   = true
   }
 }
 
@@ -129,16 +129,16 @@ variable "monitoring_config" {
 variable "networking_config" {
   description = "Networking configuration"
   type = object({
-    vnet_address_space     = list(string)
-    subnet_address_prefixes = list(string)
+    vnet_address_space       = list(string)
+    subnet_address_prefixes  = list(string)
     enable_private_endpoints = bool
-    enable_public_ip        = bool
+    enable_public_ip         = bool
   })
   default = {
-    vnet_address_space     = ["10.0.0.0/16"]
-    subnet_address_prefixes = ["10.0.1.0/24", "10.0.2.0/24"]
+    vnet_address_space       = ["10.0.0.0/16"]
+    subnet_address_prefixes  = ["10.0.1.0/24", "10.0.2.0/24"]
     enable_private_endpoints = true
-    enable_public_ip        = false
+    enable_public_ip         = false
   }
 }
 
@@ -148,12 +148,12 @@ variable "container_registry_config" {
   type = object({
     enable_acr        = bool
     acr_sku           = string
-    enable_admin_user  = bool
+    enable_admin_user = bool
   })
   default = {
     enable_acr        = true
     acr_sku           = "Standard"
-    enable_admin_user  = false
+    enable_admin_user = false
   }
 }
 
@@ -176,17 +176,17 @@ variable "servicebus_config" {
 variable "feature_flags" {
   description = "Feature flags for optional components"
   type = object({
-    enable_cosmosdb     = bool
-    enable_openai       = bool
-    enable_cdn          = bool
-    enable_waf          = bool
-    enable_backup       = bool
+    enable_cosmosdb = bool
+    enable_openai   = bool
+    enable_cdn      = bool
+    enable_waf      = bool
+    enable_backup   = bool
   })
   default = {
-    enable_cosmosdb     = false
-    enable_openai       = false
-    enable_cdn          = false
-    enable_waf          = false
-    enable_backup       = true
+    enable_cosmosdb = false
+    enable_openai   = false
+    enable_cdn      = false
+    enable_waf      = false
+    enable_backup   = true
   }
 }

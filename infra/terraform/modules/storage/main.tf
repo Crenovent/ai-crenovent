@@ -20,15 +20,15 @@ resource "azurerm_resource_group" "storage" {
 
 # PostgreSQL Database
 resource "azurerm_postgresql_flexible_server" "main" {
-  count               = var.enable_postgresql ? 1 : 0
-  name                = "${var.name_prefix}-postgres"
-  resource_group_name = azurerm_resource_group.storage.name
-  location            = azurerm_resource_group.storage.location
-  version             = "15"
-  administrator_login = var.postgresql_admin_username
+  count                  = var.enable_postgresql ? 1 : 0
+  name                   = "${var.name_prefix}-postgres"
+  resource_group_name    = azurerm_resource_group.storage.name
+  location               = azurerm_resource_group.storage.location
+  version                = "15"
+  administrator_login    = var.postgresql_admin_username
   administrator_password = var.postgresql_admin_password
-  zone                = "1"
-  tags                = var.tags
+  zone                   = "1"
+  tags                   = var.tags
 
   storage_mb = var.postgresql_storage_mb
   sku_name   = var.postgresql_sku
@@ -92,8 +92,8 @@ resource "azurerm_storage_account" "main" {
   tags                     = var.tags
 
   blob_properties {
-    versioning_enabled  = true
-    change_feed_enabled = true
+    versioning_enabled            = true
+    change_feed_enabled           = true
     change_feed_retention_in_days = 7
   }
 
