@@ -11,7 +11,7 @@ name: Microservice CI/CD Pipeline
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ main, develop ]
     paths:
       - 'microservices/**'
       - 'helm/**'
@@ -166,7 +166,7 @@ jobs:
   cd-deploy-staging:
     name: CD - Deploy to Staging
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    if: (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main') && github.event_name == 'push'
     needs: [ci-build-test]
     environment: staging
     
