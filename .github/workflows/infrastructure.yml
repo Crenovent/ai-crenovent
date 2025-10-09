@@ -29,10 +29,10 @@ jobs:
   terraform-plan:
     name: Terraform Plan
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     strategy:
       matrix:
-        environment: [dev, staging, main]
+        environment: [dev, uat, prod]
     
     steps:
     - name: Checkout
@@ -49,15 +49,15 @@ jobs:
       
     - name: Terraform Init
       run: terraform init -backend=false
-      working-directory: ./infra/terraform/environments/${{ matrix.environment }}
+      working-directory: ./infra/terraform/environments/${{ matrix.environment == 'uat' && 'staging' || matrix.environment }}
       
     - name: Terraform Validate
       run: terraform validate
-      working-directory: ./infra/terraform/environments/${{ matrix.environment }}
+      working-directory: ./infra/terraform/environments/${{ matrix.environment == 'uat' && 'staging' || matrix.environment }}
       
     - name: Terraform Plan
-      run: terraform plan -var-file="${{ matrix.environment }}.tfvars" -out=tfplan
-      working-directory: ./infra/terraform/environments/${{ matrix.environment }}
+      run: terraform plan -var-file="dev.tfvars" -out=tfplan
+      working-directory: ./infra/terraform/environments/${{ matrix.environment == 'uat' && 'staging' || matrix.environment }}
       
     - name: Upload Terraform Plan
       uses: actions/upload-artifact@v3
@@ -68,7 +68,7 @@ jobs:
   terraform-security-scan:
     name: Terraform Security Scan
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     
     steps:
     - name: Checkout
@@ -90,7 +90,7 @@ jobs:
   helm-lint:
     name: Helm Lint
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     
     steps:
     - name: Checkout
