@@ -35,7 +35,7 @@ class SecretViolation:
     masked_value: str  # Partially masked for reporting
     expected: str
     actual: str
-    autofix_available: bool = False
+    autofix_available: bool = False 
     suggested_vault_reference: Optional[str] = None
     remediation_steps: List[str] = field(default_factory=list)
 
