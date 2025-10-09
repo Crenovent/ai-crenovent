@@ -32,7 +32,7 @@ resource "azurerm_key_vault" "main" {
   enabled_for_deployment          = true
   enabled_for_template_deployment = true
   enable_rbac_authorization       = true
-  purge_protection_enabled         = var.enable_purge_protection
+  purge_protection_enabled        = var.enable_purge_protection
   soft_delete_retention_days      = var.soft_delete_retention_days
 
   # Network access
@@ -49,7 +49,7 @@ resource "azurerm_key_vault" "main" {
 resource "azurerm_role_assignment" "kv_admin" {
   count                = length(var.admin_object_ids)
   scope                = azurerm_key_vault.main.id
-  role_definition_name  = "Key Vault Administrator"
+  role_definition_name = "Key Vault Administrator"
   principal_id         = var.admin_object_ids[count.index]
 }
 
@@ -57,7 +57,7 @@ resource "azurerm_role_assignment" "kv_admin" {
 resource "azurerm_role_assignment" "kv_secrets_officer" {
   count                = length(var.secrets_officer_object_ids)
   scope                = azurerm_key_vault.main.id
-  role_definition_name  = "Key Vault Secrets Officer"
+  role_definition_name = "Key Vault Secrets Officer"
   principal_id         = var.secrets_officer_object_ids[count.index]
 }
 
@@ -65,7 +65,7 @@ resource "azurerm_role_assignment" "kv_secrets_officer" {
 resource "azurerm_role_assignment" "kv_secrets_user" {
   count                = length(var.secrets_user_object_ids)
   scope                = azurerm_key_vault.main.id
-  role_definition_name  = "Key Vault Secrets User"
+  role_definition_name = "Key Vault Secrets User"
   principal_id         = var.secrets_user_object_ids[count.index]
 }
 
@@ -86,7 +86,7 @@ resource "azurerm_key_vault_key" "evidence_signing_key" {
   }
 
   tags = merge(var.tags, {
-    Purpose = "Evidence Signing"
+    Purpose  = "Evidence Signing"
     Rotation = "Automatic"
   })
 }
