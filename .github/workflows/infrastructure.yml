@@ -2,7 +2,8 @@ name: Infrastructure CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, dev, uat ]
+    branches: [ main ]  # Only main branch for production
+    # branches: [ main, dev, uat ]  # Commented out dev and uat
     paths:
       - 'infra/**'
       - '.github/workflows/infrastructure.yml'
@@ -16,11 +17,11 @@ on:
       environment:
         description: 'Environment to deploy'
         required: true
-        default: 'dev'
+        default: 'prod'
         type: choice
         options:
-        - dev
-        - uat
+        # - dev      # Commented out dev
+        # - uat      # Commented out uat
         - prod
 
 env:
@@ -38,7 +39,8 @@ jobs:
     if: github.event_name == 'pull_request' || github.event_name == 'push'
     strategy:
       matrix:
-        environment: [dev, uat, prod]
+        environment: [prod]  # Only production environment
+        # environment: [dev, uat, prod]  # Commented out dev and uat
       fail-fast: false
     
     steps:
@@ -136,77 +138,77 @@ jobs:
         helm template orchestrator ./infra/helm/orchestrator
         helm template evidence-worker ./infra/helm/evidence-worker
 
-  terraform-apply-dev:
-    name: Terraform Apply (Dev)
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
-    environment: dev
-    needs: [terraform-plan, terraform-security-scan]
-    
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: ${{ env.TF_VERSION }}
-        
-    - name: Configure Azure Credentials
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
-    - name: Terraform Init
-      run: terraform init
-      working-directory: ./infra/terraform/environments/dev
-      
-    - name: Terraform Apply
-      run: terraform apply -var-file="dev.tfvars" -auto-approve
-      working-directory: ./infra/terraform/environments/dev
-      
-    - name: Output Infrastructure Info
-      run: |
-        echo "## Infrastructure Deployment Complete" >> $GITHUB_STEP_SUMMARY
-        echo "- Environment: Development" >> $GITHUB_STEP_SUMMARY
-        echo "- Region: Central India" >> $GITHUB_STEP_SUMMARY
-        echo "- Timestamp: $(date)" >> $GITHUB_STEP_SUMMARY
+  # terraform-apply-dev:
+  #   name: Terraform Apply (Dev)
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+  #   environment: dev
+  #   needs: [terraform-plan, terraform-security-scan]
+  #   
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v4
+  #     
+  #   - name: Setup Terraform
+  #     uses: hashicorp/setup-terraform@v3
+  #     with:
+  #       terraform_version: ${{ env.TF_VERSION }}
+  #       
+  #   - name: Configure Azure Credentials
+  #     uses: azure/login@v1
+  #     with:
+  #       creds: ${{ secrets.AZURE_CREDENTIALS }}
+  #       
+  #   - name: Terraform Init
+  #     run: terraform init
+  #     working-directory: ./infra/terraform/environments/dev
+  #     
+  #   - name: Terraform Apply
+  #     run: terraform apply -var-file="dev.tfvars" -auto-approve
+  #     working-directory: ./infra/terraform/environments/dev
+  #     
+  #   - name: Output Infrastructure Info
+  #     run: |
+  #       echo "## Infrastructure Deployment Complete" >> $GITHUB_STEP_SUMMARY
+  #       echo "- Environment: Development" >> $GITHUB_STEP_SUMMARY
+  #       echo "- Region: Central India" >> $GITHUB_STEP_SUMMARY
+  #       echo "- Timestamp: $(date)" >> $GITHUB_STEP_SUMMARY
 
-  terraform-apply-uat:
-    name: Terraform Apply (UAT)
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/uat' && github.event_name == 'push'
-    environment: uat
-    needs: [terraform-plan, terraform-security-scan]
-    
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: ${{ env.TF_VERSION }}
-        
-    - name: Configure Azure Credentials
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
-    - name: Terraform Init
-      run: terraform init
-      working-directory: ./infra/terraform/environments/staging
-      
-    - name: Terraform Apply
-      run: terraform apply -var-file="staging.tfvars" -auto-approve
-      working-directory: ./infra/terraform/environments/staging
-      
-    - name: Output Infrastructure Info
-      run: |
-        echo "## Infrastructure Deployment Complete" >> $GITHUB_STEP_SUMMARY
-        echo "- Environment: UAT/Staging" >> $GITHUB_STEP_SUMMARY
-        echo "- Region: West Europe" >> $GITHUB_STEP_SUMMARY
-        echo "- Timestamp: $(date)" >> $GITHUB_STEP_SUMMARY
+  # terraform-apply-uat:
+  #   name: Terraform Apply (UAT)
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/uat' && github.event_name == 'push'
+  #   environment: uat
+  #   needs: [terraform-plan, terraform-security-scan]
+  #   
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v4
+  #     
+  #   - name: Setup Terraform
+  #     uses: hashicorp/setup-terraform@v3
+  #     with:
+  #       terraform_version: ${{ env.TF_VERSION }}
+  #       
+  #   - name: Configure Azure Credentials
+  #     uses: azure/login@v1
+  #     with:
+  #       creds: ${{ secrets.AZURE_CREDENTIALS }}
+  #       
+  #   - name: Terraform Init
+  #     run: terraform init
+  #     working-directory: ./infra/terraform/environments/staging
+  #     
+  #   - name: Terraform Apply
+  #     run: terraform apply -var-file="staging.tfvars" -auto-approve
+  #     working-directory: ./infra/terraform/environments/staging
+  #     
+  #   - name: Output Infrastructure Info
+  #     run: |
+  #       echo "## Infrastructure Deployment Complete" >> $GITHUB_STEP_SUMMARY
+  #       echo "- Environment: UAT/Staging" >> $GITHUB_STEP_SUMMARY
+  #       echo "- Region: West Europe" >> $GITHUB_STEP_SUMMARY
+  #       echo "- Timestamp: $(date)" >> $GITHUB_STEP_SUMMARY
 
   terraform-apply-prod:
     name: Terraform Apply (Production)
@@ -254,84 +256,84 @@ jobs:
         echo "- Region: Multiple (India, EU, US)" >> $GITHUB_STEP_SUMMARY
         echo "- Timestamp: $(date)" >> $GITHUB_STEP_SUMMARY
 
-  helm-deploy-dev:
-    name: Helm Deploy (Dev)
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
-    environment: dev
-    needs: [terraform-apply-dev]
-    
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      
-    - name: Setup Helm
-      uses: azure/setup-helm@v4
-      with:
-        version: ${{ env.HELM_VERSION }}
-        
-    - name: Configure Azure Credentials
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
-    - name: Get AKS Credentials
-      run: |
-        az aks get-credentials --resource-group rg-revai-dev --name revai-dev-aks --overwrite-existing
-        
-    - name: Create Namespace
-      run: kubectl create namespace revai --dry-run=client -o yaml | kubectl apply -f -
-      
-    - name: Deploy Orchestrator
-      run: |
-        helm upgrade --install orchestrator ./infra/helm/orchestrator \
-          --namespace revai \
-          --set image.tag=${{ github.sha }} \
-          --set secrets.postgresql_password=${{ secrets.POSTGRESQL_PASSWORD }} \
-          --set secrets.redis_password=${{ secrets.REDIS_PASSWORD }} \
-          --set secrets.jwt_secret=${{ secrets.JWT_SECRET }}
-          
-    - name: Deploy Evidence Worker
-      run: |
-        helm upgrade --install evidence-worker ./infra/helm/evidence-worker \
-          --namespace revai \
-          --set image.tag=${{ github.sha }} \
-          --set secrets.postgresql_password=${{ secrets.POSTGRESQL_PASSWORD }} \
-          --set secrets.redis_password=${{ secrets.REDIS_PASSWORD }} \
-          --set secrets.jwt_secret=${{ secrets.JWT_SECRET }}
-          
-    - name: Verify Deployment
-      run: |
-        kubectl get pods -n revai
-        kubectl get services -n revai
+  # helm-deploy-dev:
+  #   name: Helm Deploy (Dev)
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+  #   environment: dev
+  #   needs: [terraform-apply-dev]
+  #   
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v4
+  #     
+  #   - name: Setup Helm
+  #     uses: azure/setup-helm@v4
+  #     with:
+  #       version: ${{ env.HELM_VERSION }}
+  #       
+  #   - name: Configure Azure Credentials
+  #     uses: azure/login@v1
+  #     with:
+  #       creds: ${{ secrets.AZURE_CREDENTIALS }}
+  #       
+  #   - name: Get AKS Credentials
+  #     run: |
+  #       az aks get-credentials --resource-group rg-revai-dev --name revai-dev-aks --overwrite-existing
+  #       
+  #   - name: Create Namespace
+  #     run: kubectl create namespace revai --dry-run=client -o yaml | kubectl apply -f -
+  #     
+  #   - name: Deploy Orchestrator
+  #     run: |
+  #       helm upgrade --install orchestrator ./infra/helm/orchestrator \
+  #         --namespace revai \
+  #         --set image.tag=${{ github.sha }} \
+  #         --set secrets.postgresql_password=${{ secrets.POSTGRESQL_PASSWORD }} \
+  #         --set secrets.redis_password=${{ secrets.REDIS_PASSWORD }} \
+  #         --set secrets.jwt_secret=${{ secrets.JWT_SECRET }}
+  #         
+  #   - name: Deploy Evidence Worker
+  #     run: |
+  #       helm upgrade --install evidence-worker ./infra/helm/evidence-worker \
+  #         --namespace revai \
+  #         --set image.tag=${{ github.sha }} \
+  #         --set secrets.postgresql_password=${{ secrets.POSTGRESQL_PASSWORD }} \
+  #         --set secrets.redis_password=${{ secrets.REDIS_PASSWORD }} \
+  #         --set secrets.jwt_secret=${{ secrets.JWT_SECRET }}
+  #         
+  #   - name: Verify Deployment
+  #     run: |
+  #       kubectl get pods -n revai
+  #       kubectl get services -n revai
 
-  cost-analysis:
-    name: Cost Analysis
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: ${{ env.TF_VERSION }}
-        
-    - name: Terraform Init
-      run: terraform init -backend=false
-      working-directory: ./infra/terraform/environments/dev
-      
-    - name: Terraform Plan for Cost Analysis
-      run: terraform plan -var-file="dev.tfvars" -out=tfplan
-      working-directory: ./infra/terraform/environments/dev
-      
-    - name: Generate Cost Report
-      run: |
-        echo "## Cost Impact Analysis" >> $GITHUB_STEP_SUMMARY
-        echo "### Resources to be created/modified:" >> $GITHUB_STEP_SUMMARY
-        terraform show -no-color tfplan | grep -E "^(Plan:|#)" >> $GITHUB_STEP_SUMMARY || true
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "**Note**: Actual costs may vary based on usage patterns." >> $GITHUB_STEP_SUMMARY
-      working-directory: ./infra/terraform/environments/dev
+  # cost-analysis:
+  #   name: Cost Analysis
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'pull_request'
+  #   
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v4
+  #     
+  #   - name: Setup Terraform
+  #     uses: hashicorp/setup-terraform@v3
+  #     with:
+  #       terraform_version: ${{ env.TF_VERSION }}
+  #       
+  #   - name: Terraform Init
+  #     run: terraform init -backend=false
+  #     working-directory: ./infra/terraform/environments/dev
+  #     
+  #   - name: Terraform Plan for Cost Analysis
+  #     run: terraform plan -var-file="dev.tfvars" -out=tfplan
+  #     working-directory: ./infra/terraform/environments/dev
+  #     
+  #   - name: Generate Cost Report
+  #     run: |
+  #       echo "## Cost Impact Analysis" >> $GITHUB_STEP_SUMMARY
+  #       echo "### Resources to be created/modified:" >> $GITHUB_STEP_SUMMARY
+  #       terraform show -no-color tfplan | grep -E "^(Plan:|#)" >> $GITHUB_STEP_SUMMARY || true
+  #       echo "" >> $GITHUB_STEP_SUMMARY
+  #       echo "**Note**: Actual costs may vary based on usage patterns." >> $GITHUB_STEP_SUMMARY
+  #     working-directory: ./infra/terraform/environments/dev

@@ -1,41 +1,35 @@
 # Infrastructure Branch Strategy
 
 ## Overview
-This document outlines the 3-branch deployment strategy for RevAI infrastructure, implementing a proper GitOps workflow with environment promotion.
+This document outlines the **production-focused** deployment strategy for RevAI infrastructure. Development and UAT environments are currently **disabled** to focus on production deployment.
 
-## Branch-to-Environment Mapping
+## Current Branch-to-Environment Mapping
 
-| Branch | Environment | Deployment Trigger | Approval Required |
-|--------|-------------|-------------------|-------------------|
-| `dev` | Development | Auto on push | No |
-| `uat` | Staging/UAT | Auto on push | No |
-| `main` | Production | Auto on push | **Yes** |
+| Branch | Environment | Status | Deployment Trigger | Approval Required |
+|--------|-------------|--------|-------------------|-------------------|
+| ~~`dev`~~ | ~~Development~~ | **DISABLED** | ~~Auto on push~~ | ~~No~~ |
+| ~~`uat`~~ | ~~Staging/UAT~~ | **DISABLED** | ~~Auto on push~~ | ~~No~~ |
+| `main` | Production | **ACTIVE** | Auto on push | **Yes** |
 
-## Deployment Flow
+## Current Deployment Flow
 
-### 1. Development Environment (`dev` branch)
-- **Trigger**: Push to `dev` branch
-- **Environment**: Development
-- **Region**: Central India
-- **Resources**: Basic SKUs for development
-- **Approval**: Automatic deployment
-- **Purpose**: Developer testing and feature development
-
-### 2. UAT Environment (`uat` branch)
-- **Trigger**: Push to `uat` branch
-- **Environment**: Staging/UAT
-- **Region**: West Europe
-- **Resources**: Medium SKUs for testing
-- **Approval**: Automatic deployment
-- **Purpose**: User acceptance testing and QA validation
-
-### 3. Production Environment (`main` branch)
+### Production Environment (`main` branch) - **ACTIVE**
 - **Trigger**: Push to `main` branch
 - **Environment**: Production
-- **Region**: Multi-region (India + EU + US)
+- **Region**: East US
 - **Resources**: Premium SKUs for production
 - **Approval**: **Manual approval required**
 - **Purpose**: Live production environment
+
+### Development Environment (`dev` branch) - **DISABLED**
+- **Status**: Temporarily disabled
+- **Reason**: Focus on production deployment
+- **Re-enable**: Uncomment dev configurations in workflow
+
+### UAT Environment (`uat` branch) - **DISABLED**
+- **Status**: Temporarily disabled
+- **Reason**: Focus on production deployment
+- **Re-enable**: Uncomment uat configurations in workflow
 
 ## Workflow Features
 
