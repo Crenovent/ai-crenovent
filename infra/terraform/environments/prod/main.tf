@@ -42,6 +42,12 @@ resource "azurerm_resource_group" "main" {
   tags     = local.common_tags
 }
 
+# Import existing Log Analytics Workspace
+import {
+  to = azurerm_log_analytics_workspace.main
+  id = "/subscriptions/0a19726d-3c64-454b-b0d3-58f055e9d39a/resourceGroups/rg-revai-prod/providers/Microsoft.OperationalInsights/workspaces/law-revai-prod"
+}
+
 # Log Analytics Workspace
 resource "azurerm_log_analytics_workspace" "main" {
   name                = "law-revai-${local.environment}"
@@ -60,6 +66,12 @@ resource "azurerm_application_insights" "main" {
   workspace_id        = azurerm_log_analytics_workspace.main.id
   application_type    = "web"
   tags                = local.common_tags
+}
+
+# Import existing Container Registry
+import {
+  to = azurerm_container_registry.main
+  id = "/subscriptions/0a19726d-3c64-454b-b0d3-58f055e9d39a/resourceGroups/rg-revai-prod/providers/Microsoft.ContainerRegistry/registries/acrrevaiprod"
 }
 
 # Container Registry
