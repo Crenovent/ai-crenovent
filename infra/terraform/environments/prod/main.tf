@@ -72,7 +72,7 @@ resource "azurerm_servicebus_namespace" "main" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   sku                 = "Premium"
-  capacity            = 4
+  premium_messaging_partitions = 4
   tags                = local.common_tags
 }
 
