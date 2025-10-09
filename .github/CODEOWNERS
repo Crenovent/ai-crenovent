@@ -1,0 +1,17 @@
+# Global owners
+* @devops-team @backend-team @frontend-team
+
+# Infrastructure
+/infra/ @devops-team
+/.github/workflows/ @devops-team
+
+# Policies
+/policies/ @devops-team @security-team
+/tests/ @devops-team @security-team
+
+# Microservices
+/src/ @backend-team
+/helm/ @devops-team @backend-team
+
+# Frontend
+/frontend/ @frontend-team

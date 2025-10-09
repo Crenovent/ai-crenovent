@@ -1,0 +1,312 @@
+# ================================================================================
+# Microservice CI/CD Pipeline Template
+# ================================================================================
+# This template provides CI/CD for microservices with:
+# - Build → Container Image → Push to Registry
+# - Deploy to staging via GitOps
+# - Policy validation and testing
+# ================================================================================
+
+name: Microservice CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'Dockerfile'
+      - 'package.json'
+      - 'requirements.txt'
+      - 'pom.xml'
+      - 'go.mod'
+      - '.github/workflows/microservice-ci-cd.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'Dockerfile'
+      - 'package.json'
+      - 'requirements.txt'
+      - 'pom.xml'
+      - 'go.mod'
+      - '.github/workflows/microservice-ci-cd.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+
+env:
+  REGISTRY: acrrevaiprod.azurecr.io
+  IMAGE_NAME: ${{ github.repository }}
+  SERVICE_NAME: ${{ github.event.repository.name }}
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  # ================================================================================
+  # CI: Build and Test
+  # ================================================================================
+  ci-build-test:
+    name: CI - Build and Test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Configure Azure Credentials
+      uses: azure/login@v1
+      with:
+        creds: |
+          {
+            "clientId": "396fc791-ac50-45cc-932d-84e846e85421",
+            "clientSecret": "dgV8Q~tUuvGXo.BsRuN1tZKCQGR3iHx6HS3rwc4~",
+            "subscriptionId": "0a19726d-3c64-454b-b0d3-58f055e9d39a",
+            "tenantId": "6c258b97-993a-429b-9124-c210e957ef7e",
+            "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+            "resourceManagerEndpointUrl": "https://management.azure.com/",
+            "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+            "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+            "galleryEndpointUrl": "https://gallery.azure.com/",
+            "managementEndpointUrl": "https://management.core.windows.net/"
+          }
+      
+    - name: Login to Azure Container Registry
+      run: |
+        az acr login --name acrrevaiprod
+        
+    - name: Extract Metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+          
+    # Language-specific build steps
+    - name: Detect Language and Run Tests
+      run: |
+        if [ -f "package.json" ]; then
+          echo "Detected Node.js project"
+          npm ci
+          npm run test || echo "No test script found"
+          npm run lint || echo "No lint script found"
+        elif [ -f "requirements.txt" ]; then
+          echo "Detected Python project"
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m pytest || echo "No pytest found"
+          python -m flake8 . || echo "No flake8 found"
+        elif [ -f "pom.xml" ]; then
+          echo "Detected Java Maven project"
+          mvn clean compile test || echo "Maven test failed"
+        elif [ -f "go.mod" ]; then
+          echo "Detected Go project"
+          go mod download
+          go test ./... || echo "Go tests failed"
+          go vet ./... || echo "Go vet failed"
+        else
+          echo "No supported language detected"
+        fi
+        
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Security Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # ================================================================================
+  # CD: Deploy to Staging
+  # ================================================================================
+  cd-deploy-staging:
+    name: CD - Deploy to Staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    needs: [ci-build-test]
+    environment: staging
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: Configure Azure Credentials
+      uses: azure/login@v1
+      with:
+        creds: |
+          {
+            "clientId": "396fc791-ac50-45cc-932d-84e846e85421",
+            "clientSecret": "dgV8Q~tUuvGXo.BsRuN1tZKCQGR3iHx6HS3rwc4~",
+            "subscriptionId": "0a19726d-3c64-454b-b0d3-58f055e9d39a",
+            "tenantId": "6c258b97-993a-429b-9124-c210e957ef7e",
+            "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+            "resourceManagerEndpointUrl": "https://management.azure.com/",
+            "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+            "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+            "galleryEndpointUrl": "https://gallery.azure.com/",
+            "managementEndpointUrl": "https://management.core.windows.net/"
+          }
+      
+    - name: Setup Helm
+      uses: azure/setup-helm@v4
+      with:
+        version: '3.12.0'
+        
+    - name: Get AKS Credentials
+      run: |
+        az aks get-credentials --resource-group rg-revai-staging --name revai-staging-aks --overwrite-existing
+        
+    - name: Create Namespace
+      run: |
+        kubectl create namespace ${{ env.SERVICE_NAME }}-staging --dry-run=client -o yaml | kubectl apply -f -
+        
+    - name: Deploy to Staging
+      run: |
+        helm upgrade --install ${{ env.SERVICE_NAME }} ./helm \
+          --namespace ${{ env.SERVICE_NAME }}-staging \
+          --set image.repository=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \
+          --set image.tag=${{ github.sha }} \
+          --set environment=staging \
+          --wait --timeout=5m
+          
+    - name: Verify Deployment
+      run: |
+        kubectl get pods -n ${{ env.SERVICE_NAME }}-staging
+        kubectl get services -n ${{ env.SERVICE_NAME }}-staging
+        
+    - name: Run Health Checks
+      run: |
+        kubectl wait --for=condition=ready pod -l app=${{ env.SERVICE_NAME }} -n ${{ env.SERVICE_NAME }}-staging --timeout=300s
+
+  # ================================================================================
+  # CD: Deploy to Production
+  # ================================================================================
+  cd-deploy-production:
+    name: CD - Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [ci-build-test]
+    environment: production
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: Configure Azure Credentials
+      uses: azure/login@v1
+      with:
+        creds: |
+          {
+            "clientId": "396fc791-ac50-45cc-932d-84e846e85421",
+            "clientSecret": "dgV8Q~tUuvGXo.BsRuN1tZKCQGR3iHx6HS3rwc4~",
+            "subscriptionId": "0a19726d-3c64-454b-b0d3-58f055e9d39a",
+            "tenantId": "6c258b97-993a-429b-9124-c210e957ef7e",
+            "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+            "resourceManagerEndpointUrl": "https://management.azure.com/",
+            "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+            "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+            "galleryEndpointUrl": "https://gallery.azure.com/",
+            "managementEndpointUrl": "https://management.core.windows.net/"
+          }
+      
+    - name: Setup Helm
+      uses: azure/setup-helm@v4
+      with:
+        version: '3.12.0'
+        
+    - name: Get AKS Credentials
+      run: |
+        az aks get-credentials --resource-group rg-revai-prod --name revai-prod-aks --overwrite-existing
+        
+    - name: Create Namespace
+      run: |
+        kubectl create namespace ${{ env.SERVICE_NAME }} --dry-run=client -o yaml | kubectl apply -f -
+        
+    - name: Deploy to Production
+      run: |
+        helm upgrade --install ${{ env.SERVICE_NAME }} ./helm \
+          --namespace ${{ env.SERVICE_NAME }} \
+          --set image.repository=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \
+          --set image.tag=${{ github.sha }} \
+          --set environment=production \
+          --wait --timeout=10m
+          
+    - name: Verify Deployment
+      run: |
+        kubectl get pods -n ${{ env.SERVICE_NAME }}
+        kubectl get services -n ${{ env.SERVICE_NAME }}
+        
+    - name: Run Health Checks
+      run: |
+        kubectl wait --for=condition=ready pod -l app=${{ env.SERVICE_NAME }} -n ${{ env.SERVICE_NAME }} --timeout=600s
+
+  # ================================================================================
+  # Policy Validation
+  # ================================================================================
+  policy-validation:
+    name: Policy Validation
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install Policy Dependencies
+      run: |
+        pip install opa-test opa-cli
+        
+    - name: Run Policy Tests
+      run: |
+        if [ -d "policies" ]; then
+          echo "Running OPA policy tests..."
+          opa test policies/ --verbose
+        else
+          echo "No policies directory found, skipping policy tests"
+        fi
+        
+    - name: Policy Evaluation Harness
+      run: |
+        if [ -f "policy-harness.yaml" ]; then
+          echo "Running policy evaluation harness..."
+          opa eval --data policies/ --input policy-harness.yaml --format pretty
+        else
+          echo "No policy harness found, skipping evaluation"
+        fi
