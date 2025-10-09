@@ -33,6 +33,7 @@ jobs:
     strategy:
       matrix:
         environment: [dev, uat, prod]
+      fail-fast: false
     
     steps:
     - name: Checkout
@@ -56,7 +57,14 @@ jobs:
       working-directory: ./infra/terraform/environments/${{ matrix.environment == 'uat' && 'staging' || matrix.environment }}
       
     - name: Terraform Plan
-      run: terraform plan -var-file="dev.tfvars" -out=tfplan
+      run: |
+        if [ "${{ matrix.environment }}" = "dev" ]; then
+          terraform plan -var-file="dev.tfvars" -out=tfplan
+        elif [ "${{ matrix.environment }}" = "uat" ]; then
+          terraform plan -var-file="staging.tfvars" -out=tfplan
+        else
+          terraform plan -var-file="prod.tfvars" -out=tfplan
+        fi
       working-directory: ./infra/terraform/environments/${{ matrix.environment == 'uat' && 'staging' || matrix.environment }}
       
     - name: Upload Terraform Plan
