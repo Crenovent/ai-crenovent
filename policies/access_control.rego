@@ -11,43 +11,43 @@ allow {
 # Allow read access for valid users
 allow {
     input.action == "read"
-    input.user in valid_users
-    input.resource in readable_resources
+    valid_users[input.user]
+    readable_resources[input.resource]
 }
 
 # Allow write access for specific users
 allow {
     input.action == "write"
-    input.user in write_users
-    input.resource in writable_resources
+    write_users[input.user]
+    writable_resources[input.resource]
     input.environment == "production"
 }
 
-# Valid users list
-valid_users := [
+# Valid users set
+valid_users := {
     "alice",
     "bob",
     "charlie"
-]
+}
 
-# Users with write permissions
-write_users := [
+# Users with write permissions set
+write_users := {
     "alice",
     "admin"
-]
+}
 
-# Readable resources
-readable_resources := [
+# Readable resources set
+readable_resources := {
     "data",
     "logs",
     "metrics"
-]
+}
 
-# Writable resources
-writable_resources := [
+# Writable resources set
+writable_resources := {
     "data",
     "config"
-]
+}
 
 # Deny access to sensitive resources
 deny {
@@ -58,13 +58,13 @@ deny {
 # Environment-based access control
 allow {
     input.environment == "development"
-    input.user in valid_users
+    valid_users[input.user]
 }
 
 # Time-based access control (example)
 allow {
     input.action == "read"
-    input.user in valid_users
+    valid_users[input.user]
     hour := time.clock(input.time)[0]
     hour >= 9
     hour <= 17
