@@ -90,15 +90,15 @@ resource "azurerm_container_registry" "main" {
   tags                = local.common_tags
 }
 
-# Service Bus
-resource "azurerm_servicebus_namespace" "main" {
-  name                         = "sb-revai-${local.environment}"
-  location                     = azurerm_resource_group.main.location
-  resource_group_name          = azurerm_resource_group.main.name
-  sku                          = "Premium"
-  premium_messaging_partitions = 4
-  tags                         = local.common_tags
-}
+# Service Bus - Commented out for now
+# resource "azurerm_servicebus_namespace" "main" {
+#   name                         = "sb-revai-${local.environment}"
+#   location                     = azurerm_resource_group.main.location
+#   resource_group_name          = azurerm_resource_group.main.name
+#   sku                          = "Premium"
+#   premium_messaging_partitions = 4
+#   tags                         = local.common_tags
+# }
 
 # Outputs
 output "resource_group_name" {
