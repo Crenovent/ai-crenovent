@@ -15,8 +15,8 @@ RUN npm install --omit=dev && npm cache clean --force
 COPY src/ ./src/
 
 # Create non-root user
-RUN addgroup -g 1000 appgroup && \
-    adduser -u 1000 -G appgroup -s /bin/sh -D appuser
+RUN addgroup -g 1001 appgroup && \
+    adduser -u 1001 -G appgroup -s /bin/sh -D appuser
 
 # Change ownership
 RUN chown -R appuser:appgroup /app
