@@ -11,14 +11,14 @@ name: Policy Pack CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
     paths:
       - 'policies/**'
       - 'tests/**'
       - 'policy-harness.yaml'
       - '.github/workflows/policy-ci-cd.yml'
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
     paths:
       - 'policies/**'
       - 'tests/**'

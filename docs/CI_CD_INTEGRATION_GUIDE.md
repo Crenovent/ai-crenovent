@@ -13,7 +13,7 @@ This guide explains how the PLAT-CICD-003 templates integrate with your existing
 - **Service**: `RevAI-AI-mainV2`
 
 ### 2. New Microservice CI/CD (`microservice-ci-cd.yml`)
-- **Triggers**: `develop` branch pushes, PRs to `main`/`develop`
+- **Triggers**: `main` branch pushes, PRs to `main`
 - **Target**: Kubernetes (AKS) or Azure App Service fallback
 - **Registry**: `acrrevaiprod.azurecr.io`
 - **Focus**: Microservices in `/microservices/` directory
@@ -33,7 +33,7 @@ This guide explains how the PLAT-CICD-003 templates integrate with your existing
 
 ✅ **Different Environments**: 
 - `deployment.yml`: Production (Azure App Service)
-- `microservice-ci-cd.yml`: Staging (Kubernetes/App Service fallback)
+- `microservice-ci-cd.yml`: Production (Kubernetes/App Service fallback)
 
 ✅ **Different Registries**:
 - `deployment.yml`: `acrnewcrenoaiapp.azurecr.io`
@@ -57,7 +57,7 @@ mkdir -p microservices/user-service
 # Add microservice code
 git add microservices/
 git commit -m "Add user microservice"
-git push origin develop
+git push origin main
 # → Triggers microservice-ci-cd.yml only
 ```
 
@@ -100,18 +100,23 @@ microservices/
 
 ## Deployment Flow
 
-### Development → Staging
-1. Developer pushes to `develop` branch
+### Main Application → Production
+1. Developer pushes to `main` branch
+2. `deployment.yml` triggers (existing workflow)
+3. Deploys main application to Azure App Service
+
+### Microservices → Production
+1. Developer pushes microservice changes to `main` branch
 2. `microservice-ci-cd.yml` triggers
 3. Builds microservice container
 4. Pushes to `acrrevaiprod.azurecr.io`
 5. Deploys to Kubernetes (if AKS exists) or App Service fallback
 
-### Staging → Production
-1. Merge `develop` → `main`
-2. `deployment.yml` triggers (existing workflow)
-3. Deploys main application to Azure App Service
-4. Microservices can be deployed separately if needed
+### Policies → Validation
+1. Developer pushes policy changes to `main` branch
+2. `policy-ci-cd.yml` triggers
+3. Validates policies and runs tests
+4. Blocks merge if policies fail validation
 
 ## Configuration
 

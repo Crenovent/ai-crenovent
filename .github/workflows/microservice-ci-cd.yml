@@ -11,13 +11,13 @@ name: Microservice CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
     paths:
       - 'microservices/**'
       - 'helm/**'
       - '.github/workflows/microservice-ci-cd.yml'
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
     paths:
       - 'microservices/**'
       - 'helm/**'
@@ -27,10 +27,9 @@ on:
       environment:
         description: 'Target environment'
         required: true
-        default: 'staging'
+        default: 'production'
         type: choice
         options:
-        - staging
         - production
 
 env:
@@ -161,14 +160,14 @@ jobs:
         sarif_file: 'trivy-results.sarif'
 
   # ================================================================================
-  # CD: Deploy to Staging (Kubernetes)
+  # CD: Deploy to Production (Kubernetes or App Service)
   # ================================================================================
-  cd-deploy-staging:
-    name: CD - Deploy to Staging
+  cd-deploy-production:
+    name: CD - Deploy to Production
     runs-on: ubuntu-latest
-    if: (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main') && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: [ci-build-test]
-    environment: staging
+    environment: production
     
     steps:
     - name: Checkout Code
@@ -199,8 +198,8 @@ jobs:
     - name: Get AKS Credentials
       run: |
         # Check if AKS cluster exists, if not skip Kubernetes deployment
-        if az aks list --resource-group rg-revai-staging --query "[].name" -o tsv | grep -q "revai-staging-aks"; then
-          az aks get-credentials --resource-group rg-revai-staging --name revai-staging-aks --overwrite-existing
+        if az aks list --resource-group rg-revai-prod --query "[].name" -o tsv | grep -q "revai-prod-aks"; then
+          az aks get-credentials --resource-group rg-revai-prod --name revai-prod-aks --overwrite-existing
           echo "AKS_CLUSTER_EXISTS=true" >> $GITHUB_ENV
         else
           echo "AKS cluster not found, skipping Kubernetes deployment"
@@ -210,20 +209,20 @@ jobs:
     - name: Deploy to Kubernetes (if AKS exists)
       if: env.AKS_CLUSTER_EXISTS == 'true'
       run: |
-        kubectl create namespace ${{ env.SERVICE_NAME }}-staging --dry-run=client -o yaml | kubectl apply -f -
+        kubectl create namespace ${{ env.SERVICE_NAME }} --dry-run=client -o yaml | kubectl apply -f -
         
         helm upgrade --install ${{ env.SERVICE_NAME }} ./helm/microservice-template \
-          --namespace ${{ env.SERVICE_NAME }}-staging \
+          --namespace ${{ env.SERVICE_NAME }} \
           --set image.repository=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \
           --set image.tag=${{ github.sha }} \
-          --set environment=staging \
-          --wait --timeout=5m
+          --set environment=production \
+          --wait --timeout=10m
           
     - name: Verify Kubernetes Deployment
       if: env.AKS_CLUSTER_EXISTS == 'true'
       run: |
-        kubectl get pods -n ${{ env.SERVICE_NAME }}-staging
-        kubectl get services -n ${{ env.SERVICE_NAME }}-staging
+        kubectl get pods -n ${{ env.SERVICE_NAME }}
+        kubectl get services -n ${{ env.SERVICE_NAME }}
         
     - name: Deploy to Azure App Service (Fallback)
       if: env.AKS_CLUSTER_EXISTS == 'false'
@@ -234,8 +233,8 @@ jobs:
         echo "Using existing App Service deployment workflow for microservices"
 
   # ================================================================================
-  # Note: Production deployment is handled by existing deployment.yml workflow
-  # This microservice CI/CD pipeline focuses on staging/testing microservices
+  # Note: This microservice CI/CD pipeline handles microservices deployment
+  # Main application deployment is handled by existing deployment.yml workflow
   # ================================================================================
 
   # ================================================================================
