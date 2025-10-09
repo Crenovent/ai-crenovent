@@ -55,13 +55,19 @@ jobs:
     - name: Configure Azure Credentials
       uses: azure/login@v1
       with:
-        client-id: '396fc791-ac50-45cc-932d-84e846e85421'
-        tenant-id: '6c258b97-993a-429b-9124-c210e957ef7e'
-        subscription-id: '0a19726d-3c64-454b-b0d3-58f055e9d39a'
-        client-secret: 'dgV8Q~tUuvGXo.BsRuN1tZKCQGR3iHx6HS3rwc4~'
-        enable-AzPSSession: false
-        allow-no-subscriptions: false
-        auth-type: 'SERVICE_PRINCIPAL'
+        creds: |
+          {
+            "clientId": "396fc791-ac50-45cc-932d-84e846e85421",
+            "clientSecret": "dgV8Q~tUuvGXo.BsRuN1tZKCQGR3iHx6HS3rwc4~",
+            "subscriptionId": "0a19726d-3c64-454b-b0d3-58f055e9d39a",
+            "tenantId": "6c258b97-993a-429b-9124-c210e957ef7e",
+            "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+            "resourceManagerEndpointUrl": "https://management.azure.com/",
+            "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+            "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+            "galleryEndpointUrl": "https://gallery.azure.com/",
+            "managementEndpointUrl": "https://management.core.windows.net/"
+          }
 
         
     - name: Terraform Format Check
@@ -231,13 +237,19 @@ jobs:
     - name: Configure Azure Credentials
       uses: azure/login@v1
       with:
-        client-id: '396fc791-ac50-45cc-932d-84e846e85421'
-        tenant-id: '6c258b97-993a-429b-9124-c210e957ef7e'
-        subscription-id: '0a19726d-3c64-454b-b0d3-58f055e9d39a'
-        client-secret: 'dgV8Q~tUuvGXo.BsRuN1tZKCQGR3iHx6HS3rwc4~'
-        enable-AzPSSession: false
-        allow-no-subscriptions: false
-        auth-type: 'SERVICE_PRINCIPAL'
+        creds: |
+          {
+            "clientId": "396fc791-ac50-45cc-932d-84e846e85421",
+            "clientSecret": "dgV8Q~tUuvGXo.BsRuN1tZKCQGR3iHx6HS3rwc4~",
+            "subscriptionId": "0a19726d-3c64-454b-b0d3-58f055e9d39a",
+            "tenantId": "6c258b97-993a-429b-9124-c210e957ef7e",
+            "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+            "resourceManagerEndpointUrl": "https://management.azure.com/",
+            "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+            "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+            "galleryEndpointUrl": "https://gallery.azure.com/",
+            "managementEndpointUrl": "https://management.core.windows.net/"
+          }
         
     - name: Terraform Init
       run: terraform init
