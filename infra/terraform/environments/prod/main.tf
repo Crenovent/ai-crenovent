@@ -68,12 +68,12 @@ resource "azurerm_container_registry" "main" {
 
 # Service Bus
 resource "azurerm_servicebus_namespace" "main" {
-  name                = "sb-revai-${local.environment}"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-  sku                 = "Premium"
+  name                         = "sb-revai-${local.environment}"
+  location                     = azurerm_resource_group.main.location
+  resource_group_name          = azurerm_resource_group.main.name
+  sku                          = "Premium"
   premium_messaging_partitions = 4
-  tags                = local.common_tags
+  tags                         = local.common_tags
 }
 
 # Outputs
