@@ -697,7 +697,7 @@ def create_test_manifest_with_secrets():
         'version': '1.0.0',
         'created_at': '2024-01-15T10:00:00Z',
         'deployment_config': {
-            'aws_access_key_id': os.getenv("SLACK_WEBHOOK_URL"),  # AWS access key
+            'aws_access_key_id': os.getenv("AWS_ACCESS_KEY_ID"),  # AWS access key
             'aws_secret_access_key': os.getenv("AWS_SECRET_ACCESS_KEY"),  # AWS secret
             'SLACK_WEBHOOK' : os.getenv("SLACK_WEBHOOK_URL"),
         },
