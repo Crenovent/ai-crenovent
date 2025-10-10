@@ -96,3 +96,4 @@ class ResidencyAwareIncludeGuard:
                 self.logger.warning(f"Blocked import: {import_path} - {violations[0].message}")
         
         return allowed_imports
+

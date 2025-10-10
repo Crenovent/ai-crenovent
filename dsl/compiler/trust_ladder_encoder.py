@@ -197,3 +197,4 @@ class TrustLadderEncoder:
                 execution_modes.get('blocked', 0)
             ])
         }
+

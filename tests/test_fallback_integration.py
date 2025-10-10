@@ -334,3 +334,4 @@ class TestFallbackPerformance:
 if __name__ == "__main__":
     # Run the tests
     pytest.main([__file__, "-v"])
+

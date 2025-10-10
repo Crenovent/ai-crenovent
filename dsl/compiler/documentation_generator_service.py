@@ -1470,3 +1470,4 @@ def run_documentation_generator_tests():
 
 if __name__ == "__main__":
     run_documentation_generator_tests()
+

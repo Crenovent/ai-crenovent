@@ -270,3 +270,4 @@ class TriggerEvaluationEngine:
             response = self.evaluate_trigger(request)
             responses.append(response)
         return responses
+

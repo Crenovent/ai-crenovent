@@ -136,3 +136,4 @@ async def get_fallback_status(fallback_id: str):
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "service": "Fallback Engine Orchestrator", "task": "6.4.4"}
+

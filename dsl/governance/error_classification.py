@@ -266,3 +266,4 @@ class ErrorClassificationMap:
         if definition:
             return definition.message_template.format(details=details)
         return f"Unknown error: {details}"
+

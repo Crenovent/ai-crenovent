@@ -283,3 +283,4 @@ class CostAnnotationService:
             'cost_trend': 'stable',  # Would be calculated from historical data
             'generated_at': ir_data.get('metadata', {}).get('generated_at')
         }
+

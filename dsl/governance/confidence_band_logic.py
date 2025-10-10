@@ -212,3 +212,4 @@ class ConfidenceBandService:
         if self.logic.is_in_gray_zone(confidence_score, workflow_type):
             return self.logic._get_assisted_mode_config(workflow_type, confidence_score)
         return {}
+

@@ -264,3 +264,4 @@ class ConversationalIntentsMappingService:
                     break
         
         return suggestions
+

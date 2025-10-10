@@ -1217,3 +1217,4 @@ def run_ir_pretty_printer_tests():
 
 if __name__ == "__main__":
     run_ir_pretty_printer_tests()
+

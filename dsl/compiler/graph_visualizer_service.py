@@ -1388,3 +1388,4 @@ def run_graph_visualizer_tests():
 
 if __name__ == "__main__":
     run_graph_visualizer_tests()
+

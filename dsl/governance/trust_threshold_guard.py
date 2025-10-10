@@ -190,3 +190,4 @@ class TrustThresholdGuardService:
         """Check if operation should be blocked"""
         thresholds = self.guard.get_trust_thresholds(risk_level)
         return trust_score < thresholds.min_trust_block
+

@@ -234,3 +234,4 @@ class ApprovalGatesService:
             'approval_complete': blocking_pending == 0,
             'approval_percentage': (approved_gates / total_gates * 100) if total_gates > 0 else 100
         }
+

@@ -481,3 +481,4 @@ if __name__ == "__main__":
         print(f"Language: {spanish_playbook.language}")
         print(f"Accessibility: {spanish_playbook.accessibility_level}")
         print(f"Content: {spanish_playbook.content[:200]}...")
+

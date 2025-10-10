@@ -334,3 +334,4 @@ error_handling:
             'auto_fix_percentage': (auto_fixable / total_suggestions * 100) if total_suggestions > 0 else 0,
             'issue_type_distribution': issue_type_counts
         }
+

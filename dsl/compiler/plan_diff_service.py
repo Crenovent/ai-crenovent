@@ -536,3 +536,4 @@ class PlanDiffService:
         
         should_block = len(blocking_reasons) > 0
         return should_block, blocking_reasons
+

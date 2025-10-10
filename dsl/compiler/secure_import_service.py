@@ -346,3 +346,4 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...
         }
         
         self.logger.info(f"Added trusted source: {name} ({base_url})")
+
