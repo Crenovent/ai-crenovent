@@ -1,0 +1,20 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Node Contract Schema",
+    "type": "object",
+    "properties": {
+      "node_id": {
+        "type": "string",
+        "description": "ML node identifier"
+      },
+      "supported_explanations": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": ["shap", "lime", "reason_codes"]
+        },
+        "description": "Explanation types supported by this node"
+      }
+    },
+    "required": ["node_id", "supported_explanations"]
+  }

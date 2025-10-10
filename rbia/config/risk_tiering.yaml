@@ -1,0 +1,13 @@
+risk_levels:
+  - name: low
+    description: "Minimal or no regulatory impact."
+    controls: [policy_lint, model_card]
+  - name: medium
+    description: "Operational automation with limited personal data."
+    controls: [policy_lint, model_card, drift_check]
+  - name: high
+    description: "Models affecting financial, legal, or personal outcomes."
+    controls: [model_card, bias_check, drift_check, approvals, evidence_pack]
+  - name: critical
+    description: "Models with systemic or high regulatory impact."
+    controls: [bias_check, drift_check, approvals, SoD, DPIA, CAB_signoff, kill_switch]

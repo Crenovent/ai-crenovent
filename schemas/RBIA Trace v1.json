@@ -1,0 +1,157 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "RBIA Trace Schema v1.0",
+    "description": "Canonical schema for RBIA traces capturing workflow execution, ML I/O, justifications, and governance metadata.",
+    "type": "object",
+    "properties": {
+      "trace_id": {
+        "type": "string",
+        "format": "uuid",
+        "description": "Unique ID for this trace event"
+      },
+      "workflow_id": {
+        "type": "string",
+        "description": "ID of the workflow being executed"
+      },
+      "node_id": {
+        "type": "string",
+        "description": "ID of the specific node/step inside the workflow"
+      },
+      "tenant_id": {
+        "type": "string",
+        "description": "Tenant identifier for multi-tenancy isolation"
+      },
+      "region_id": {
+        "type": "string",
+        "description": "Region identifier for data residency (e.g. EU, APAC)"
+      },
+      "plan_hash": {
+        "type": "string",
+        "description": "Hash of workflow plan/config version for reproducibility"
+      },
+      "persona": {
+        "type": "string",
+        "description": "Persona/actor that triggered execution (CRO, RevOpsBot, Analyst)"
+      },
+      "timestamps": {
+        "type": "object",
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "executed_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["created_at", "executed_at"]
+      },
+      "rule_execution_path": {
+        "type": "array",
+        "description": "Deterministic rule evaluations from RBA",
+        "items": {
+          "type": "object",
+          "properties": {
+            "rule_id": { "type": "string" },
+            "condition": { "type": "string" },
+            "outcome": { "type": "string" }
+          },
+          "required": ["rule_id", "condition", "outcome"]
+        }
+      },
+      "ml_input": {
+        "type": "object",
+        "description": "Snapshot of ML features at decision time",
+        "properties": {
+          "features": { "type": "object" },
+          "metadata": { "type": "object" }
+        }
+      },
+      "ml_output": {
+        "type": "object",
+        "description": "Snapshot of ML model outputs",
+        "properties": {
+          "prediction": { "type": "string" },
+          "confidence": { "type": "number" },
+          "threshold": { "type": "number" },
+          "model_id": { "type": "string" },
+          "model_version": { "type": "string" }
+        }
+      },
+      "justifications": {
+        "type": "array",
+        "description": "Reason codes and explanations for ML/RBA decisions",
+        "items": {
+          "type": "object",
+          "properties": {
+            "reason_code": { "type": "string" },
+            "explanation_text": { "type": "string" },
+            "shap_ref": { "type": "string" },
+            "lime_ref": { "type": "string" }
+          },
+          "required": ["reason_code"]
+        }
+      },
+      "fallback": {
+        "type": "object",
+        "description": "Fallback execution details",
+        "properties": {
+          "trigger": { "type": "string" },
+          "fallback_path": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      },
+      "override": {
+        "type": "object",
+        "description": "Human override details",
+        "properties": {
+          "actor": { "type": "string" },
+          "reason": { "type": "string" },
+          "justification": { "type": "string" },
+          "sod_proof": { "type": "string" }
+        }
+      },
+      "trust_score": {
+        "type": "number",
+        "description": "Calculated trust score at decision time"
+      },
+      "policy_pack": {
+        "type": "object",
+        "description": "Applied governance policies",
+        "properties": {
+          "residency": { "type": "string" },
+          "thresholds": { "type": "object" },
+          "sod_ids": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "sod_metadata": {
+        "type": "object",
+        "description": "Segregation of Duties metadata",
+        "properties": {
+          "author_id": { "type": "string" },
+          "approver_id": { "type": "string" },
+          "executor_persona": { "type": "string" }
+        }
+      },
+      "evidence_uri": {
+        "type": "object",
+        "description": "External linkage for audit evidence",
+        "properties": {
+          "hash": { "type": "string" },
+          "location": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "required": [
+      "trace_id",
+      "workflow_id",
+      "node_id",
+      "tenant_id",
+      "region_id",
+      "plan_hash",
+      "timestamps"
+    ]
+  }
+  

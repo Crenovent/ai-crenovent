@@ -1,0 +1,148 @@
+# Policy Snippet Library - Task 6.5.76
+# Reusable governance snippets for common policies
+
+# Confidence Thresholds
+confidence_high_risk:
+  confidence_threshold: 0.9
+  min_confidence_auto: 0.95
+  assisted_mode_below: 0.8
+
+confidence_medium_risk:
+  confidence_threshold: 0.8
+  min_confidence_auto: 0.85
+  assisted_mode_below: 0.7
+
+confidence_low_risk:
+  confidence_threshold: 0.7
+  min_confidence_auto: 0.75
+  assisted_mode_below: 0.6
+
+# Kill Switch Patterns
+kill_switch_financial:
+  enabled: true
+  conditions:
+    - amount_threshold: 100000
+    - confidence_below: 0.9
+  action: "immediate_halt"
+  notification_required: true
+
+kill_switch_compliance:
+  enabled: true
+  conditions:
+    - policy_violation: true
+    - audit_flag: true
+  action: "immediate_halt"
+  escalation_required: true
+
+# Assisted Mode Triggers
+assisted_mode_complex:
+  required_if:
+    - complexity_score: ">= 0.8"
+    - multiple_stakeholders: true
+    - financial_impact: ">= 50000"
+
+assisted_mode_regulatory:
+  required_if:
+    - compliance_framework: ["SOX", "GDPR"]
+    - data_sensitivity: "high"
+    - cross_border: true
+
+# Trust Budget Configurations
+trust_budget_strict:
+  min_trust_score: 0.9
+  decay_rate: 0.1
+  recovery_threshold: 0.95
+
+trust_budget_moderate:
+  min_trust_score: 0.7
+  decay_rate: 0.05
+  recovery_threshold: 0.8
+
+trust_budget_lenient:
+  min_trust_score: 0.5
+  decay_rate: 0.02
+  recovery_threshold: 0.6
+
+# Evidence Requirements
+evidence_full_audit:
+  evidence_capture: true
+  evidence_pack_required: true
+  retention_years: 7
+  digital_signature: true
+
+evidence_standard:
+  evidence_capture: true
+  evidence_pack_required: false
+  retention_years: 3
+  digital_signature: false
+
+# SLA Configurations
+sla_critical:
+  sla_tier: "T0"
+  sla_budget_ms: 500
+  timeout_ms: 1000
+  retry_attempts: 3
+
+sla_important:
+  sla_tier: "T1"
+  sla_budget_ms: 2000
+  timeout_ms: 5000
+  retry_attempts: 2
+
+sla_standard:
+  sla_tier: "T2"
+  sla_budget_ms: 10000
+  timeout_ms: 30000
+  retry_attempts: 1
+
+# Fallback Patterns
+fallback_ml_to_rba:
+  enabled: true
+  fallback:
+    - type: "rba_rule"
+      target: "deterministic_backup"
+      condition: "confidence < 0.7"
+    - type: "human_escalation"
+      target: "manual_review"
+      condition: "error"
+
+fallback_with_approval:
+  enabled: true
+  fallback:
+    - type: "rba_rule"
+      target: "rule_based_decision"
+      condition: "confidence < 0.8"
+    - type: "human_escalation"
+      target: "approval_workflow"
+      condition: "high_risk"
+
+# Compliance Patterns
+sox_compliance:
+  policy_pack: "sox_financial_controls"
+  evidence_capture: true
+  approval_required: true
+  approver_roles: ["finance_manager", "cfo"]
+  segregation_of_duties: true
+
+gdpr_compliance:
+  policy_pack: "gdpr_data_privacy"
+  data_residency: "eu_west"
+  consent_required: true
+  purpose_limitation: true
+  data_minimization: true
+
+# Regional Patterns
+us_residency:
+  region_id: "us_east"
+  data_residency: "us"
+  compliance_frameworks: ["SOX", "CCPA"]
+
+eu_residency:
+  region_id: "eu_west"
+  data_residency: "eu"
+  compliance_frameworks: ["GDPR", "DPA"]
+
+apac_residency:
+  region_id: "apac_southeast"
+  data_residency: "apac"
+  compliance_frameworks: ["PDPA", "DPDP"]

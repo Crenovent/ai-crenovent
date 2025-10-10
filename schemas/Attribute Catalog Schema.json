@@ -1,0 +1,57 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "RBIA Attribute Catalog Schema v1",
+    "description": "Canonical metadata schema for intelligent attributes linked to ontology entities. All entity-specific attributes (Opportunity, Loan, Claim, etc.) must conform to this structure.",
+    "type": "object",
+    "required": [
+      "entity_type",
+      "attr_name",
+      "attr_type",
+      "description",
+      "model_id",
+      "industry",
+      "policy_pack"
+    ],
+    "properties": {
+      "entity_type": {
+        "type": "string",
+        "enum": ["account", "opportunity", "loan", "claim", "invoice", "order"],
+        "description": "Ontology entity this attribute belongs to (as defined in canonical entity list from task 7.2.1)."
+      },
+      "attr_name": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_]+$",
+        "description": "Name of the intelligent attribute (e.g., churn_score, credit_score, anomaly_flag)."
+      },
+      "attr_type": {
+        "type": "string",
+        "enum": ["number", "boolean", "string", "categorical", "vector", "json"],
+        "description": "Data type of the attribute value."
+      },
+      "description": {
+        "type": "string",
+        "description": "Human-readable explanation of what the attribute represents and how it is derived."
+      },
+      "model_id": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]+(@[0-9]+\\.[0-9]+\\.[0-9]+)?$",
+        "description": "Identifier of the model producing this attribute, optionally version pinned (e.g., model_churn@1.0.0)."
+      },
+      "industry": {
+        "type": ["string", "array"],
+        "items": { "type": "string" },
+        "description": "Industry overlays this attribute applies to (e.g., 'SaaS', 'Banking', 'Insurance')."
+      },
+      "policy_pack": {
+        "type": "string",
+        "description": "Policy or compliance pack applied to this attribute (e.g., gdpr_v1, aml_pack)."
+      },
+      "metadata": {
+        "type": "object",
+        "description": "Optional extended metadata (stored as JSONB in Postgres). Can include references such as feature_schema_ref, retrain_frequency, threshold_bounds, or explainability links.",
+        "additionalProperties": true
+      }
+    },
+    "additionalProperties": false
+  }
+  

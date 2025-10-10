@@ -1,0 +1,180 @@
+# Example RBIA Workflow with ML Primitives
+# Demonstrates the use of predict, score, classify, and explain operators
+
+workflow_id: "saas_churn_analysis_workflow"
+name: "SaaS Churn Risk Analysis with ML Intelligence"
+module: "revenue_operations"
+automation_type: "RBIA"
+version: "1.0.0"
+
+governance:
+  tenant_id: "saas_company_001"
+  region_id: "us-west-2"
+  sla_tier: "T1"
+  policy_pack_id: "saas_governance_pack"
+  trust_score_threshold: 0.75
+  evidence_pack_required: true
+
+metadata:
+  description: "Comprehensive churn analysis workflow using ML primitives"
+  industry: "saas"
+  created_by: "ml_team"
+  tags: ["churn", "ml", "saas", "retention"]
+
+steps:
+  # Step 1: Data Collection and Preparation
+  - id: "collect_customer_data"
+    type: "query"
+    params:
+      query: "SELECT customer_id, days_since_last_login, mrr, support_tickets_count, feature_usage_score, contract_length_months, payment_history_score FROM customers WHERE last_activity_date >= CURRENT_DATE - INTERVAL '30 days'"
+      output_fields: ["customer_data"]
+    outputs:
+      customer_data: "customer_records"
+    governance:
+      policy_id: "data_access_policy"
+      evidence_capture: true
+
+  # Step 2: ML Churn Prediction
+  - id: "predict_churn_risk"
+    type: "ml_predict"
+    params:
+      model_id: "saas_churn_predictor_v2"
+      input_data: "{{ customer_data }}"
+      confidence_threshold: 0.8
+      explainability_enabled: true
+      fallback_enabled: true
+      fallback_rules:
+        - rule_type: "threshold"
+          condition: "mrr < 100"
+          action:
+            prediction: "high_risk"
+            confidence: 0.6
+            reason: "Low MRR fallback rule"
+    outputs:
+      prediction: "churn_prediction"
+      confidence: "prediction_confidence"
+      explanation: "prediction_explanation"
+    governance:
+      policy_id: "ml_governance_policy"
+      evidence_capture: true
+      bias_monitoring: true
+
+  # Step 3: ML Churn Scoring
+  - id: "score_churn_risk"
+    type: "ml_score"
+    params:
+      model_id: "saas_churn_predictor_v2"
+      input_data: "{{ customer_data }}"
+      score_range: [0, 100]
+      thresholds:
+        low: 30
+        medium: 60
+        high: 80
+      explainability_enabled: true
+    outputs:
+      score: "churn_score"
+      percentile: "score_percentile"
+      threshold_categories: "risk_categories"
+    governance:
+      policy_id: "ml_governance_policy"
+      evidence_capture: true
+
+  # Step 4: ML Classification for Risk Tiers
+  - id: "classify_risk_tier"
+    type: "ml_classify"
+    params:
+      model_id: "saas_churn_predictor_v2"
+      input_data: "{{ customer_data }}"
+      confidence_threshold: 0.75
+      class_mapping:
+        low_risk: "Low Risk"
+        medium_risk: "Medium Risk"
+        high_risk: "High Risk"
+        critical_risk: "Critical Risk"
+      explainability_enabled: true
+    outputs:
+      predicted_class: "risk_tier"
+      class_probabilities: "tier_probabilities"
+      confidence: "classification_confidence"
+    governance:
+      policy_id: "ml_governance_policy"
+      evidence_capture: true
+
+  # Step 5: ML Explanation Generation
+  - id: "explain_churn_prediction"
+    type: "ml_explain"
+    params:
+      model_id: "saas_churn_predictor_v2"
+      input_data: "{{ customer_data }}"
+      explanation_type: "shap"
+      explanation_params:
+        shap:
+          background_samples: 100
+          max_evals: 1000
+      explainability_enabled: true
+    outputs:
+      explanation_data: "shap_explanation"
+      feature_importance: "feature_contributions"
+      confidence: "explanation_confidence"
+    governance:
+      policy_id: "ml_governance_policy"
+      evidence_capture: true
+
+  # Step 6: Decision Logic Based on ML Results
+  - id: "determine_action"
+    type: "decision"
+    params:
+      expression: "churn_score > 70 and prediction_confidence > 0.8"
+      on_true: "high_risk_action"
+      on_false: "standard_monitoring"
+    outputs:
+      decision_result: "action_decision"
+      next_action: "recommended_action"
+
+  # Step 7: High Risk Customer Action
+  - id: "high_risk_action"
+    type: "notify"
+    params:
+      message: "High churn risk detected for customer {{ customer_data.customer_id }}. Risk score: {{ churn_score }}, Confidence: {{ prediction_confidence }}. Explanation: {{ shap_explanation.reasoning }}"
+      recipients: ["customer_success_team", "account_manager"]
+      priority: "high"
+      include_evidence: true
+    outputs:
+      notification_sent: "alert_sent"
+    governance:
+      policy_id: "notification_policy"
+      evidence_capture: true
+
+  # Step 8: Standard Monitoring
+  - id: "standard_monitoring"
+    type: "notify"
+    params:
+      message: "Customer {{ customer_data.customer_id }} in standard monitoring. Risk score: {{ churn_score }}"
+      recipients: ["customer_success_team"]
+      priority: "normal"
+    outputs:
+      notification_sent: "monitoring_alert_sent"
+
+  # Step 9: Log Results for Analysis
+  - id: "log_analysis_results"
+    type: "query"
+    params:
+      query: "INSERT INTO churn_analysis_logs (customer_id, churn_score, risk_tier, prediction_confidence, explanation_data, analysis_date) VALUES ({{ customer_data.customer_id }}, {{ churn_score }}, {{ risk_tier }}, {{ prediction_confidence }}, '{{ shap_explanation }}', CURRENT_TIMESTAMP)"
+    outputs:
+      logged: "analysis_logged"
+    governance:
+      policy_id: "data_retention_policy"
+      evidence_capture: true
+
+# Workflow execution flow
+execution_flow:
+  start: "collect_customer_data"
+  steps:
+    - from: "collect_customer_data"
+      to: ["predict_churn_risk", "score_churn_risk", "classify_risk_tier", "explain_churn_prediction"]
+    - from: ["predict_churn_risk", "score_churn_risk", "classify_risk_tier", "explain_churn_prediction"]
+      to: "determine_action"
+    - from: "determine_action"
+      to: ["high_risk_action", "standard_monitoring"]
+    - from: ["high_risk_action", "standard_monitoring"]
+      to: "log_analysis_results"
