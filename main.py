@@ -51,9 +51,9 @@ rba_hierarchy_router = None
 HIERARCHY_PROCESSOR_AVAILABLE = True  # Enable hierarchy processor for core CSV endpoints
 try:
     from api.rba_hierarchy_endpoint import router as rba_hierarchy_router
-    logging.info("✅ RBA Hierarchy Processor loaded successfully")
+    logging.info(" RBA Hierarchy Processor loaded successfully")
 except ImportError as e:
-    logging.warning(f"❌ RBA Hierarchy Processor not available: {e}")
+    logging.warning(f" RBA Hierarchy Processor not available: {e}")
     # Create a fallback router with basic health check
     from fastapi import APIRouter
     rba_hierarchy_router = APIRouter(prefix="/api/rba/hierarchy")
@@ -72,16 +72,16 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifecycle management"""
-    logger.info("🚀 Starting RevAI Pro Pipeline Agents...")
+    logger.info(" Starting RevAI Pro Pipeline Agents...")
     
     try:
         # Initialize connection pool with error handling
-        logger.info("📊 Initializing connection pool...")
+        logger.info(" Initializing connection pool...")
         pool_success = await pool_manager.initialize()
         
         if not pool_success or pool_manager.postgres_pool is None:
-            logger.error("❌ Failed to initialize database connection pool")
-            logger.info("🔄 Continuing with limited functionality (no database operations)")
+            logger.error(" Failed to initialize database connection pool")
+            logger.info(" Continuing with limited functionality (no database operations)")
             # Set a flag for limited mode
             app.state.database_available = False
             app.state.pool_manager = None
@@ -92,19 +92,19 @@ async def lifespan(app: FastAPI):
             app.state.multi_tenant_enforcer = None
             app.state.policy_engine = None
             
-            logger.info("✅ RevAI Pro Pipeline Agents initialized in LIMITED MODE!")
-            logger.warning("⚠️ Database operations disabled due to connection issues")
+            logger.info(" RevAI Pro Pipeline Agents initialized in LIMITED MODE!")
+            logger.warning(" Database operations disabled due to connection issues")
             yield
             return
         
         # Initialize Knowledge Graph Store
-        logger.info("🧠 Initializing Knowledge Graph Store...")
+        logger.info(" Initializing Knowledge Graph Store...")
         kg_store = KnowledgeGraphStore(pool_manager)
         try:
             await kg_store.initialize()
         except Exception as e:
-            logger.error(f"❌ Knowledge Graph initialization failed: {e}")
-            logger.info("🔄 Continuing without Knowledge Graph functionality")
+            logger.error(f" Knowledge Graph initialization failed: {e}")
+            logger.info(" Continuing without Knowledge Graph functionality")
             kg_store = None
         
         # Initialize Workflow Runtime with atomic pipeline agents
@@ -127,8 +127,8 @@ async def lifespan(app: FastAPI):
         try:
             await multi_tenant_enforcer.initialize()
         except Exception as e:
-            logger.error(f"❌ Multi-Tenant Enforcer initialization failed: {e}")
-            logger.info("🔄 Continuing without multi-tenant enforcement")
+            logger.error(f" Multi-Tenant Enforcer initialization failed: {e}")
+            logger.info(" Continuing without multi-tenant enforcement")
             multi_tenant_enforcer = None
         
         # Initialize Policy Engine (Chapter 16)
@@ -137,19 +137,19 @@ async def lifespan(app: FastAPI):
         try:
             await policy_engine.initialize()
         except Exception as e:
-            logger.error(f"❌ Policy Engine initialization failed: {e}")
-            logger.info("🔄 Continuing without policy enforcement")
+            logger.error(f" Policy Engine initialization failed: {e}")
+            logger.info(" Continuing without policy enforcement")
             policy_engine = None
         
         # Initialize Enhanced Execution Hub (Tasks 14.1.x, 15.x, 16.1.x)
-        logger.info("🚀 Initializing Enhanced Execution Hub...")
+        logger.info(" Initializing Enhanced Execution Hub...")
         execution_hub = ExecutionHub(pool_manager)
         try:
             await execution_hub.initialize()
-            logger.info("✅ Enhanced Execution Hub initialized with all SaaS intelligence components")
+            logger.info(" Enhanced Execution Hub initialized with all SaaS intelligence components")
         except Exception as e:
-            logger.error(f"❌ Enhanced Execution Hub initialization failed: {e}")
-            logger.info("🔄 Continuing without enhanced execution tracking")
+            logger.error(f" Enhanced Execution Hub initialization failed: {e}")
+            logger.info(" Continuing without enhanced execution tracking")
             execution_hub = None
         
         # Store in app state for access in endpoints
@@ -163,8 +163,8 @@ async def lifespan(app: FastAPI):
         app.state.policy_engine = policy_engine
         app.state.execution_hub = execution_hub
         
-        logger.info("✅ RevAI Pro Pipeline Agents initialized successfully!")
-        logger.info("🤖 Atomic agents loaded: Data + Analysis + Action agents")
+        logger.info(" RevAI Pro Pipeline Agents initialized successfully!")
+        logger.info(" Atomic agents loaded: Data + Analysis + Action agents")
         logger.info("🏛️ Pipeline policy integration: ACTIVE")
         
         if multi_tenant_enforcer:
@@ -174,18 +174,18 @@ async def lifespan(app: FastAPI):
             
         if policy_engine:
             logger.info("⚖️ Compliance frameworks: SOX, GDPR, HIPAA, RBI, DPDP, NAIC")
-            logger.info("📋 Evidence packs and override ledger: ACTIVE")
+            logger.info(" Evidence packs and override ledger: ACTIVE")
         else:
             logger.warning("⚖️ Compliance frameworks: DISABLED (initialization failed)")
-            logger.warning("📋 Evidence packs and override ledger: DISABLED")
+            logger.warning(" Evidence packs and override ledger: DISABLED")
         yield
         
     except Exception as e:
-        logger.error(f"❌ Failed to initialize application: {e}")
+        logger.error(f" Failed to initialize application: {e}")
         raise
     finally:
         # Cleanup on shutdown
-        logger.info("🔄 Shutting down RevAI Pro Pipeline Agents...")
+        logger.info(" Shutting down RevAI Pro Pipeline Agents...")
         if hasattr(pool_manager, 'postgres_pool') and pool_manager.postgres_pool:
             await pool_manager.postgres_pool.close()
 
@@ -218,9 +218,9 @@ app.include_router(parameter_router, tags=["Parameter Discovery"])
 if rba_hierarchy_router:
     app.include_router(rba_hierarchy_router, tags=["RBA Hierarchy Processing"])
     if HIERARCHY_PROCESSOR_AVAILABLE:
-        logging.info("✅ RBA Hierarchy endpoints registered")
+        logging.info(" RBA Hierarchy endpoints registered")
     else:
-        logging.warning("⚠️ RBA Hierarchy fallback router registered (limited functionality)")
+        logging.warning(" RBA Hierarchy fallback router registered (limited functionality)")
 
 # Include Pipeline Agents API (our new system)
 from api.workflow_builder_api import include_workflow_builder_routes
@@ -238,7 +238,7 @@ except ImportError:
 try:
     from api.rba_config_api import router as rba_config_router
     app.include_router(rba_config_router, tags=["RBA Configuration"])
-    logger.info("✅ RBA Configuration API loaded")
+    logger.info(" RBA Configuration API loaded")
 except ImportError:
     logger.warning("RBA Configuration API not found, skipping...")
 
@@ -246,7 +246,7 @@ except ImportError:
 try:
     from api.onboarding_workflow_api import router as onboarding_router
     app.include_router(onboarding_router, tags=["Onboarding Workflow"])
-    logger.info("✅ Onboarding Workflow API loaded")
+    logger.info(" Onboarding Workflow API loaded")
 except ImportError:
     logger.warning("Onboarding Workflow API not found, skipping...")
 
@@ -254,7 +254,7 @@ except ImportError:
 try:
     from api.feedback_api import router as feedback_router
     app.include_router(feedback_router, tags=["Feedback & Learning"])
-    logger.info("✅ Feedback API loaded")
+    logger.info(" Feedback API loaded")
 except ImportError:
     logger.warning("Feedback API not found, skipping...")
 
@@ -306,19 +306,19 @@ if HIERARCHY_PROCESSOR_AVAILABLE:
             llm_processor = CSVLLMProcessor()
             LLM_FALLBACK_AVAILABLE = llm_processor.client is not None
             if LLM_FALLBACK_AVAILABLE:
-                logger.info("✅ LLM Fallback Processor available")
+                logger.info(" LLM Fallback Processor available")
             else:
-                logger.warning("⚠️ LLM Fallback Processor initialized but no API key available")
+                logger.warning(" LLM Fallback Processor initialized but no API key available")
         except ImportError as e:
             LLM_FALLBACK_AVAILABLE = False
             llm_processor = None
-            logger.warning(f"⚠️ LLM Fallback Processor not available: {e}")
+            logger.warning(f" LLM Fallback Processor not available: {e}")
         
         @app.post("/api/hierarchy/normalize-csv-universal", tags=["Hierarchy Processor"])
         async def normalize_csv_universal(request: CSVProcessRequest):
             """Universal CSV normalization with intelligent RBA → LLM fallback"""
             try:
-                logger.info(f"🚀 Universal processing: {len(request.csv_data)} records from any HRMS")
+                logger.info(f" Universal processing: {len(request.csv_data)} records from any HRMS")
 
                 if not request.csv_data:
                     raise HTTPException(status_code=400, detail="CSV data is empty")
@@ -347,7 +347,7 @@ if HIERARCHY_PROCESSOR_AVAILABLE:
                     success_rate = valid_records / len(crenovent_df) if len(crenovent_df) > 0 else 0
                     
                     if success_rate >= 0.8:  # 80% success rate threshold
-                        logger.info(f"✅ RBA Universal Mapper succeeded with {success_rate:.1%} success rate")
+                        logger.info(f" RBA Universal Mapper succeeded with {success_rate:.1%} success rate")
                         normalized_data = crenovent_df.to_dict('records')
                         
                         return {
@@ -374,15 +374,15 @@ if HIERARCHY_PROCESSOR_AVAILABLE:
                             }
                         }
                     else:
-                        logger.warning(f"⚠️ RBA Universal Mapper had low success rate ({success_rate:.1%}), trying LLM fallback...")
+                        logger.warning(f" RBA Universal Mapper had low success rate ({success_rate:.1%}), trying LLM fallback...")
                         
                 except Exception as rba_error:
-                    logger.warning(f"⚠️ RBA Universal Mapper failed: {str(rba_error)}, trying LLM fallback...")
+                    logger.warning(f" RBA Universal Mapper failed: {str(rba_error)}, trying LLM fallback...")
                 
                 # Step 2: Try LLM Fallback if RBA failed or had low success rate
                 if LLM_FALLBACK_AVAILABLE:
                     try:
-                        logger.info("🤖 Attempting LLM Fallback Processor...")
+                        logger.info(" Attempting LLM Fallback Processor...")
                         
                         # Define target Crenovent columns
                         target_columns = [
@@ -422,7 +422,7 @@ if HIERARCHY_PROCESSOR_AVAILABLE:
                             
                             normalized_data = extracted_df.to_dict('records')
                             
-                            logger.info(f"✅ LLM Fallback succeeded: {len(normalized_data)} records processed")
+                            logger.info(f" LLM Fallback succeeded: {len(normalized_data)} records processed")
                             
                             return {
                                 "success": True,
@@ -446,12 +446,12 @@ if HIERARCHY_PROCESSOR_AVAILABLE:
                                 }
                             }
                         else:
-                            logger.error("❌ LLM Fallback: No columns could be mapped")
+                            logger.error(" LLM Fallback: No columns could be mapped")
                             
                     except Exception as llm_error:
-                        logger.error(f"❌ LLM Fallback failed: {str(llm_error)}")
+                        logger.error(f" LLM Fallback failed: {str(llm_error)}")
                 else:
-                    logger.warning("❌ LLM Fallback not available - missing dependencies")
+                    logger.warning(" LLM Fallback not available - missing dependencies")
                 
                 # If both RBA and LLM failed, return error
                 raise HTTPException(
@@ -462,7 +462,7 @@ if HIERARCHY_PROCESSOR_AVAILABLE:
             except HTTPException:
                 raise
             except Exception as e:
-                logger.error(f"❌ Universal processing completely failed: {str(e)}")
+                logger.error(f" Universal processing completely failed: {str(e)}")
                 raise HTTPException(status_code=500, detail=f"Universal processing failed: {str(e)}")
 
         @app.post("/api/hierarchy/normalize-csv", response_model=CSVProcessResponse, tags=["Hierarchy Processor"])
@@ -642,12 +642,12 @@ if HIERARCHY_PROCESSOR_AVAILABLE:
                 logger.error(f"Error detecting system: {str(e)}")
                 raise HTTPException(status_code=400, detail=f"Detection failed: {str(e)}")
         
-        logger.info("✅ Hierarchy Processor API loaded and integrated")
+        logger.info(" Hierarchy Processor API loaded and integrated")
         
     except ImportError as e:
         logger.warning(f"Failed to load Hierarchy Processor components: {e}")
 else:
-    logger.warning("❌ Hierarchy Processor not available - install requirements_hierarchy.txt")
+    logger.warning(" Hierarchy Processor not available - install requirements_hierarchy.txt")
 
 # Mount static files for UI (if directory exists)
 import os
@@ -666,13 +666,13 @@ async def root():
         "timestamp": datetime.utcnow().isoformat(),
         "features": [
             "🏛️ Policy-Aware Pipeline Agents",
-            "🤖 36+ Atomic Agents (Data + Analysis + Action)",
-            "🧠 Semantic Intent Parsing (LLM-powered)",
+            " 36+ Atomic Agents (Data + Analysis + Action)",
+            " Semantic Intent Parsing (LLM-powered)",
             "⚙️ DSL Compiler & Runtime Engine (Chapter 6.2)",
             "🎯 Smart Capability Registry Integration",
-            "🔗 Knowledge Graph Execution Tracing",
+            " Knowledge Graph Execution Tracing",
             "🏗️ Dynamic Workflow Composition",
-            "🛡️ Multi-tenant Governance & Compliance"
+            " Multi-tenant Governance & Compliance"
         ],
         "endpoints": {
             "pipeline_agents": "/api/pipeline/execute",
@@ -768,8 +768,8 @@ if __name__ == "__main__":
     # Log environment configuration
     config_summary = env_config.get_config_summary()
     logger.info(f"🌍 Environment: {config_summary['environment']}")
-    logger.info(f"🔗 Backend URL: {config_summary['backend_url']}")
-    logger.info(f"🚀 Starting server on {host}:{port}")
+    logger.info(f" Backend URL: {config_summary['backend_url']}")
+    logger.info(f" Starting server on {host}:{port}")
     
     uvicorn.run(
         "main:app",

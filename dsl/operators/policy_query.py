@@ -162,7 +162,7 @@ class PolicyAwareQueryOperator(BaseOperator):
     async def _fabric_fallback_query(self, query_type: str, data: dict, context: OperatorContext, config: dict) -> dict:
         """Fallback to direct Fabric query when backend is unavailable"""
         try:
-            logger.info(f"🔄 Executing Fabric fallback query for {query_type}")
+            logger.info(f"Executing Fabric fallback query for {query_type}")
             
             # Get Fabric service from context (pool manager)
             pool_manager = getattr(context, 'pool_manager', None)
@@ -243,7 +243,7 @@ class PolicyAwareQueryOperator(BaseOperator):
                 }
                 
         except Exception as e:
-            logger.error(f"❌ Fabric fallback failed: {e}")
+            logger.error(f"Fabric fallback failed: {e}")
             # Return minimal data to keep workflow running
             return {
                 'success': False,

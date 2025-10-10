@@ -99,13 +99,13 @@ class MultiTenantEnforcer:
             # Validate RLS policies are enabled
             await self._validate_rls_policies()
             
-            self.logger.info("✅ Multi-Tenant Enforcement Engine initialized successfully")
-            self.logger.info(f"🏢 Loaded {len(self.tenant_cache)} tenants into cache")
+            self.logger.info(" Multi-Tenant Enforcement Engine initialized successfully")
+            self.logger.info(f" Loaded {len(self.tenant_cache)} tenants into cache")
             
             return True
             
         except Exception as e:
-            self.logger.error(f"❌ Multi-Tenant Enforcement Engine initialization failed: {e}")
+            self.logger.error(f" Multi-Tenant Enforcement Engine initialization failed: {e}")
             return False
     
     async def set_tenant_context(self, tenant_id: int, user_id: int = None) -> bool:
@@ -123,11 +123,11 @@ class MultiTenantEnforcer:
             # Validate tenant exists and is active
             tenant = await self.get_tenant_metadata(tenant_id)
             if not tenant:
-                self.logger.error(f"❌ Invalid tenant_id: {tenant_id}")
+                self.logger.error(f" Invalid tenant_id: {tenant_id}")
                 return False
             
             if tenant.status != 'active':
-                self.logger.error(f"❌ Tenant {tenant_id} is not active: {tenant.status}")
+                self.logger.error(f" Tenant {tenant_id} is not active: {tenant.status}")
                 return False
             
             # Set tenant context in database session
@@ -145,7 +145,7 @@ class MultiTenantEnforcer:
             return True
             
         except Exception as e:
-            self.logger.error(f"❌ Failed to set tenant context: {e}")
+            self.logger.error(f" Failed to set tenant context: {e}")
             return False
     
     async def validate_tenant_access(self, tenant_id: int, resource_type: str, operation: str) -> bool:
@@ -164,18 +164,18 @@ class MultiTenantEnforcer:
             # Get tenant metadata
             tenant = await self.get_tenant_metadata(tenant_id)
             if not tenant:
-                self.logger.warning(f"⚠️ Access denied: Invalid tenant {tenant_id}")
+                self.logger.warning(f" Access denied: Invalid tenant {tenant_id}")
                 return False
             
             # Check tenant status
             if tenant.status != 'active':
-                self.logger.warning(f"⚠️ Access denied: Tenant {tenant_id} status is {tenant.status}")
+                self.logger.warning(f" Access denied: Tenant {tenant_id} status is {tenant.status}")
                 return False
             
             # Check trust score (Task 9.4.30)
             trust_score = await self._calculate_tenant_trust_score(tenant_id)
             if trust_score < self.enforcement_config['trust_threshold']:
-                self.logger.warning(f"⚠️ Access denied: Tenant {tenant_id} trust score {trust_score} below threshold")
+                self.logger.warning(f" Access denied: Tenant {tenant_id} trust score {trust_score} below threshold")
                 await self._log_tenant_access(tenant_id, None, 'access_denied_low_trust', {
                     'trust_score': trust_score,
                     'threshold': self.enforcement_config['trust_threshold'],
@@ -194,7 +194,7 @@ class MultiTenantEnforcer:
             return True
             
         except Exception as e:
-            self.logger.error(f"❌ Tenant access validation failed: {e}")
+            self.logger.error(f" Tenant access validation failed: {e}")
             return False
     
     async def get_tenant_metadata(self, tenant_id: int, use_cache: bool = True) -> Optional[TenantMetadata]:
@@ -246,7 +246,7 @@ class MultiTenantEnforcer:
                 return tenant
                 
         except Exception as e:
-            self.logger.error(f"❌ Failed to get tenant metadata for {tenant_id}: {e}")
+            self.logger.error(f" Failed to get tenant metadata for {tenant_id}: {e}")
             return None
     
     async def create_tenant(self, tenant_data: Dict[str, Any], created_by_user_id: int) -> Optional[TenantMetadata]:
@@ -305,12 +305,12 @@ class MultiTenantEnforcer:
                 # Create default policy packs for new tenant
                 await self._create_default_policy_packs(tenant.tenant_id, tenant.industry_code, tenant.region_code)
                 
-                self.logger.info(f"✅ Created new tenant: {tenant.tenant_id} ({tenant.tenant_name})")
+                self.logger.info(f" Created new tenant: {tenant.tenant_id} ({tenant.tenant_name})")
                 
                 return tenant
                 
         except Exception as e:
-            self.logger.error(f"❌ Failed to create tenant: {e}")
+            self.logger.error(f" Failed to create tenant: {e}")
             return None
     
     async def detect_cross_tenant_access(self, current_tenant_id: int, requested_resource_tenant_id: int) -> bool:
@@ -374,7 +374,7 @@ class MultiTenantEnforcer:
                 return trust_score
                 
         except Exception as e:
-            self.logger.error(f"❌ Failed to calculate tenant trust score: {e}")
+            self.logger.error(f" Failed to calculate tenant trust score: {e}")
             return 0.5  # Default to medium trust on error
     
     async def _ensure_database_schema(self) -> None:
@@ -390,11 +390,11 @@ class MultiTenantEnforcer:
                 """)
                 
                 if not exists:
-                    self.logger.warning("⚠️ tenant_metadata table not found - please run database migrations")
+                    self.logger.warning(" tenant_metadata table not found - please run database migrations")
                     # Could auto-create schema here if needed
                     
         except Exception as e:
-            self.logger.error(f"❌ Database schema validation failed: {e}")
+            self.logger.error(f" Database schema validation failed: {e}")
             raise
     
     async def _refresh_tenant_cache(self) -> None:
@@ -428,7 +428,7 @@ class MultiTenantEnforcer:
                     self.last_cache_refresh[tenant.tenant_id] = current_time
                 
         except Exception as e:
-            self.logger.error(f"❌ Failed to refresh tenant cache: {e}")
+            self.logger.error(f" Failed to refresh tenant cache: {e}")
     
     async def _validate_rls_policies(self) -> None:
         """Validate RLS policies are enabled on all multi-tenant tables"""
@@ -448,12 +448,12 @@ class MultiTenantEnforcer:
                     """, table_name)
                     
                     if not rls_enabled:
-                        self.logger.warning(f"⚠️ RLS not enabled on table: {table_name}")
+                        self.logger.warning(f" RLS not enabled on table: {table_name}")
                     else:
-                        self.logger.debug(f"✅ RLS enabled on table: {table_name}")
+                        self.logger.debug(f" RLS enabled on table: {table_name}")
                         
         except Exception as e:
-            self.logger.error(f"❌ RLS policy validation failed: {e}")
+            self.logger.error(f" RLS policy validation failed: {e}")
     
     async def _log_tenant_access(self, tenant_id: int, user_id: Optional[int], operation: str, metadata: Dict[str, Any] = None) -> None:
         """Log tenant access for audit trail"""
@@ -468,10 +468,10 @@ class MultiTenantEnforcer:
                 'metadata': metadata or {}
             }
             
-            self.logger.info(f"🔍 Tenant access log: {json.dumps(log_entry)}")
+            self.logger.info(f" Tenant access log: {json.dumps(log_entry)}")
             
         except Exception as e:
-            self.logger.error(f"❌ Failed to log tenant access: {e}")
+            self.logger.error(f" Failed to log tenant access: {e}")
     
     async def _create_default_policy_packs(self, tenant_id: int, industry_code: IndustryCode, region_code: RegionCode) -> None:
         """Create default policy packs for new tenant"""
@@ -510,10 +510,10 @@ class MultiTenantEnforcer:
                         1319  # System user
                     )
             
-            self.logger.info(f"✅ Created default policy packs for tenant {tenant_id}: {compliance_packs}")
+            self.logger.info(f" Created default policy packs for tenant {tenant_id}: {compliance_packs}")
             
         except Exception as e:
-            self.logger.error(f"❌ Failed to create default policy packs: {e}")
+            self.logger.error(f" Failed to create default policy packs: {e}")
     
     def _get_default_policy_rules(self, pack_type: str, industry_code: IndustryCode) -> Dict[str, Any]:
         """Get default policy rules for compliance pack"""

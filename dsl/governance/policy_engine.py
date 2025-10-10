@@ -166,13 +166,13 @@ class PolicyEngine:
             # Validate policy schemas
             await self._validate_policy_schemas()
             
-            self.logger.info("✅ Policy Engine initialized successfully")
-            self.logger.info(f"📋 Loaded {len(self.policy_cache)} policy packs into cache")
+            self.logger.info(" Policy Engine initialized successfully")
+            self.logger.info(f" Loaded {len(self.policy_cache)} policy packs into cache")
             
             return True
             
         except Exception as e:
-            self.logger.error(f"❌ Policy Engine initialization failed: {e}")
+            self.logger.error(f" Policy Engine initialization failed: {e}")
             return False
     
     async def enforce_policy(self, tenant_id: int, workflow_data: Dict[str, Any], context: Dict[str, Any] = None) -> Tuple[bool, List[PolicyViolation]]:
@@ -218,7 +218,7 @@ class PolicyEngine:
             else:
                 allowed = True
                 if violations:
-                    self.logger.info(f"⚠️ Operation allowed with {len(violations)} policy violations (advisory mode)")
+                    self.logger.info(f" Operation allowed with {len(violations)} policy violations (advisory mode)")
             
             # Log violations for audit trail
             for violation in violations:
@@ -227,7 +227,7 @@ class PolicyEngine:
             return allowed, violations
             
         except Exception as e:
-            self.logger.error(f"❌ Policy enforcement failed: {e}")
+            self.logger.error(f" Policy enforcement failed: {e}")
             # Fail closed - deny operation on error
             return False, []
     
@@ -298,12 +298,12 @@ class PolicyEngine:
                 self.policy_cache[cache_key] = policy_pack
                 self.last_cache_refresh[cache_key] = datetime.now().timestamp()
                 
-                self.logger.info(f"✅ Created policy pack: {pack_data['pack_name']} for tenant {tenant_id}")
+                self.logger.info(f" Created policy pack: {pack_data['pack_name']} for tenant {tenant_id}")
                 
                 return policy_pack
                 
         except Exception as e:
-            self.logger.error(f"❌ Failed to create policy pack: {e}")
+            self.logger.error(f" Failed to create policy pack: {e}")
             return None
     
     async def create_override(self, override_request: OverrideRequest) -> Optional[str]:
@@ -343,7 +343,7 @@ class PolicyEngine:
                     'pending' if override_request.approval_required else 'active'
                 )
                 
-                self.logger.info(f"✅ Created override request: {override_request.override_id}")
+                self.logger.info(f" Created override request: {override_request.override_id}")
                 
                 # Create evidence pack for override
                 await self._create_override_evidence_pack(override_request)
@@ -351,7 +351,7 @@ class PolicyEngine:
                 return override_request.override_id
                 
         except Exception as e:
-            self.logger.error(f"❌ Failed to create override: {e}")
+            self.logger.error(f" Failed to create override: {e}")
             return None
     
     async def generate_evidence_pack(self, tenant_id: int, pack_type: str, data: Dict[str, Any]) -> Optional[str]:
@@ -396,12 +396,12 @@ class PolicyEngine:
                     len(evidence_json)
                 )
                 
-                self.logger.info(f"✅ Generated evidence pack: {evidence_pack_id} for tenant {tenant_id}")
+                self.logger.info(f" Generated evidence pack: {evidence_pack_id} for tenant {tenant_id}")
                 
                 return evidence_pack_id
                 
         except Exception as e:
-            self.logger.error(f"❌ Failed to generate evidence pack: {e}")
+            self.logger.error(f" Failed to generate evidence pack: {e}")
             return None
     
     async def get_compliance_dashboard_data(self, tenant_id: int, framework: str = None) -> Dict[str, Any]:
@@ -505,7 +505,7 @@ class PolicyEngine:
                 return dashboard_data
                 
         except Exception as e:
-            self.logger.error(f"❌ Failed to get compliance dashboard data: {e}")
+            self.logger.error(f" Failed to get compliance dashboard data: {e}")
             return {}
     
     async def _get_tenant_policy_packs(self, tenant_id: int) -> List[PolicyPack]:
@@ -544,7 +544,7 @@ class PolicyEngine:
             return policy_packs
             
         except Exception as e:
-            self.logger.error(f"❌ Failed to get tenant policy packs: {e}")
+            self.logger.error(f" Failed to get tenant policy packs: {e}")
             return []
     
     async def _evaluate_policy_pack(self, policy_pack: PolicyPack, workflow_data: Dict[str, Any], context: Dict[str, Any]) -> List[PolicyViolation]:
@@ -563,7 +563,7 @@ class PolicyEngine:
                 violations.extend(await self._evaluate_hipaa_policies(policy_pack, workflow_data, context))
             
         except Exception as e:
-            self.logger.error(f"❌ Policy evaluation failed for {policy_pack.pack_name}: {e}")
+            self.logger.error(f" Policy evaluation failed for {policy_pack.pack_name}: {e}")
         
         return violations
     
@@ -738,7 +738,7 @@ class PolicyEngine:
                 # Could store in dedicated policy_violations table
                 
         except Exception as e:
-            self.logger.error(f"❌ Failed to log policy violation: {e}")
+            self.logger.error(f" Failed to log policy violation: {e}")
     
     async def _create_override_evidence_pack(self, override_request: OverrideRequest) -> None:
         """Create evidence pack for override request"""
@@ -761,7 +761,7 @@ class PolicyEngine:
             )
             
         except Exception as e:
-            self.logger.error(f"❌ Failed to create override evidence pack: {e}")
+            self.logger.error(f" Failed to create override evidence pack: {e}")
     
     async def _refresh_policy_cache(self) -> None:
         """Refresh policy pack cache"""
@@ -797,7 +797,7 @@ class PolicyEngine:
                     self.last_cache_refresh[cache_key] = current_time
                 
         except Exception as e:
-            self.logger.error(f"❌ Failed to refresh policy cache: {e}")
+            self.logger.error(f" Failed to refresh policy cache: {e}")
     
     async def _validate_policy_schemas(self) -> None:
         """Validate policy pack schemas"""

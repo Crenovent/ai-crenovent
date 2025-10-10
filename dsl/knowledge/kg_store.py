@@ -54,10 +54,10 @@ class KnowledgeGraphStore:
                 await self._create_indexes(conn)
                 
             self.initialized = True
-            logger.info("✅ Knowledge Graph storage initialized")
+            logger.info(" Knowledge Graph storage initialized")
             
         except Exception as e:
-            logger.error(f"❌ Failed to initialize KG storage: {e}")
+            logger.error(f" Failed to initialize KG storage: {e}")
             raise
     
     async def _create_kg_schema(self, conn: asyncpg.Connection):
@@ -148,7 +148,7 @@ class KnowledgeGraphStore:
             );
         """)
         
-        logger.info("📊 Knowledge Graph schema created")
+        logger.info(" Knowledge Graph schema created")
     
     async def _setup_rls_policies(self, conn: asyncpg.Connection):
         """Setup Row Level Security for multi-tenant isolation"""
@@ -194,9 +194,9 @@ class KnowledgeGraphStore:
                 ON kg_entities USING ivfflat (embedding vector_cosine_ops)
                 WITH (lists = 100);
             """)
-            logger.info("✅ Vector index created successfully")
+            logger.info(" Vector index created successfully")
         except Exception as e:
-            logger.warning(f"⚠️ Vector index creation skipped: {e}")
+            logger.warning(f" Vector index creation skipped: {e}")
             # Create a regular index as fallback
             await conn.execute("""
                 CREATE INDEX IF NOT EXISTS idx_kg_entities_embedding_fallback 
@@ -225,7 +225,7 @@ class KnowledgeGraphStore:
             ON kg_execution_traces USING GIN(entities_affected);
         """)
         
-        logger.info("🚀 Knowledge Graph indexes created")
+        logger.info(" Knowledge Graph indexes created")
     
     async def store_entity(self, entity: EntityNode, embedding: Optional[np.ndarray] = None) -> bool:
         """Store an entity node in the Knowledge Graph"""
@@ -256,11 +256,11 @@ class KnowledgeGraphStore:
                     entity.updated_at
                 )
                 
-            logger.debug(f"✅ Stored entity: {entity.id} ({entity.entity_type.value})")
+            logger.debug(f" Stored entity: {entity.id} ({entity.entity_type.value})")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to store entity {entity.id}: {e}")
+            logger.error(f" Failed to store entity {entity.id}: {e}")
             return False
     
     async def store_relationship(self, relationship: RelationshipEdge) -> bool:
@@ -292,11 +292,11 @@ class KnowledgeGraphStore:
                     relationship.created_at
                 )
                 
-            logger.debug(f"✅ Stored relationship: {relationship.source_id} -[{relationship.relationship_type.value}]-> {relationship.target_id}")
+            logger.debug(f" Stored relationship: {relationship.source_id} -[{relationship.relationship_type.value}]-> {relationship.target_id}")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to store relationship {relationship.id}: {e}")
+            logger.error(f" Failed to store relationship {relationship.id}: {e}")
             return False
     
     async def get_entity(self, entity_id: str, tenant_id: str) -> Optional[EntityNode]:
@@ -328,7 +328,7 @@ class KnowledgeGraphStore:
                 )
                 
         except Exception as e:
-            logger.error(f"❌ Failed to get entity {entity_id}: {e}")
+            logger.error(f" Failed to get entity {entity_id}: {e}")
             return None
     
     async def find_entities(self, tenant_id: str, entity_type: Optional[EntityType] = None,
@@ -376,7 +376,7 @@ class KnowledgeGraphStore:
                 return entities
                 
         except Exception as e:
-            logger.error(f"❌ Failed to find entities: {e}")
+            logger.error(f" Failed to find entities: {e}")
             return []
     
     async def get_relationships(self, entity_id: str, tenant_id: str, 
@@ -431,7 +431,7 @@ class KnowledgeGraphStore:
                 return relationships
                 
         except Exception as e:
-            logger.error(f"❌ Failed to get relationships for {entity_id}: {e}")
+            logger.error(f" Failed to get relationships for {entity_id}: {e}")
             return []
     
     async def semantic_search(self, query_embedding: np.ndarray, tenant_id: str,
@@ -480,7 +480,7 @@ class KnowledgeGraphStore:
                 return results
                 
         except Exception as e:
-            logger.error(f"❌ Failed semantic search: {e}")
+            logger.error(f" Failed semantic search: {e}")
             return []
     
     async def get_knowledge_stats(self, tenant_id: str) -> Dict[str, Any]:
@@ -529,5 +529,5 @@ class KnowledgeGraphStore:
                 }
                 
         except Exception as e:
-            logger.error(f"❌ Failed to get KG stats: {e}")
+            logger.error(f" Failed to get KG stats: {e}")
             return {}

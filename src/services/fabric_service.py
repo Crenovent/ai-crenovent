@@ -83,7 +83,7 @@ class FabricService:
         
         # Debug log (without sensitive info)
         debug_string = connection_string.replace(client_secret, "***")
-        self.logger.info(f"🔗 Fabric connection string (Python): {debug_string}")
+        self.logger.info(f" Fabric connection string (Python): {debug_string}")
         
         return connection_string
     

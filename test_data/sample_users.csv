@@ -1,8 +1,0 @@
-Name,Email,Role Title,Department,Manager,Location,Reports To Email,Team,Employee Number,Hire Date,User Status,Permissions,User Type
-John Smith,john.smith@company.com,Sales Manager,Sales,,New York,,Sales Team,EMP001,2023-01-15,Active,Full Access,Manager
-Jane Doe,jane.doe@company.com,VP Sales,Sales,,San Francisco,,Executive Team,EMP002,2022-06-01,Active,Full Access,Executive
-Mike Johnson,mike.johnson@company.com,Sales Rep,Sales,john.smith@company.com,Chicago,john.smith@company.com,Sales Team,EMP003,2023-03-10,Active,Standard Access,Individual Contributor
-Sarah Wilson,sarah.wilson@company.com,Marketing Manager,Marketing,,Boston,,Marketing Team,EMP004,2022-09-15,Active,Full Access,Manager
-Tom Brown,tom.brown@company.com,Marketing Specialist,Marketing,sarah.wilson@company.com,Boston,sarah.wilson@company.com,Marketing Team,EMP005,2023-05-20,Active,Standard Access,Individual Contributor
-Lisa Davis,lisa.davis@company.com,HR Director,Human Resources,,Austin,,HR Team,EMP006,2022-01-10,Active,Full Access,Manager
-Bob Miller,bob.miller@company.com,HR Specialist,Human Resources,lisa.davis@company.com,Austin,lisa.davis@company.com,HR Team,EMP007,2023-02-28,Active,Standard Access,Individual Contributor

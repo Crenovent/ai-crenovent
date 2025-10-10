@@ -49,11 +49,11 @@ class JWTAuthService:
         Matches crenovent-backend/middlewares.js authenticateJWT function
         """
         try:
-            # 🌐 MULTI-TENANT COOKIE READING (matches your backend exactly)
+            # MULTI-TENANT COOKIE READING (matches your backend exactly)
             context = parse_request_context(request)
             cookie_prefix = context['cookiePrefix']
             
-            self.logger.info(f"🍪 AI Service: Looking for auth cookies with prefix: {cookie_prefix}")
+            self.logger.info(f"AI Service: Looking for auth cookies with prefix: {cookie_prefix}")
             
             # Try multi-tenant cookie names first, then fall back to legacy
             jwt_cookie_name = f"{cookie_prefix}_jwt_token"
@@ -65,19 +65,19 @@ class JWTAuthService:
                 # Fall back to legacy cookie name for backward compatibility
                 token = request.cookies.get(legacy_jwt_cookie_name)
                 if token:
-                    self.logger.info(f"🔄 AI Service: Found token using legacy cookie name: {legacy_jwt_cookie_name}")
+                    self.logger.info(f"AI Service: Found token using legacy cookie name: {legacy_jwt_cookie_name}")
             else:
-                self.logger.info(f"✅ AI Service: Found token using multi-tenant cookie name: {jwt_cookie_name}")
+                self.logger.info(f"AI Service: Found token using multi-tenant cookie name: {jwt_cookie_name}")
             
             # Also try Authorization header as fallback
             if not token:
                 auth_header = request.headers.get('Authorization')
                 if auth_header and auth_header.startswith('Bearer '):
                     token = auth_header.split(' ')[1]
-                    self.logger.info("🔄 AI Service: Found token in Authorization header")
+                    self.logger.info("AI Service: Found token in Authorization header")
             
             if not token:
-                self.logger.warning("❌ AI Service: No JWT token found in cookies or headers")
+                self.logger.warning("AI Service: No JWT token found in cookies or headers")
                 return None
                 
             # Decode and validate token (matches your backend format)
@@ -88,32 +88,32 @@ class JWTAuthService:
             for audience in audiences_to_try:
                 try:
                     payload = jwt.decode(token, self.secret, algorithms=[self.algorithm], audience=audience)
-                    self.logger.info(f"✅ AI Service: JWT validated with audience: {audience}")
+                    self.logger.info(f"AI Service: JWT validated with audience: {audience}")
                     break
                 except jwt.InvalidAudienceError:
-                    self.logger.info(f"🔄 AI Service: Token audience validation failed for {audience}, trying next...")
+                    self.logger.info(f"AI Service: Token audience validation failed for {audience}, trying next...")
                     continue
                 except Exception as e:
-                    self.logger.error(f"❌ AI Service: JWT validation failed for {audience}: {e}")
+                    self.logger.error(f"AI Service: JWT validation failed for {audience}: {e}")
                     continue
             
             # If all audiences failed, try without audience validation (legacy fallback)
             if not payload:
-                self.logger.info("🔄 AI Service: All audience validations failed, trying without audience (legacy fallback)")
+                self.logger.info(" AI Service: All audience validations failed, trying without audience (legacy fallback)")
                 try:
                     payload = jwt.decode(token, self.secret, algorithms=[self.algorithm])
-                    self.logger.info("✅ AI Service: JWT validated without audience (legacy fallback)")
+                    self.logger.info(" AI Service: JWT validated without audience (legacy fallback)")
                 except Exception as e:
-                    self.logger.error(f"❌ AI Service: All JWT validation attempts failed: {e}")
+                    self.logger.error(f" AI Service: All JWT validation attempts failed: {e}")
                     raise e
             
             if not payload:
-                self.logger.error("❌ AI Service: No payload extracted from JWT")
+                self.logger.error(" AI Service: No payload extracted from JWT")
                 return None
             
             # Log the raw payload for debugging
-            self.logger.info(f"🔍 AI Service: Raw JWT payload keys: {list(payload.keys())}")
-            self.logger.info(f"🔍 AI Service: JWT payload sample: user_id={payload.get('user_id')}, id={payload.get('id')}, tenant_id={payload.get('tenant_id')}, email={payload.get('email')}")
+            self.logger.info(f" AI Service: Raw JWT payload keys: {list(payload.keys())}")
+            self.logger.info(f" AI Service: JWT payload sample: user_id={payload.get('user_id')}, id={payload.get('id')}, tenant_id={payload.get('tenant_id')}, email={payload.get('email')}")
             
             # Extract tenant_id from profile if not directly available
             profile = payload.get('profile', {})
@@ -143,25 +143,25 @@ class JWTAuthService:
                 'target_service': payload.get('target_service')
             }
             
-            self.logger.info(f"✅ AI Service: JWT validated for user: {user_data.get('user_id')} (tenant: {user_data.get('tenant_id')}, email: {user_data.get('email')})")
+            self.logger.info(f" AI Service: JWT validated for user: {user_data.get('user_id')} (tenant: {user_data.get('tenant_id')}, email: {user_data.get('email')})")
             return user_data
             
         except jwt.ExpiredSignatureError:
-            self.logger.warning("❌ AI Service: JWT token expired")
+            self.logger.warning(" AI Service: JWT token expired")
             return None
         except jwt.InvalidAudienceError as e:
-            self.logger.warning(f"❌ AI Service: Invalid JWT audience - {str(e)}")
-            self.logger.warning(f"❌ AI Service: Token received: {token[:50]}...")
-            self.logger.warning(f"❌ AI Service: Using secret: {self.secret[:20]}...")
+            self.logger.warning(f" AI Service: Invalid JWT audience - {str(e)}")
+            self.logger.warning(f" AI Service: Token received: {token[:50]}...")
+            self.logger.warning(f" AI Service: Using secret: {self.secret[:20]}...")
             return None
         except jwt.InvalidTokenError as e:
-            self.logger.warning(f"❌ AI Service: Invalid JWT token - {str(e)}")
-            self.logger.warning(f"❌ AI Service: Token received: {token[:50]}...")
-            self.logger.warning(f"❌ AI Service: Using secret: {self.secret[:20]}...")
+            self.logger.warning(f" AI Service: Invalid JWT token - {str(e)}")
+            self.logger.warning(f" AI Service: Token received: {token[:50]}...")
+            self.logger.warning(f" AI Service: Using secret: {self.secret[:20]}...")
             return None
         except Exception as e:
-            self.logger.error(f"❌ AI Service: JWT validation error: {e}")
-            self.logger.error(f"❌ AI Service: Token: {token[:50]}...")
+            self.logger.error(f" AI Service: JWT validation error: {e}")
+            self.logger.error(f" AI Service: Token: {token[:50]}...")
             return None
     
     def create_jwt_token(self, user_data: Dict[str, Any]) -> str:

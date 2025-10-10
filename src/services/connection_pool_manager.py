@@ -113,18 +113,18 @@ class ConnectionPoolManager:
             await connection.execute("SET tcp_keepalives_idle = 600")  # 10 minutes
             await connection.execute("SET tcp_keepalives_interval = 30")  # 30 seconds
             await connection.execute("SET tcp_keepalives_count = 3")  # 3 retries
-            self.logger.debug("✅ Azure-optimized connection setup completed")
+            self.logger.debug("Azure-optimized connection setup completed")
         except Exception as e:
-            self.logger.warning(f"⚠️ Connection setup warning (non-critical): {e}")
+            self.logger.warning(f"Connection setup warning (non-critical): {e}")
     
     async def _init_connection(self, connection):
         """Initialize callback for connections - minimal testing"""
         try:
             # Minimal connection test to avoid interference
             await connection.fetchval("SELECT 1")
-            self.logger.debug("✅ Connection validated")
+            self.logger.debug("Connection validated")
         except Exception as e:
-            self.logger.error(f"❌ Connection validation failed: {e}")
+            self.logger.error(f"Connection validation failed: {e}")
             raise
     
     async def initialize(self) -> bool:
@@ -136,31 +136,31 @@ class ConnectionPoolManager:
             await self._initialize_postgres_pool()
             await self._initialize_openai_client()
             await self._initialize_fabric_service()
-            self.logger.info("✅ All services initialized - PostgreSQL, OpenAI, and Fabric working!")
+            self.logger.info(" All services initialized - PostgreSQL, OpenAI, and Fabric working!")
             
             # Start health monitoring (now passive)
             asyncio.create_task(self._health_monitor())
             
-            self.logger.info("✅ Connection Pool Manager initialized successfully")
-            self.logger.info(f"📊 PostgreSQL Pool: {self.pool_config['min_size']}-{self.pool_config['max_size']} connections")
+            self.logger.info(" Connection Pool Manager initialized successfully")
+            self.logger.info(f" PostgreSQL Pool: {self.pool_config['min_size']}-{self.pool_config['max_size']} connections")
             
             return True
             
         except Exception as e:
-            self.logger.error(f"❌ Connection Pool Manager initialization failed: {e}")
+            self.logger.error(f" Connection Pool Manager initialization failed: {e}")
             return False
     
     async def reset_pool_if_closed(self):
         """Reset the connection pool if it's closed - Azure PostgreSQL fix"""
         try:
             if not self.postgres_pool or self.postgres_pool.is_closing():
-                self.logger.warning("🔄 Connection pool is closed, reinitializing...")
+                self.logger.warning(" Connection pool is closed, reinitializing...")
                 await self._initialize_postgres_pool()
-                self.logger.info("✅ Connection pool reinitialized successfully")
+                self.logger.info(" Connection pool reinitialized successfully")
                 return True
             return False
         except Exception as e:
-            self.logger.error(f"❌ Failed to reset connection pool: {e}")
+            self.logger.error(f" Failed to reset connection pool: {e}")
             return False
     
     async def _initialize_postgres_pool(self):
@@ -193,9 +193,9 @@ class ConnectionPoolManager:
                     }
                     
                     self.postgres_pool = await asyncpg.create_pool(**merged_config)
-                    self.logger.info("✅ Using Azure database configuration")
+                    self.logger.info(" Using Azure database configuration")
                 except Exception as e:
-                    self.logger.warning(f"⚠️ Azure database config failed, falling back to environment: {e}")
+                    self.logger.warning(f" Azure database config failed, falling back to environment: {e}")
                     await self._initialize_postgres_pool_from_env()
                     return
             else:
@@ -209,18 +209,18 @@ class ConnectionPoolManager:
                 # Test pgvector extension (optional, don't fail if not available)
                 try:
                     await conn.fetchval("SELECT '[1,2,3]'::vector")
-                    self.logger.info("✅ pgvector extension available")
+                    self.logger.info(" pgvector extension available")
                 except Exception as e:
-                    self.logger.warning(f"⚠️ pgvector extension not available: {e}")
+                    self.logger.warning(f" pgvector extension not available: {e}")
             
             # Ensure intelligence schema exists
             if azure_db_config.initialized:
                 await azure_db_config.ensure_intelligence_schema('primary')
             
-            self.logger.info("✅ PostgreSQL connection pool initialized")
+            self.logger.info(" PostgreSQL connection pool initialized")
             
         except Exception as e:
-            self.logger.error(f"❌ PostgreSQL pool initialization failed: {e}")
+            self.logger.error(f" PostgreSQL pool initialization failed: {e}")
             raise
     
     async def _initialize_postgres_pool_from_env(self):
@@ -241,7 +241,7 @@ class ConnectionPoolManager:
                 database=os.getenv('POSTGRES_DB'),  # Changed from POSTGRES_DATABASE
                 **self.pool_config
             )
-        self.logger.info("✅ Using environment variable database configuration")
+        self.logger.info(" Using environment variable database configuration")
     
     async def _initialize_openai_client(self):
         """Initialize Azure OpenAI client"""
@@ -261,10 +261,10 @@ class ConnectionPoolManager:
                 input=["connection test"]
             )
             
-            self.logger.info("✅ Azure OpenAI client initialized")
+            self.logger.info(" Azure OpenAI client initialized")
             
         except Exception as e:
-            self.logger.error(f"❌ Azure OpenAI client initialization failed: {e}")
+            self.logger.error(f" Azure OpenAI client initialization failed: {e}")
             raise
     
     async def _initialize_fabric_service(self):
@@ -278,13 +278,13 @@ class ConnectionPoolManager:
             self.fabric_service = FabricService()
             await self.fabric_service.initialize()
             
-            self.logger.info("✅ Fabric service initialized")
+            self.logger.info(" Fabric service initialized")
             
         except Exception as e:
-            self.logger.error(f"❌ FABRIC SERVICE INITIALIZATION FAILED: {e}")
-            self.logger.error("🔍 This means workflows will use MOCK DATA instead of real Salesforce data!")
+            self.logger.error(f" FABRIC SERVICE INITIALIZATION FAILED: {e}")
+            self.logger.error(" This means workflows will use MOCK DATA instead of real Salesforce data!")
             import traceback
-            self.logger.error(f"📋 Full error traceback: {traceback.format_exc()}")
+            self.logger.error(f" Full error traceback: {traceback.format_exc()}")
             # Don't raise - Fabric is optional, system can work without it
             self.fabric_service = None
     
@@ -301,7 +301,7 @@ class ConnectionPoolManager:
         
         if not self.postgres_pool:
             # Try to reinitialize the pool
-            self.logger.warning("🔄 PostgreSQL pool not available, attempting to reinitialize...")
+            self.logger.warning(" PostgreSQL pool not available, attempting to reinitialize...")
             success = await self.initialize()
             if not success:
                 raise RuntimeError("PostgreSQL pool not initialized and reinitialize failed")
@@ -313,11 +313,11 @@ class ConnectionPoolManager:
             
         except Exception as e:
             self.pool_stats['connection_errors'] += 1
-            self.logger.error(f"❌ Failed to acquire PostgreSQL connection: {e}")
+            self.logger.error(f" Failed to acquire PostgreSQL connection: {e}")
             
             # If pool is closed, try to reset and reinitialize
             if "pool is closed" in str(e).lower() or "pool is closing" in str(e).lower():
-                self.logger.warning("🔄 Pool is closed/closing, attempting to reset...")
+                self.logger.warning(" Pool is closed/closing, attempting to reset...")
                 try:
                     await self.reset_pool_if_closed()
                     if self.postgres_pool:
@@ -325,7 +325,7 @@ class ConnectionPoolManager:
                         self.pool_stats['total_queries'] += 1
                         return connection
                 except Exception as reinit_error:
-                    self.logger.error(f"❌ Pool reset failed: {reinit_error}")
+                    self.logger.error(f" Pool reset failed: {reinit_error}")
             
             raise
     
@@ -334,7 +334,7 @@ class ConnectionPoolManager:
         try:
             self.postgres_pool.release(connection)
         except Exception as e:
-            self.logger.error(f"❌ Failed to release PostgreSQL connection: {e}")
+            self.logger.error(f" Failed to release PostgreSQL connection: {e}")
     
     async def execute_postgres_query(self, query: str, *args) -> Any:
         """Execute PostgreSQL query with automatic connection management and recovery"""
@@ -367,12 +367,12 @@ class ConnectionPoolManager:
                     
                 except Exception as e:
                     self.pool_stats['connection_errors'] += 1
-                    self.logger.error(f"❌ PostgreSQL query failed: {e}")
+                    self.logger.error(f" PostgreSQL query failed: {e}")
                     raise
         except Exception as e:
             # If pool is closed, try to recover
             if "pool is closed" in str(e).lower() or "pool is closing" in str(e).lower():
-                self.logger.warning("🔄 Pool closed during query, attempting recovery...")
+                self.logger.warning(" Pool closed during query, attempting recovery...")
                 await self.reset_pool_if_closed()
                 if self.postgres_pool:
                     # Retry once
@@ -389,7 +389,7 @@ class ConnectionPoolManager:
                 return result
             except Exception as e:
                 self.pool_stats['connection_errors'] += 1
-                self.logger.error(f"❌ PostgreSQL fetchrow failed: {e}")
+                self.logger.error(f" PostgreSQL fetchrow failed: {e}")
                 raise
     
     async def execute_postgres_fetchval(self, query: str, *args) -> Any:
@@ -401,7 +401,7 @@ class ConnectionPoolManager:
                 return result
             except Exception as e:
                 self.pool_stats['connection_errors'] += 1
-                self.logger.error(f"❌ PostgreSQL fetchval failed: {e}")
+                self.logger.error(f" PostgreSQL fetchval failed: {e}")
                 raise
     
     async def create_openai_embedding(self, text: str, model: str = None) -> list:
@@ -420,7 +420,7 @@ class ConnectionPoolManager:
             return response.data[0].embedding
             
         except Exception as e:
-            self.logger.error(f"❌ OpenAI embedding creation failed: {e}")
+            self.logger.error(f" OpenAI embedding creation failed: {e}")
             raise
     
     async def chat_completion(self, messages: list, model: str = None, **kwargs) -> Any:
@@ -440,7 +440,7 @@ class ConnectionPoolManager:
             return response
             
         except Exception as e:
-            self.logger.error(f"❌ OpenAI chat completion failed: {e}")
+            self.logger.error(f" OpenAI chat completion failed: {e}")
             raise
     
     def get_fabric_service(self):
@@ -489,7 +489,7 @@ class ConnectionPoolManager:
         """Background health monitoring task - DISABLED to prevent pool closure"""
         # CRITICAL: Health monitor disabled due to Azure PostgreSQL connection issues
         # The health monitor was causing connection pool closures during active use
-        self.logger.info("🔄 Health monitor disabled to prevent Azure PostgreSQL connection issues")
+        self.logger.info(" Health monitor disabled to prevent Azure PostgreSQL connection issues")
         
         # Instead of continuous monitoring, we'll do passive monitoring
         while True:
@@ -504,7 +504,7 @@ class ConnectionPoolManager:
                 if datetime.now().minute % 30 == 0:
                     try:
                         stats = await self.get_pool_stats()
-                        self.logger.info(f"📊 Pool Stats: Connections available, "
+                        self.logger.info(f" Pool Stats: Connections available, "
                                        f"{stats['total_queries']} queries processed")
                     except Exception as stats_error:
                         self.logger.debug(f"Stats collection skipped: {stats_error}")
@@ -518,18 +518,18 @@ class ConnectionPoolManager:
         try:
             if self.postgres_pool:
                 await self.postgres_pool.close()
-                self.logger.info("✅ PostgreSQL pool closed")
+                self.logger.info(" PostgreSQL pool closed")
             
             if self.openai_client:
                 await self.openai_client.close()
-                self.logger.info("✅ OpenAI client closed")
+                self.logger.info(" OpenAI client closed")
             
             if self.fabric_service:
                 await self.fabric_service.close()
-                self.logger.info("✅ Fabric service closed")
+                self.logger.info(" Fabric service closed")
             
         except Exception as e:
-            self.logger.error(f"❌ Error during cleanup: {e}")
+            self.logger.error(f" Error during cleanup: {e}")
 
 # Global instance
 pool_manager = ConnectionPoolManager()

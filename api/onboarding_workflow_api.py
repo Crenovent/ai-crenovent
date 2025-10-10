@@ -55,7 +55,7 @@ def generate_service_token(authenticated_user: Dict[str, Any]) -> str:
         email = authenticated_user.get('email', 'service@crenovent.com')
         role = authenticated_user.get('role', 'admin')
         
-        logger.info(f"🔐 [SERVICE-AUTH] Extracted from authenticated_user: user_id={user_id}, tenant_id={tenant_id}, email={email}, role={role}")
+        logger.info(f" [SERVICE-AUTH] Extracted from authenticated_user: user_id={user_id}, tenant_id={tenant_id}, email={email}, role={role}")
         
         payload = {
             'id': user_id,  # Use the UUID string from user_id field
@@ -68,15 +68,15 @@ def generate_service_token(authenticated_user: Dict[str, Any]) -> str:
             'exp': int(time.time()) + (15 * 60)  # 15 minutes
         }
         
-        logger.info(f"🔐 [SERVICE-AUTH] Generating service token for: userId: {user_id}, tenantId: {tenant_id}, email: {email}, role: {role}, service: {payload['service']}, target_service: {payload['target_service']}")
+        logger.info(f" [SERVICE-AUTH] Generating service token for: userId: {user_id}, tenantId: {tenant_id}, email: {email}, role: {role}, service: {payload['service']}, target_service: {payload['target_service']}")
         
         token = jwt.encode(payload, jwt_secret, algorithm='HS256')
         
-        logger.info("✅ [SERVICE-AUTH] Service token generated successfully")
+        logger.info(" [SERVICE-AUTH] Service token generated successfully")
         return token
         
     except Exception as e:
-        logger.error(f"❌ [SERVICE-AUTH] Failed to generate service token: {e}")
+        logger.error(f" [SERVICE-AUTH] Failed to generate service token: {e}")
         raise Exception(f"Service token generation failed: {str(e)}")
 
 
@@ -88,8 +88,8 @@ async def execute_onboarding_workflow(
     request: Request,
     background_tasks: BackgroundTasks,
     file: UploadFile = File(..., description="CSV file with user data"),
-    tenant_id: int = Form(..., description="Tenant ID"),
-    uploaded_by_user_id: int = Form(..., description="User ID who uploaded the file"),
+    tenant_id: str = Form(..., description="Tenant ID (UUID string)"),
+    uploaded_by_user_id: str = Form(..., description="User ID who uploaded the file (UUID string)"),
     workflow_config: Optional[str] = Form(None, description="JSON string of workflow configuration"),
     execution_mode: str = Form("sync", description="Execution mode: sync or async"),
     save_to_database: bool = Form(False, description="Save processed users to database")
@@ -121,18 +121,18 @@ async def execute_onboarding_workflow(
     try:
         # **PHASE 2: JWT AUTHENTICATION**
         user = await require_auth(request)
-        logger.info(f"🔐 Authenticated user: {user.get('user_id')} (tenant: {user.get('tenant_id')})")
-        logger.info(f"🔍 DEBUG: Full user object: {user}")
-        logger.info(f"🔍 DEBUG: Requested tenant_id: {tenant_id} (type: {type(tenant_id)})")
-        logger.info(f"🔍 DEBUG: User tenant_id: {user.get('tenant_id')} (type: {type(user.get('tenant_id'))})")
+        logger.info(f" Authenticated user: {user.get('user_id')} (tenant: {user.get('tenant_id')})")
+        logger.info(f"DEBUG: Full user object: {user}")
+        logger.info(f"DEBUG: Requested tenant_id: {tenant_id} (type: {type(tenant_id)})")
+        logger.info(f"DEBUG: User tenant_id: {user.get('tenant_id')} (type: {type(user.get('tenant_id'))})")
         
         # **PHASE 2: TENANT VALIDATION**  
         # **TEMPORARY**: Skip tenant validation for debugging
         tenant_validation_result = validate_tenant_access(user, tenant_id)
-        logger.info(f"🔍 DEBUG: Tenant validation result: {tenant_validation_result}")
+        logger.info(f"DEBUG: Tenant validation result: {tenant_validation_result}")
         
         if not tenant_validation_result:
-            logger.warning(f"⚠️ BYPASSING tenant validation for debugging: User tenant {user.get('tenant_id')} != requested tenant {tenant_id}")
+            logger.warning(f" BYPASSING tenant validation for debugging: User tenant {user.get('tenant_id')} != requested tenant {tenant_id}")
             # Temporarily allow access for debugging
             # raise HTTPException(
             #     status_code=403,
@@ -143,7 +143,7 @@ async def execute_onboarding_workflow(
             #     }
             # )
         
-        logger.info(f"✅ Tenant access validated for user {user.get('user_id')} -> tenant {tenant_id}")
+        logger.info(f" Tenant access validated for user {user.get('user_id')} -> tenant {tenant_id}")
         
         # Initialize status tracking
         workflow_status[execution_id] = {
@@ -153,19 +153,19 @@ async def execute_onboarding_workflow(
             'message': 'Initializing workflow execution'
         }
         
-        logger.info(f"🚀 Starting onboarding workflow execution: {execution_id}")
+        logger.info(f" Starting onboarding workflow execution: {execution_id}")
         
         # Parse CSV file
-        logger.info(f"📁 Processing CSV file: {file.filename} (size: {file.size if hasattr(file, 'size') else 'unknown'})")
+        logger.info(f" Processing CSV file: {file.filename} (size: {file.size if hasattr(file, 'size') else 'unknown'})")
         csv_content = await file.read()
-        logger.info(f"📊 CSV content size: {len(csv_content)} bytes")
+        logger.info(f" CSV content size: {len(csv_content)} bytes")
         csv_data = parse_csv_content(csv_content)
-        logger.info(f"📋 Parsed CSV data: {len(csv_data)} users")
+        logger.info(f" Parsed CSV data: {len(csv_data)} users")
         
         if csv_data:
-            logger.info(f"📋 First user sample: {csv_data[0]}")
+            logger.info(f" First user sample: {csv_data[0]}")
         else:
-            logger.warning("⚠️ No CSV data parsed!")
+            logger.warning(" No CSV data parsed!")
         
         if not csv_data:
             raise HTTPException(status_code=400, detail="No valid user data found in CSV")
@@ -215,7 +215,7 @@ async def execute_onboarding_workflow(
             return result
             
     except Exception as e:
-        logger.error(f"❌ Onboarding workflow execution failed: {e}")
+        logger.error(f" Onboarding workflow execution failed: {e}")
         if execution_id in workflow_status:
             workflow_status[execution_id]['status'] = 'failed'
             workflow_status[execution_id]['error'] = str(e)
@@ -284,7 +284,7 @@ async def validate_csv_format(
         }
         
     except Exception as e:
-        logger.error(f"❌ CSV validation failed: {e}")
+        logger.error(f" CSV validation failed: {e}")
         return {
             'valid': False,
             'error': f'Validation failed: {str(e)}',
@@ -296,8 +296,8 @@ async def execute_workflow_sync(
     execution_id: str,
     csv_data: List[Dict],
     config: Dict,
-    tenant_id: int,
-    user_id: int,
+    tenant_id: str,
+    user_id: str,
     save_to_database: bool = False,
     authenticated_user: Dict[str, Any] = None
 ) -> Dict[str, Any]:
@@ -349,28 +349,28 @@ async def execute_workflow_sync(
         processed_users = result.get('processed_users', [])
         if processed_users:
             first_user = processed_users[0]
-            logger.info(f"🎯 RESPONSE VERIFICATION - First user: {first_user.get('Name', 'Unknown')}")
-            logger.info(f"🎯 RESPONSE VERIFICATION - Modules: {first_user.get('Modules', 'NOT FOUND')}")
-            logger.info(f"🎯 RESPONSE VERIFICATION - Modules type: {type(first_user.get('Modules', 'NOT FOUND'))}")
-            logger.info(f"🎯 RESPONSE VERIFICATION - modules_assigned flag: {first_user.get('modules_assigned', 'NOT FOUND')}")
+            logger.info(f" RESPONSE VERIFICATION - First user: {first_user.get('Name', 'Unknown')}")
+            logger.info(f" RESPONSE VERIFICATION - Modules: {first_user.get('Modules', 'NOT FOUND')}")
+            logger.info(f" RESPONSE VERIFICATION - Modules type: {type(first_user.get('Modules', 'NOT FOUND'))}")
+            logger.info(f" RESPONSE VERIFICATION - modules_assigned flag: {first_user.get('modules_assigned', 'NOT FOUND')}")
             
             # Count users with modules
             users_with_modules = sum(1 for user in processed_users if user.get('Modules') and user.get('Modules') != '')
-            logger.info(f"🎯 RESPONSE VERIFICATION - Users with modules: {users_with_modules}/{len(processed_users)}")
+            logger.info(f" RESPONSE VERIFICATION - Users with modules: {users_with_modules}/{len(processed_users)}")
         
         # **PHASE 2: DATABASE SAVE DISABLED**
         # Database save is now handled by the separate /complete-setup endpoint
         # This endpoint only processes and returns data for frontend preview
-        logger.info("💾 Database save skipped - will be handled by /complete-setup endpoint")
+        logger.info(" Database save skipped - will be handled by /complete-setup endpoint")
         if save_to_database:
-            logger.info("⚠️ save_to_database=True ignored - use /complete-setup endpoint instead")
+            logger.info(" save_to_database=True ignored - use /complete-setup endpoint instead")
             result['database_save'] = {
                 'success': True,
                 'message': 'Database save will be handled by /complete-setup endpoint',
                 'inserted_count': 0
             }
         
-        logger.info(f"✅ Workflow {execution_id} completed successfully")
+        logger.info(f" Workflow {execution_id} completed successfully")
         
         return {
             'success': True,
@@ -380,7 +380,7 @@ async def execute_workflow_sync(
         }
         
     except Exception as e:
-        logger.error(f"❌ Sync workflow execution failed: {e}")
+        logger.error(f" Sync workflow execution failed: {e}")
         workflow_status[execution_id]['status'] = 'failed'
         workflow_status[execution_id]['error'] = str(e)
         raise
@@ -396,22 +396,22 @@ async def execute_workflow_background(
     try:
         await execute_workflow_sync(execution_id, csv_data, config, tenant_id, user_id)
     except Exception as e:
-        logger.error(f"❌ Background workflow execution failed: {e}")
+        logger.error(f" Background workflow execution failed: {e}")
         workflow_status[execution_id]['status'] = 'failed'
         workflow_status[execution_id]['error'] = str(e)
 
 def parse_csv_content(csv_content: bytes) -> List[Dict[str, Any]]:
     """Parse CSV content and return list of dictionaries"""
     try:
-        logger.info(f"🔍 CSV parsing: Input size {len(csv_content)} bytes")
+        logger.info(f"CSV parsing: Input size {len(csv_content)} bytes")
         
         # Decode bytes to string
         csv_string = csv_content.decode('utf-8-sig')  # Handle BOM if present
-        logger.info(f"🔍 CSV parsing: Decoded string length {len(csv_string)} chars")
+        logger.info(f"CSV parsing: Decoded string length {len(csv_string)} chars")
         
         # Parse CSV
         csv_reader = csv.DictReader(io.StringIO(csv_string))
-        logger.info(f"🔍 CSV parsing: Headers found: {csv_reader.fieldnames}")
+        logger.info(f"CSV parsing: Headers found: {csv_reader.fieldnames}")
         
         users_data = []
         for i, row in enumerate(csv_reader):
@@ -426,15 +426,15 @@ def parse_csv_content(csv_content: bytes) -> List[Dict[str, Any]]:
             if cleaned_row:  # Only add non-empty rows
                 users_data.append(cleaned_row)
                 if i < 3:  # Log first 3 rows for debugging
-                    logger.info(f"🔍 CSV parsing: Row {i+1}: {cleaned_row}")
+                    logger.info(f"CSV parsing: Row {i+1}: {cleaned_row}")
         
-        logger.info(f"📊 Parsed {len(users_data)} users from CSV")
+        logger.info(f" Parsed {len(users_data)} users from CSV")
         return users_data
         
     except Exception as e:
-        logger.error(f"❌ CSV parsing failed: {e}")
+        logger.error(f" CSV parsing failed: {e}")
         import traceback
-        logger.error(f"❌ CSV parsing traceback: {traceback.format_exc()}")
+        logger.error(f" CSV parsing traceback: {traceback.format_exc()}")
         return []
 
 async def save_users_to_database(
@@ -447,7 +447,7 @@ async def save_users_to_database(
     Uses the existing bulkImportUsers endpoint instead of direct database access
     """
     try:
-        logger.info(f"🚀 Calling TypeScript backend to save {len(processed_users)} users")
+        logger.info(f" Calling TypeScript backend to save {len(processed_users)} users")
         
         # Get TypeScript backend URL from environment
         nodejs_backend_url = os.getenv('NODEJS_BACKEND_URL', 'http://localhost:8080')
@@ -456,11 +456,11 @@ async def save_users_to_database(
         users_for_import = []
         for user in processed_users:
             # DEBUG: Log all available fields in the processed user data
-            logger.info(f"🔍 [DEBUG] Processing user: {user.get('Name', 'Unknown')}")
-            logger.info(f"🔍 [DEBUG] Available fields: {list(user.keys())}")
-            logger.info(f"🔍 [DEBUG] Manager Email field: '{user.get('Manager Email', 'NOT_FOUND')}'")
-            logger.info(f"🔍 [DEBUG] Reports To Email field: '{user.get('Reports To Email', 'NOT_FOUND')}'")
-            logger.info(f"🔍 [DEBUG] Reporting Email field: '{user.get('Reporting Email', 'NOT_FOUND')}'")
+            logger.info(f"[DEBUG] Processing user: {user.get('Name', 'Unknown')}")
+            logger.info(f"[DEBUG] Available fields: {list(user.keys())}")
+            logger.info(f"[DEBUG] Manager Email field: '{user.get('Manager Email', 'NOT_FOUND')}'")
+            logger.info(f"[DEBUG] Reports To Email field: '{user.get('Reports To Email', 'NOT_FOUND')}'")
+            logger.info(f"[DEBUG] Reporting Email field: '{user.get('Reporting Email', 'NOT_FOUND')}'")
             
             # Extract user data
             email = user.get('Email', '').strip().lower()
@@ -478,7 +478,7 @@ async def save_users_to_database(
                            user.get('manager_email') or
                            user.get('ManagerEmail', '')).strip().lower()
             
-            logger.info(f"🔍 [DEBUG] Extracted manager_email: '{manager_email}'")
+            logger.info(f"[DEBUG] Extracted manager_email: '{manager_email}'")
             
             # Convert modules to string if it's a list
             modules_data = user.get('Modules', '')
@@ -516,7 +516,7 @@ async def save_users_to_database(
         original_tenant_id = authenticated_user.get('tenant_id', str(tenant_id))
         # Ensure it's always a string for headers
         original_tenant_id = str(original_tenant_id)
-        logger.info(f"🔐 [SERVICE-AUTH] Using original tenant_id UUID: {original_tenant_id} (instead of integer: {tenant_id})")
+        logger.info(f" [SERVICE-AUTH] Using original tenant_id UUID: {original_tenant_id} (instead of integer: {tenant_id})")
         
         payload = {
             'users': users_for_import,
@@ -528,10 +528,10 @@ async def save_users_to_database(
         # Use the original authenticated user object (contains UUID strings)
         if authenticated_user is None:
             # This should not happen since user is passed from the endpoint
-            logger.error("❌ [SERVICE-AUTH] No authenticated_user provided - this should not happen")
+            logger.error(" [SERVICE-AUTH] No authenticated_user provided - this should not happen")
             raise Exception("No authenticated user provided for service token generation")
         
-        logger.info(f"🔐 [SERVICE-AUTH] Using authenticated_user: {authenticated_user}")
+        logger.info(f" [SERVICE-AUTH] Using authenticated_user: {authenticated_user}")
         service_token = generate_service_token(authenticated_user)
         
         # Call TypeScript backend bulkImportUsers endpoint
@@ -541,7 +541,7 @@ async def save_users_to_database(
             'x-tenant-id': original_tenant_id  # Use UUID string, not integer
         }
         
-        logger.info(f"📡 Calling {nodejs_backend_url}/api/auth/bulk-import")
+        logger.info(f" Calling {nodejs_backend_url}/api/auth/bulk-import")
         
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
@@ -552,7 +552,7 @@ async def save_users_to_database(
             
             if response.status_code == 200:
                 result = response.json()
-                logger.info(f"✅ TypeScript backend response: {result}")
+                logger.info(f" TypeScript backend response: {result}")
                 
                 # Convert the response to match expected format
                 return {
@@ -568,7 +568,7 @@ async def save_users_to_database(
                 }
             else:
                 error_msg = f"TypeScript backend returned status {response.status_code}: {response.text}"
-                logger.error(f"❌ {error_msg}")
+                logger.error(f" {error_msg}")
         
         return {
             "success": False,
@@ -585,7 +585,7 @@ async def save_users_to_database(
         
     except Exception as e:
         error_msg = f"Error calling TypeScript backend: {str(e)}"
-        logger.error(f"❌ {error_msg}")
+        logger.error(f" {error_msg}")
         return {
             "success": False,
             "message": "Failed to save users",
@@ -602,7 +602,7 @@ async def save_users_to_database(
 @router.get("/test-endpoint")
 async def test_endpoint():
     """Simple test endpoint to verify router is working"""
-    logger.info("🧪 TEST ENDPOINT CALLED!")
+    logger.info(" TEST ENDPOINT CALLED!")
     return {"status": "success", "message": "Test endpoint working"}
 
 @router.post("/complete-setup")
@@ -611,19 +611,19 @@ async def complete_onboarding_setup(request: dict):
     Complete onboarding setup by saving processed users to database
     This endpoint is called by the "Complete Setup" button
     """
-    logger.info("🚀 COMPLETE SETUP ENDPOINT CALLED!")
+    logger.info(" COMPLETE SETUP ENDPOINT CALLED!")
     
     try:
         # Extract data from request body
         processed_users = request.get('processed_users')
         tenant_id = request.get('tenant_id')
         
-        logger.info(f"🔍 Complete Setup called with tenant_id: {tenant_id}")
-        logger.info(f"📥 RAW INPUT: {len(processed_users) if processed_users else 0} characters")
-        logger.info(f"📥 RAW DATA PREVIEW: {processed_users[:200] if processed_users else 'None'}...")
+        logger.info(f"Complete Setup called with tenant_id: {tenant_id}")
+        logger.info(f" RAW INPUT: {len(processed_users) if processed_users else 0} characters")
+        logger.info(f" RAW DATA PREVIEW: {processed_users[:200] if processed_users else 'None'}...")
         
         if not processed_users or not tenant_id:
-            logger.error("❌ Missing required fields: processed_users or tenant_id")
+            logger.error(" Missing required fields: processed_users or tenant_id")
             return {
                 "success": False,
                 "error": "Missing required fields: processed_users and tenant_id"
@@ -634,29 +634,29 @@ async def complete_onboarding_setup(request: dict):
         try:
             # Try to parse as UUID
             tenant_uuid = uuid.UUID(tenant_id)
-            logger.info(f"✅ Valid tenant_id UUID: {tenant_uuid}")
+            logger.info(f" Valid tenant_id UUID: {tenant_uuid}")
         except (ValueError, TypeError):
-            logger.error(f"❌ Invalid tenant_id UUID format: {tenant_id}")
+            logger.error(f" Invalid tenant_id UUID format: {tenant_id}")
             return {
                 "success": False,
                 "error": "Invalid tenant ID UUID format provided"
             }
         
         # Parse JSON
-        logger.info("🔍 Parsing JSON data...")
+        logger.info("Parsing JSON data...")
         try:
             users_data = json.loads(processed_users)
             if not isinstance(users_data, list):
                 raise ValueError("Processed users must be a list")
-            logger.info(f"✅ Parsed {len(users_data)} users from JSON")
+            logger.info(f" Parsed {len(users_data)} users from JSON")
         except json.JSONDecodeError as e:
-            logger.error(f"❌ JSON PARSE ERROR: {e}")
+            logger.error(f" JSON PARSE ERROR: {e}")
             return {
                 "success": False,
                 "error": f"Invalid JSON format: {str(e)}"
             }
         except ValueError as e:
-            logger.error(f"❌ DATA VALIDATION ERROR: {e}")
+            logger.error(f" DATA VALIDATION ERROR: {e}")
             return {
                 "success": False,
                 "error": f"Data validation error: {str(e)}"
@@ -664,7 +664,7 @@ async def complete_onboarding_setup(request: dict):
         
         # Validate users data
         if not users_data:
-            logger.error("❌ No users data provided")
+            logger.error(" No users data provided")
             return {
                 "success": False,
                 "error": "No users data provided"
@@ -673,7 +673,7 @@ async def complete_onboarding_setup(request: dict):
         # Validate required fields for each user
         for i, user in enumerate(users_data):
             if not isinstance(user, dict):
-                logger.error(f"❌ User {i+1} is not a valid object")
+                logger.error(f" User {i+1} is not a valid object")
                 return {
                     "success": False,
                     "error": f"User {i+1} is not a valid object"
@@ -682,7 +682,7 @@ async def complete_onboarding_setup(request: dict):
             required_fields = ['Name', 'Email']
             for field in required_fields:
                 if not user.get(field) or not str(user.get(field)).strip():
-                    logger.error(f"❌ User {i+1} missing required field: {field}")
+                    logger.error(f" User {i+1} missing required field: {field}")
                     return {
                         "success": False,
                         "error": f"User {i+1} missing required field: {field}"
@@ -691,19 +691,19 @@ async def complete_onboarding_setup(request: dict):
         # **CRITICAL MODULES DEBUG**
         if users_data:
             first_user = users_data[0]
-            logger.info(f"🎯 MODULES DEBUG - First user: {first_user.get('Name', 'Unknown')}")
-            logger.info(f"🎯 MODULES KEY EXISTS: {'Modules' in first_user}")
-            logger.info(f"🎯 MODULES VALUE: {first_user.get('Modules', 'NOT FOUND')}")
-            logger.info(f"🎯 MODULES TYPE: {type(first_user.get('Modules', 'NOT FOUND'))}")
+            logger.info(f" MODULES DEBUG - First user: {first_user.get('Name', 'Unknown')}")
+            logger.info(f" MODULES KEY EXISTS: {'Modules' in first_user}")
+            logger.info(f" MODULES VALUE: {first_user.get('Modules', 'NOT FOUND')}")
+            logger.info(f" MODULES TYPE: {type(first_user.get('Modules', 'NOT FOUND'))}")
             
             # Check first 3 users
             for i in range(min(3, len(users_data))):
                 user = users_data[i]
                 modules = user.get('Modules', 'NOT FOUND')
-                logger.info(f"🎯 User {i+1} ({user.get('Name', 'Unknown')}): Modules = {modules}")
+                logger.info(f" User {i+1} ({user.get('Name', 'Unknown')}): Modules = {modules}")
         
         # **PHASE 2: SAVE TO DATABASE**
-        logger.info(f"💾 Starting database save for {len(users_data)} users...")
+        logger.info(f" Starting database save for {len(users_data)} users...")
         try:
             # Mock user for database save (temporarily bypass auth)
             mock_user = {"user_id": "c0d323a5-0e78-4936-bfe4-0da5e16ce185", "tenant_id": tenant_id}
@@ -713,7 +713,7 @@ async def complete_onboarding_setup(request: dict):
                 tenant_id, 
                 mock_user
             )
-            logger.info(f"✅ Database save completed: {database_result}")
+            logger.info(f" Database save completed: {database_result}")
             
             return {
                 "success": True,
@@ -726,7 +726,7 @@ async def complete_onboarding_setup(request: dict):
             }
             
         except Exception as db_error:
-            logger.error(f"❌ Database save failed: {db_error}")
+            logger.error(f" Database save failed: {db_error}")
             return {
                 "success": False,
                 "error": f"Database save failed: {str(db_error)}",
@@ -736,7 +736,7 @@ async def complete_onboarding_setup(request: dict):
             }
         
     except Exception as e:
-        logger.error(f"❌ Unexpected error in complete setup: {e}")
+        logger.error(f" Unexpected error in complete setup: {e}")
         return {
             "success": False,
             "error": f"Unexpected error: {str(e)}"
@@ -760,7 +760,7 @@ async def get_agent_configuration():
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to get agent config: {e}")
+        logger.error(f" Failed to get agent config: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get agent configuration: {str(e)}")
 
 @router.post("/preview-assignments")
@@ -816,7 +816,7 @@ async def preview_field_assignments(
         }
         
     except Exception as e:
-        logger.error(f"❌ Preview failed: {e}")
+        logger.error(f" Preview failed: {e}")
         raise HTTPException(status_code=500, detail=f"Preview failed: {str(e)}")
 
 # Health check endpoint
@@ -835,7 +835,7 @@ async def health_check():
         }
         
     except Exception as e:
-        logger.error(f"❌ Health check failed: {e}")
+        logger.error(f" Health check failed: {e}")
         return {
             'status': 'unhealthy',
             'service': 'onboarding_workflow',

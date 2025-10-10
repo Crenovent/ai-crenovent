@@ -893,3 +893,135 @@ execution_mode: sync
 workflow_config: None
 file.filename: salesforce_user_hierarchy.csv
 ==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1
+execution_mode: sync
+workflow_config: None
+file.filename: test-direct.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 0aa1755d-a384-4f74-9ff7-5872ac9df23b
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 878818473
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
