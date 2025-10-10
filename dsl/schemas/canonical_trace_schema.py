@@ -57,16 +57,31 @@ class TraceActor:
 
 @dataclass
 class TraceContext:
-    """Execution context information"""
+    """Execution context information - Task 7.1-T04: Enhanced tenant tagging"""
     tenant_id: int
     user_id: str
     session_id: str
     correlation_id: str
     parent_execution_id: Optional[str] = None
-    industry_code: str = "SaaS"
+    
+    # Task 7.1-T05: Industry overlay fields
+    industry_code: str = "SaaS"  # SaaS, BANK, INSUR, ECOMM, FS, IT
+    industry_overlay_version: str = "v1.0"
+    industry_specific_fields: Dict[str, Any] = field(default_factory=dict)
+    
+    # Enhanced tenant isolation
+    tenant_isolation_level: str = "strict"  # strict, standard, relaxed
+    tenant_metadata: Dict[str, Any] = field(default_factory=dict)
+    
+    # Compliance and residency
     data_residency: str = "US"
     compliance_frameworks: List[str] = field(default_factory=list)
+    regulatory_tags: List[str] = field(default_factory=list)
+    
+    # Feature flags and configuration
     feature_flags: Dict[str, bool] = field(default_factory=dict)
+    trace_sampling_rate: float = 1.0
+    pii_redaction_enabled: bool = True
 
 @dataclass
 class TraceInput:
@@ -88,28 +103,81 @@ class TraceOutput:
 
 @dataclass
 class TraceError:
-    """Error information in trace"""
+    """Error information in trace - Task 7.1-T08: Enhanced error logging"""
     error_code: str
     error_message: str
     error_type: str
+    error_class: str = "execution_error"  # execution_error, validation_error, governance_error, system_error
+    
+    # Enhanced error details
     stack_trace: Optional[str] = None
     retry_count: int = 0
     is_retryable: bool = False
     root_cause: Optional[str] = None
+    
+    # Task 7.1-T08: Escalation path fields
+    escalation_path: List[str] = field(default_factory=list)  # ["support", "engineering", "compliance"]
+    escalation_level: str = "low"  # low, medium, high, critical
+    escalation_triggered: bool = False
+    escalation_timestamp: Optional[str] = None
+    
+    # Error context
+    component_name: Optional[str] = None
+    step_context: Dict[str, Any] = field(default_factory=dict)
+    tenant_impact: str = "isolated"  # isolated, tenant_wide, system_wide
+    
+    # Recovery information
+    recovery_suggestions: List[str] = field(default_factory=list)
+    recovery_attempted: bool = False
+    recovery_successful: bool = False
+    
+    # Compliance and audit
+    compliance_impact: bool = False
+    audit_required: bool = False
+    regulator_notification_required: bool = False
 
 @dataclass
 class GovernanceEvent:
-    """Governance-related event in trace"""
+    """Governance-related event in trace - Task 7.1-T06: Enhanced governance fields"""
     event_id: str
     event_type: str
     policy_id: str
     policy_version: str
-    decision: str  # allowed, denied, warning
+    decision: str  # allowed, denied, warning, escalated
     reason: str
-    evidence_refs: List[str] = field(default_factory=list)
+    
+    # Task 7.1-T06: Policy application details
+    policy_applied: bool = True
+    policy_enforcement_mode: str = "strict"  # strict, advisory, disabled
+    policy_scope: str = "step"  # step, workflow, tenant, global
+    
+    # Override and approval details
     override_id: Optional[str] = None
+    override_justification: Optional[str] = None
+    override_type: Optional[str] = None  # emergency, planned, exception
     approver_id: Optional[str] = None
+    approval_chain: List[Dict[str, Any]] = field(default_factory=list)
+    
+    # Task 7.1-T07: Evidence linkage fields
+    evidence_refs: List[str] = field(default_factory=list)
+    evidence_id: Optional[str] = None
+    evidence_hash: Optional[str] = None
+    evidence_signature: Optional[str] = None
+    
+    # Compliance and regulatory
+    compliance_framework: Optional[str] = None
+    regulatory_requirement: Optional[str] = None
+    audit_trail_id: Optional[str] = None
+    
+    # Risk and trust impact
+    risk_level: str = "low"  # low, medium, high, critical
+    trust_impact: float = 0.0
+    business_impact: Optional[str] = None
+    
+    # Timing and context
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    processing_time_ms: int = 0
+    tenant_context: Dict[str, Any] = field(default_factory=dict)
 
 @dataclass
 class StepTrace:
@@ -175,7 +243,17 @@ class WorkflowTrace:
     governance_events: List[GovernanceEvent] = field(default_factory=list)
     policy_pack_version: str = "default_v1.0"
     compliance_score: float = 1.0
+    
+    # Task 7.1-T09: Trust scoring fields
     trust_score: float = 1.0
+    trust_index: float = 1.0  # Normalized trust index (0.0 - 1.0)
+    trust_score_before: Optional[float] = None
+    trust_score_after: Optional[float] = None
+    trust_degradation: float = 0.0
+    override_impact: float = 0.0  # Impact of overrides on trust
+    trust_factors: Dict[str, float] = field(default_factory=dict)  # Individual trust components
+    trust_calculation_method: str = "weighted_average"
+    trust_last_updated: Optional[str] = None
     
     # Evidence and audit
     evidence_pack_id: Optional[str] = None
@@ -266,75 +344,160 @@ class WorkflowTrace:
 class TraceSchemaValidator:
     """
     Validator for canonical RBA trace schema
-    Tasks 7.1-T03, T04: Schema validation and governance
+    Tasks 7.1-T03, T04, T12: Schema validation and runtime compliance
     """
     
-    def __init__(self):
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
         self.schema_version = "1.0.0"
+        self.config = config or {}
+        
+        # Core required fields
         self.required_fields = [
             'trace_id', 'workflow_id', 'execution_id', 'workflow_version',
             'context', 'actor', 'schema_version'
         ]
+        
+        # Governance required fields
         self.governance_required_fields = [
             'policy_pack_version', 'compliance_score', 'trust_score'
         ]
+        
+        # Task 7.1-T04: Tenant isolation validation
+        self.tenant_required_fields = [
+            'context.tenant_id', 'context.tenant_isolation_level'
+        ]
+        
+        # Task 7.1-T05: Industry overlay validation
+        self.industry_required_fields = [
+            'context.industry_code', 'context.industry_overlay_version'
+        ]
+        
+        # Task 7.1-T12: Runtime validation settings
+        self.fail_on_invalid = self.config.get('fail_on_invalid', True)
+        self.strict_mode = self.config.get('strict_mode', True)
+        self.pii_validation_enabled = self.config.get('pii_validation_enabled', True)
+        self.compliance_validation_enabled = self.config.get('compliance_validation_enabled', True)
+        
+        # Dynamic validation rules based on industry
+        self.industry_validation_rules = {
+            'BANK': {
+                'required_compliance_frameworks': ['RBI', 'BASEL_III'],
+                'required_regulatory_tags': ['banking_regulation'],
+                'trust_score_threshold': 0.8
+            },
+            'INSUR': {
+                'required_compliance_frameworks': ['IRDAI', 'SOLVENCY_II'],
+                'required_regulatory_tags': ['insurance_regulation'],
+                'trust_score_threshold': 0.75
+            },
+            'SaaS': {
+                'required_compliance_frameworks': ['SOX', 'GDPR'],
+                'required_regulatory_tags': [],
+                'trust_score_threshold': 0.7
+            }
+        }
     
     def validate_trace(self, trace: WorkflowTrace) -> Dict[str, Any]:
-        """Validate trace against canonical schema"""
+        """Validate trace against canonical schema - Task 7.1-T12: Runtime validation"""
         
         validation_result = {
             'valid': True,
             'errors': [],
             'warnings': [],
-            'governance_compliant': True
+            'governance_compliant': True,
+            'tenant_compliant': True,
+            'industry_compliant': True,
+            'pii_compliant': True,
+            'trust_compliant': True
         }
         
-        # Check required fields
-        trace_dict = trace.to_dict()
-        for field in self.required_fields:
-            if field not in trace_dict or trace_dict[field] is None:
-                validation_result['errors'].append(f"Missing required field: {field}")
+        try:
+            # Check required fields
+            trace_dict = trace.to_dict()
+            for field in self.required_fields:
+                if field not in trace_dict or trace_dict[field] is None:
+                    validation_result['errors'].append(f"Missing required field: {field}")
+                    validation_result['valid'] = False
+            
+            # Task 7.1-T04: Validate tenant isolation
+            tenant_errors = self._validate_tenant_isolation(trace)
+            validation_result['errors'].extend(tenant_errors)
+            if tenant_errors:
+                validation_result['tenant_compliant'] = False
                 validation_result['valid'] = False
-        
-        # Check governance fields
-        for field in self.governance_required_fields:
-            if field not in trace_dict or trace_dict[field] is None:
-                validation_result['warnings'].append(f"Missing governance field: {field}")
-                validation_result['governance_compliant'] = False
-        
-        # Validate schema version
-        if trace.schema_version != self.schema_version:
-            validation_result['warnings'].append(
-                f"Schema version mismatch: expected {self.schema_version}, got {trace.schema_version}"
-            )
-        
-        # Validate tenant context
-        if not trace.context.tenant_id:
-            validation_result['errors'].append("Missing tenant_id in context")
-            validation_result['valid'] = False
-        
-        # Validate execution consistency
-        if trace.status == ExecutionStatus.COMPLETED and not trace.completed_at:
-            validation_result['errors'].append("Completed workflow missing completed_at timestamp")
-            validation_result['valid'] = False
-        
-        if trace.status == ExecutionStatus.FAILED and not trace.error:
-            validation_result['errors'].append("Failed workflow missing error information")
-            validation_result['valid'] = False
-        
-        # Validate steps
-        for i, step in enumerate(trace.steps):
-            step_errors = self._validate_step(step, i)
-            validation_result['errors'].extend(step_errors)
-            if step_errors:
+            
+            # Task 7.1-T05: Validate industry overlay
+            industry_errors = self._validate_industry_overlay(trace)
+            validation_result['errors'].extend(industry_errors)
+            if industry_errors:
+                validation_result['industry_compliant'] = False
                 validation_result['valid'] = False
-        
-        # Validate governance events
-        for i, event in enumerate(trace.governance_events):
-            event_errors = self._validate_governance_event(event, i)
-            validation_result['errors'].extend(event_errors)
-            if event_errors:
+            
+            # Check governance fields
+            for field in self.governance_required_fields:
+                if field not in trace_dict or trace_dict[field] is None:
+                    validation_result['warnings'].append(f"Missing governance field: {field}")
+                    validation_result['governance_compliant'] = False
+            
+            # Task 7.1-T09: Validate trust scoring
+            trust_errors = self._validate_trust_scoring(trace)
+            validation_result['errors'].extend(trust_errors)
+            if trust_errors:
+                validation_result['trust_compliant'] = False
+                if self.strict_mode:
+                    validation_result['valid'] = False
+            
+            # Validate schema version
+            if trace.schema_version != self.schema_version:
+                validation_result['warnings'].append(
+                    f"Schema version mismatch: expected {self.schema_version}, got {trace.schema_version}"
+                )
+            
+            # Validate tenant context
+            if not trace.context.tenant_id:
+                validation_result['errors'].append("Missing tenant_id in context")
                 validation_result['valid'] = False
+            
+            # Validate execution consistency
+            if trace.status == ExecutionStatus.COMPLETED and not trace.completed_at:
+                validation_result['errors'].append("Completed workflow missing completed_at timestamp")
+                validation_result['valid'] = False
+            
+            if trace.status == ExecutionStatus.FAILED and not trace.error:
+                validation_result['errors'].append("Failed workflow missing error information")
+                validation_result['valid'] = False
+            
+            # Validate PII handling
+            if self.pii_validation_enabled:
+                pii_errors = self._validate_pii_handling(trace)
+                validation_result['errors'].extend(pii_errors)
+                if pii_errors:
+                    validation_result['pii_compliant'] = False
+                    validation_result['valid'] = False
+            
+            # Validate steps
+            for i, step in enumerate(trace.steps):
+                step_errors = self._validate_step(step, i)
+                validation_result['errors'].extend(step_errors)
+                if step_errors:
+                    validation_result['valid'] = False
+            
+            # Validate governance events
+            for i, event in enumerate(trace.governance_events):
+                event_errors = self._validate_governance_event(event, i)
+                validation_result['errors'].extend(event_errors)
+                if event_errors:
+                    validation_result['valid'] = False
+            
+            # Task 7.1-T12: Fail-closed validation
+            if self.fail_on_invalid and not validation_result['valid']:
+                raise ValueError(f"Trace validation failed: {validation_result['errors']}")
+        
+        except Exception as e:
+            validation_result['valid'] = False
+            validation_result['errors'].append(f"Validation exception: {str(e)}")
+            if self.fail_on_invalid:
+                raise
         
         return validation_result
     
@@ -368,6 +531,102 @@ class TraceSchemaValidator:
         
         if not event.decision:
             errors.append(f"Governance event {event_index}: Missing decision")
+        
+        return errors
+    
+    def _validate_tenant_isolation(self, trace: WorkflowTrace) -> List[str]:
+        """Validate tenant isolation requirements - Task 7.1-T04"""
+        errors = []
+        
+        if not trace.context.tenant_id:
+            errors.append("Missing tenant_id in trace context")
+        
+        if not trace.context.tenant_isolation_level:
+            errors.append("Missing tenant_isolation_level in trace context")
+        elif trace.context.tenant_isolation_level not in ['strict', 'standard', 'relaxed']:
+            errors.append(f"Invalid tenant_isolation_level: {trace.context.tenant_isolation_level}")
+        
+        # Validate actor tenant alignment
+        if trace.actor.tenant_id != trace.context.tenant_id:
+            errors.append("Actor tenant_id does not match trace context tenant_id")
+        
+        return errors
+    
+    def _validate_industry_overlay(self, trace: WorkflowTrace) -> List[str]:
+        """Validate industry overlay requirements - Task 7.1-T05"""
+        errors = []
+        
+        industry_code = trace.context.industry_code
+        if not industry_code:
+            errors.append("Missing industry_code in trace context")
+            return errors
+        
+        # Validate industry code
+        valid_industries = ['SaaS', 'BANK', 'INSUR', 'ECOMM', 'FS', 'IT']
+        if industry_code not in valid_industries:
+            errors.append(f"Invalid industry_code: {industry_code}. Must be one of {valid_industries}")
+        
+        # Validate industry-specific requirements
+        if industry_code in self.industry_validation_rules:
+            rules = self.industry_validation_rules[industry_code]
+            
+            # Check required compliance frameworks
+            required_frameworks = rules.get('required_compliance_frameworks', [])
+            for framework in required_frameworks:
+                if framework not in trace.context.compliance_frameworks:
+                    errors.append(f"Missing required compliance framework for {industry_code}: {framework}")
+            
+            # Check required regulatory tags
+            required_tags = rules.get('required_regulatory_tags', [])
+            for tag in required_tags:
+                if tag not in trace.context.regulatory_tags:
+                    errors.append(f"Missing required regulatory tag for {industry_code}: {tag}")
+        
+        return errors
+    
+    def _validate_trust_scoring(self, trace: WorkflowTrace) -> List[str]:
+        """Validate trust scoring requirements - Task 7.1-T09"""
+        errors = []
+        
+        # Validate trust score range
+        if not (0.0 <= trace.trust_score <= 1.0):
+            errors.append(f"Trust score out of range: {trace.trust_score}. Must be between 0.0 and 1.0")
+        
+        if not (0.0 <= trace.trust_index <= 1.0):
+            errors.append(f"Trust index out of range: {trace.trust_index}. Must be between 0.0 and 1.0")
+        
+        # Validate industry-specific trust thresholds
+        industry_code = trace.context.industry_code
+        if industry_code in self.industry_validation_rules:
+            threshold = self.industry_validation_rules[industry_code].get('trust_score_threshold', 0.5)
+            if trace.trust_score < threshold:
+                errors.append(f"Trust score {trace.trust_score} below industry threshold {threshold} for {industry_code}")
+        
+        # Validate trust calculation consistency
+        if trace.trust_score_before and trace.trust_score_after:
+            calculated_degradation = trace.trust_score_before - trace.trust_score_after
+            if abs(calculated_degradation - trace.trust_degradation) > 0.01:
+                errors.append("Trust degradation calculation inconsistent with before/after scores")
+        
+        return errors
+    
+    def _validate_pii_handling(self, trace: WorkflowTrace) -> List[str]:
+        """Validate PII handling requirements"""
+        errors = []
+        
+        # Check if PII redaction is enabled when required
+        if trace.context.pii_redaction_enabled:
+            if trace.inputs and not trace.inputs.pii_redacted and trace.inputs.sensitive_fields:
+                errors.append("PII redaction enabled but input data not redacted despite sensitive fields")
+            
+            if trace.outputs and not trace.outputs.pii_redacted and trace.outputs.sensitive_fields:
+                errors.append("PII redaction enabled but output data not redacted despite sensitive fields")
+        
+        # Validate PII handling in steps
+        for i, step in enumerate(trace.steps):
+            if step.inputs and step.inputs.sensitive_fields and not step.inputs.pii_redacted:
+                if trace.context.pii_redaction_enabled:
+                    errors.append(f"Step {i}: PII not redacted despite sensitive fields and redaction enabled")
         
         return errors
 
