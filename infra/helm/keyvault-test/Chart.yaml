@@ -1,0 +1,17 @@
+apiVersion: v2
+name: keyvault-test
+description: A Helm chart for testing Key Vault access and functionality
+type: application
+version: 0.1.0
+appVersion: "1.0"
+keywords:
+  - keyvault
+  - testing
+  - verification
+  - security
+home: https://github.com/Crenovent/ai-crenovent
+sources:
+  - https://github.com/Crenovent/ai-crenovent
+maintainers:
+  - name: DevOps Team
+    email: devops@crenovent.com
