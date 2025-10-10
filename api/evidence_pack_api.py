@@ -1081,6 +1081,109 @@ async def export_evidence_pack(
     """
     return await service.export_evidence_pack(request, tenant_id)
 
+@router.get("/download/{evidence_pack_id}")
+async def one_click_evidence_download(
+    evidence_pack_id: str,
+    tenant_id: int = Query(..., description="Tenant ID"),
+    format: str = Query("zip", description="Download format: zip, pdf, json"),
+    service: EvidencePackService = Depends(get_evidence_service)
+):
+    """One-click evidence pack download - Task 6.4.40"""
+    
+    try:
+        # Create export request for one-click download
+        export_request = EvidenceExportRequest(
+            evidence_pack_id=evidence_pack_id,
+            export_format=EvidenceFormat.ZIP if format == "zip" else EvidenceFormat.JSON,
+            include_attachments=True,
+            include_metadata=True,
+            include_audit_trail=True,
+            digital_signature=True,
+            export_reason="One-click user download"
+        )
+        
+        # Export the evidence pack
+        export_result = await service.export_evidence_pack(export_request, tenant_id)
+        
+        # Return download-ready response
+        return {
+            "download_ready": True,
+            "evidence_pack_id": evidence_pack_id,
+            "format": format,
+            "download_url": f"/api/evidence-packs/download/{evidence_pack_id}/file?format={format}",
+            "file_size_bytes": export_result.get("file_size_bytes", 0),
+            "expires_at": (datetime.utcnow() + timedelta(hours=24)).isoformat(),
+            "digital_signature": export_result.get("digital_signature"),
+            "export_metadata": export_result
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ One-click download failed for {evidence_pack_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Download preparation failed: {str(e)}")
+
+@router.get("/download/{evidence_pack_id}/file")
+async def download_evidence_file(
+    evidence_pack_id: str,
+    tenant_id: int = Query(..., description="Tenant ID"),
+    format: str = Query("zip", description="File format"),
+    service: EvidencePackService = Depends(get_evidence_service)
+):
+    """Download evidence pack file directly - Task 6.4.40"""
+    
+    from fastapi.responses import StreamingResponse
+    import tempfile
+    import os
+    
+    try:
+        # Generate the evidence pack file
+        export_request = EvidenceExportRequest(
+            evidence_pack_id=evidence_pack_id,
+            export_format=EvidenceFormat.ZIP if format == "zip" else EvidenceFormat.JSON,
+            include_attachments=True,
+            include_metadata=True,
+            include_audit_trail=True,
+            digital_signature=True,
+            export_reason="Direct file download"
+        )
+        
+        export_result = await service.export_evidence_pack(export_request, tenant_id)
+        
+        # Create temporary file for download
+        with tempfile.NamedTemporaryFile(delete=False, suffix=f".{format}") as temp_file:
+            if format == "zip":
+                # Create ZIP file with evidence data
+                with zipfile.ZipFile(temp_file, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                    zip_file.writestr("evidence_pack.json", json.dumps(export_result, indent=2))
+                    if "attachments" in export_result:
+                        for attachment in export_result["attachments"]:
+                            zip_file.writestr(f"attachments/{attachment['filename']}", attachment['content'])
+            else:
+                # JSON format
+                temp_file.write(json.dumps(export_result, indent=2).encode())
+            
+            temp_file_path = temp_file.name
+        
+        # Stream the file for download
+        def file_generator():
+            with open(temp_file_path, 'rb') as f:
+                while chunk := f.read(8192):
+                    yield chunk
+            # Clean up temp file after streaming
+            os.unlink(temp_file_path)
+        
+        filename = f"evidence_pack_{evidence_pack_id}.{format}"
+        media_type = "application/zip" if format == "zip" else "application/json"
+        
+        return StreamingResponse(
+            file_generator(),
+            media_type=media_type,
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ File download failed for {evidence_pack_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"File download failed: {str(e)}")
+
 @router.post("/search")
 async def search_evidence_packs(
     request: EvidenceSearchRequest,

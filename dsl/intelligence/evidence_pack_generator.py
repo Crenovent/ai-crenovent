@@ -200,6 +200,49 @@ class EvidencePackGenerator:
             evidence_id: Unique identifier for the generated evidence pack
         """
         try:
+            return await self._generate_evidence_pack_internal(
+                evidence_type, tenant_id, industry_code, tenant_tier,
+                evidence_data, created_by, business_context, supporting_documents
+            )
+        except Exception as e:
+            logger.error(f"Evidence pack generation failed: {e}")
+            # Trigger evidence write failure fallback - Task 6.4.23
+            await self._trigger_evidence_write_failure_fallback(
+                tenant_id, str(evidence_type.value), str(e)
+            )
+            raise
+    
+    async def _trigger_evidence_write_failure_fallback(
+        self,
+        tenant_id: int,
+        evidence_type: str,
+        error_message: str
+    ):
+        """Trigger fallback when evidence write fails"""
+        try:
+            fallback_data = {
+                "request_id": f"evidence_write_failure_{uuid.uuid4()}",
+                "tenant_id": str(tenant_id),
+                "workflow_id": f"evidence_{evidence_type}",
+                "current_system": "rbia",
+                "error_type": "evidence_write_failure",
+                "error_message": f"Evidence write failed: {error_message}",
+                "evidence_type": evidence_type
+            }
+            
+            logger.warning(f"Triggering evidence write failure fallback: {json.dumps(fallback_data)}")
+            
+        except Exception as fallback_error:
+            logger.error(f"Failed to trigger evidence write failure fallback: {fallback_error}")
+    
+    async def _generate_evidence_pack_internal(
+        self, evidence_type: EvidenceType, tenant_id: int,
+        industry_code: str, tenant_tier: str,
+        evidence_data: Dict[str, Any], created_by: str,
+        business_context: Dict[str, Any] = None,
+        supporting_documents: List[Dict[str, Any]] = None
+    ) -> str:
+        try:
             evidence_id = str(uuid.uuid4())
             
             # Get industry configuration (dynamic, not hardcoded)

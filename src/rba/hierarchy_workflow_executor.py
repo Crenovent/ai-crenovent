@@ -59,6 +59,10 @@ except ImportError:
             return df, 0.8, "MOCK_SYSTEM"
     
     class OptimizedUniversalMapper:
+        def __init__(self, enable_caching=True, chunk_size=1000):
+            self.enable_caching = enable_caching
+            self.chunk_size = chunk_size
+        
         def map_any_hrms_to_crenovent_vectorized(self, df):
             return df
     

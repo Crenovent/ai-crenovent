@@ -1,0 +1,24 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Explainability Response Schema",
+    "type": "object",
+    "properties": {
+      "explanation_id": {
+        "type": "string",
+        "description": "Unique explanation identifier"
+      },
+      "node_id": {
+        "type": "string",
+        "description": "ML node identifier"
+      },
+      "explanation_type": {
+        "type": "string",
+        "enum": ["shap", "lime", "reason_codes"]
+      },
+      "explanation_data": {
+        "type": "object",
+        "description": "Explanation results"
+      }
+    },
+    "required": ["explanation_id", "node_id", "explanation_type", "explanation_data"]
+  }

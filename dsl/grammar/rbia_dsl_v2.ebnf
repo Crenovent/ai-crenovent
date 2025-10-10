@@ -1,0 +1,159 @@
+(* RBIA DSL v2 Grammar - Task 6.2.1 *)
+(* Hybrid Workflow Compiler Grammar: deterministic + ML nodes *)
+(* Backward compatible with RBA, adds ML decision capabilities *)
+
+(* Root Production *)
+workflow = "workflow_id" ":" workflow_id 
+          "name" ":" string
+          "module" ":" string  
+          "automation_type" ":" automation_type
+          "version" ":" version
+          "policy_pack" ":" policy_pack?
+          "governance" ":" governance_block?
+          "steps" ":" "[" step_list "]" ;
+
+(* Core Types *)
+workflow_id = identifier ;
+automation_type = "RBA" | "RBIA" | "AALA" ;
+version = string ;
+policy_pack = string ;
+
+(* Step Definitions *)
+step_list = step ( "," step )* ;
+step = "{" step_body "}" ;
+step_body = "id" ":" identifier
+          "type" ":" step_type
+          "params" ":" params_block
+          "outputs" ":" outputs_block?
+          "governance" ":" governance_block?
+          "next_steps" ":" "[" identifier_list "]"?
+          "fallback" ":" fallback_block? ;
+
+(* Step Types - Backward Compatible + New ML Types *)
+step_type = traditional_step | ml_step | control_flow_step ;
+traditional_step = "query" | "decision" | "action" | "notify" | "governance" | "agent_call" ;
+ml_step = "ml_node" | "ml_predict" | "ml_score" | "ml_classify" | "ml_explain" ;
+control_flow_step = "match" | "when" ;
+
+(* ML Node Specific Grammar *)
+params_block = "{" param_list "}" ;
+param_list = param ( "," param )* ;
+param = param_name ":" param_value ;
+param_name = identifier ;
+param_value = string | number | boolean | object | array | ml_config | feature_ref ;
+
+(* Feature Reference Syntax *)
+feature_ref = feature_namespace "." feature_name ;
+feature_namespace = identifier ;
+feature_name = identifier ;
+
+(* ML Configuration Block *)
+ml_config = "{" ml_param_list "}" ;
+ml_param_list = ml_param ( "," ml_param )* ;
+ml_param = model_param | threshold_param | confidence_param | explainability_param ;
+
+model_param = "model_id" ":" string 
+            "model_version" ":" string? ;
+
+threshold_param = "threshold" ":" number 
+                | "confidence_threshold" ":" number
+                | "score_threshold" ":" number ;
+
+confidence_param = "confidence" ":" "{" 
+                  "min_confidence" ":" number
+                  "auto_execute_above" ":" number?
+                  "assisted_mode_below" ":" number?
+                  "}" ;
+
+explainability_param = "explainability" ":" "{" 
+                      "enabled" ":" boolean
+                      "method" ":" explainability_method
+                      "params" ":" explainability_params?
+                      "}" ;
+
+explainability_method = "shap" | "lime" | "gradient" | "attention" | "counterfactual" ;
+explainability_params = "{" explainability_param_list "}" ;
+explainability_param_list = explainability_param_item ( "," explainability_param_item )* ;
+explainability_param_item = identifier ":" param_value ;
+
+(* Fallback Configuration *)
+fallback_block = "{" fallback_config "}" ;
+fallback_config = "enabled" ":" boolean
+                 "fallback" ":" "[" fallback_list "]"
+                 "trigger_conditions" ":" trigger_conditions? ;
+
+fallback_list = fallback_item ( "," fallback_item )* ;
+fallback_item = "{" fallback_step "}" ;
+fallback_step = "type" ":" fallback_type
+               "target" ":" identifier
+               "condition" ":" condition_expr? ;
+
+fallback_type = "rba_rule" | "default_action" | "human_escalation" | "previous_step" ;
+
+(* Trigger Conditions *)
+trigger_conditions = "[" condition_list "]" ;
+condition_list = condition_expr ( "," condition_expr )* ;
+condition_expr = confidence_condition | error_condition | timeout_condition | ml_predicate_condition ;
+confidence_condition = "confidence" comparison_op number ;
+error_condition = "error" ":" string ;
+timeout_condition = "timeout" ":" number ;
+ml_predicate_condition = "ml_result" comparison_op ml_value | "prediction" comparison_op ml_value ;
+ml_value = number | string | boolean ;
+comparison_op = "<" | "<=" | ">" | ">=" | "==" | "!=" ;
+
+(* Governance Block *)
+governance_block = "{" governance_params "}" ;
+governance_params = governance_param ( "," governance_param )* ;
+governance_param = policy_param | evidence_param | approval_param | residency_param | sla_param ;
+
+policy_param = "policy_id" ":" string ;
+evidence_param = "evidence_capture" ":" boolean 
+               | "evidence_pack_required" ":" boolean ;
+approval_param = "approval_required" ":" boolean
+               | "approver_roles" ":" "[" string_list "]" ;
+residency_param = "region_id" ":" string
+                | "data_residency" ":" string ;
+sla_param = "sla_budget_ms" ":" number
+          | "sla_tier" ":" sla_tier_value ;
+sla_tier_value = "T0" | "T1" | "T2" ;
+
+(* Output Configuration *)
+outputs_block = "{" output_list "}" ;
+output_list = output_param ( "," output_param )* ;
+output_param = identifier ":" string ;
+
+(* Primitive Types *)
+identifier = letter ( letter | digit | "_" | "-" )* ;
+string = "\"" character* "\"" ;
+number = integer | float ;
+integer = digit+ ;
+float = digit+ "." digit+ ;
+boolean = "true" | "false" ;
+letter = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" 
+       | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+       | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M"
+       | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" ;
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+character = letter | digit | " " | "!" | "@" | "#" | "$" | "%" | "^" | "&" | "*" 
+          | "(" | ")" | "-" | "_" | "+" | "=" | "{" | "}" | "[" | "]" | "|" | "\\"
+          | ":" | ";" | "'" | "<" | ">" | "," | "." | "?" | "/" | "~" | "`" ;
+
+(* Collection Types *)
+array = "[" array_elements? "]" ;
+array_elements = param_value ( "," param_value )* ;
+object = "{" object_elements? "}" ;
+object_elements = object_pair ( "," object_pair )* ;
+object_pair = string ":" param_value ;
+
+(* Match/When Control Flow *)
+match_block = "{" match_cases "}" ;
+match_cases = match_case ( "," match_case )* ;
+match_case = "when" ":" condition_expr "then" ":" "[" identifier_list "]" ;
+
+(* Utility Lists *)
+identifier_list = identifier ( "," identifier )* ;
+string_list = string ( "," string )* ;
+
+(* Comments *)
+comment = "(*" comment_text "*)" ;
+comment_text = ( character | comment )* ;

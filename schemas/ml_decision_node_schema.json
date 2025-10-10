@@ -1,0 +1,376 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ML Decision Node Schema",
+  "description": "Schema for ML decision nodes in RBIA workflows - defines inputs, thresholds, outputs, and confidence requirements",
+  "type": "object",
+  "required": [
+    "node_id",
+    "node_type",
+    "model_id",
+    "input_schema",
+    "output_schema",
+    "confidence_threshold",
+    "fallback_config"
+  ],
+  "properties": {
+    "node_id": {
+      "type": "string",
+      "description": "Unique identifier for the ML decision node",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "node_type": {
+      "type": "string",
+      "enum": ["predict", "score", "classify", "explain"],
+      "description": "Type of ML primitive this node implements"
+    },
+    "model_id": {
+      "type": "string",
+      "description": "Identifier of the ML model to use",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "model_version": {
+      "type": "string",
+      "description": "Version of the ML model",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "default": "1.0.0"
+    },
+    "input_schema": {
+      "type": "object",
+      "description": "Schema defining required input features",
+      "required": ["features"],
+      "properties": {
+        "features": {
+          "type": "array",
+          "description": "List of required input features",
+          "items": {
+            "type": "object",
+            "required": ["name", "type", "required"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Feature name",
+                "pattern": "^[a-zA-Z0-9_-]+$"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["string", "integer", "float", "boolean", "array", "object"],
+                "description": "Feature data type"
+              },
+              "required": {
+                "type": "boolean",
+                "description": "Whether this feature is required"
+              },
+              "description": {
+                "type": "string",
+                "description": "Human-readable description of the feature"
+              },
+              "validation_rules": {
+                "type": "object",
+                "description": "Validation rules for the feature",
+                "properties": {
+                  "min_value": {"type": "number"},
+                  "max_value": {"type": "number"},
+                  "min_length": {"type": "integer"},
+                  "max_length": {"type": "integer"},
+                  "pattern": {"type": "string"},
+                  "enum_values": {
+                    "type": "array",
+                    "items": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "description": "Schema defining expected outputs",
+      "required": ["prediction", "confidence"],
+      "properties": {
+        "prediction": {
+          "type": "object",
+          "description": "Schema for prediction output",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean", "object", "array"],
+              "description": "Type of prediction value"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the prediction"
+            }
+          }
+        },
+        "confidence": {
+          "type": "object",
+          "description": "Schema for confidence score",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["float"],
+              "default": "float"
+            },
+            "min": {
+              "type": "number",
+              "default": 0.0
+            },
+            "max": {
+              "type": "number",
+              "default": 1.0
+            },
+            "description": {
+              "type": "string",
+              "default": "Confidence score between 0 and 1"
+            }
+          }
+        },
+        "feature_importance": {
+          "type": "object",
+          "description": "Schema for feature importance scores",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["object"],
+              "default": "object"
+            },
+            "description": {
+              "type": "string",
+              "default": "Feature importance scores as key-value pairs"
+            }
+          }
+        },
+        "explanation": {
+          "type": "object",
+          "description": "Schema for model explanation",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["object"],
+              "default": "object"
+            },
+            "description": {
+              "type": "string",
+              "default": "Model explanation data"
+            }
+          }
+        }
+      }
+    },
+    "confidence_threshold": {
+      "type": "number",
+      "description": "Minimum confidence threshold for ML prediction",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "default": 0.7
+    },
+    "fallback_config": {
+      "type": "object",
+      "description": "Configuration for fallback to deterministic rules",
+      "required": ["enabled"],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether fallback is enabled",
+          "default": true
+        },
+        "fallback_rules": {
+          "type": "array",
+          "description": "List of fallback rules to execute when confidence is low",
+          "items": {
+            "type": "object",
+            "required": ["rule_type", "condition"],
+            "properties": {
+              "rule_type": {
+                "type": "string",
+                "enum": ["threshold", "field_check", "custom"],
+                "description": "Type of fallback rule"
+              },
+              "condition": {
+                "type": "string",
+                "description": "Condition expression for the rule"
+              },
+              "action": {
+                "type": "object",
+                "description": "Action to take when condition is met",
+                "properties": {
+                  "prediction": {
+                    "type": "string",
+                    "description": "Fallback prediction value"
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "description": "Fallback confidence score"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Reason for fallback"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "explainability_config": {
+      "type": "object",
+      "description": "Configuration for model explainability",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether explainability is enabled",
+          "default": true
+        },
+        "methods": {
+          "type": "array",
+          "description": "List of explainability methods to use",
+          "items": {
+            "type": "string",
+            "enum": ["shap", "lime", "gradient", "attention", "counterfactual"]
+          },
+          "default": ["shap"]
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Parameters for explainability methods",
+          "properties": {
+            "shap": {
+              "type": "object",
+              "description": "SHAP-specific parameters",
+              "properties": {
+                "background_samples": {
+                  "type": "integer",
+                  "default": 100
+                },
+                "max_evals": {
+                  "type": "integer",
+                  "default": 1000
+                }
+              }
+            },
+            "lime": {
+              "type": "object",
+              "description": "LIME-specific parameters",
+              "properties": {
+                "num_features": {
+                  "type": "integer",
+                  "default": 10
+                },
+                "num_samples": {
+                  "type": "integer",
+                  "default": 5000
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "governance_config": {
+      "type": "object",
+      "description": "Governance configuration for the ML node",
+      "properties": {
+        "evidence_required": {
+          "type": "boolean",
+          "description": "Whether evidence capture is required",
+          "default": true
+        },
+        "audit_logging": {
+          "type": "boolean",
+          "description": "Whether to log all executions for audit",
+          "default": true
+        },
+        "bias_monitoring": {
+          "type": "boolean",
+          "description": "Whether to monitor for bias in predictions",
+          "default": true
+        },
+        "drift_monitoring": {
+          "type": "boolean",
+          "description": "Whether to monitor for model drift",
+          "default": true
+        },
+        "override_required": {
+          "type": "boolean",
+          "description": "Whether manual override is required for low confidence",
+          "default": false
+        }
+      }
+    },
+    "performance_config": {
+      "type": "object",
+      "description": "Performance configuration for the ML node",
+      "properties": {
+        "timeout_seconds": {
+          "type": "integer",
+          "description": "Maximum execution time in seconds",
+          "default": 30,
+          "minimum": 1,
+          "maximum": 300
+        },
+        "max_retries": {
+          "type": "integer",
+          "description": "Maximum number of retries on failure",
+          "default": 3,
+          "minimum": 0,
+          "maximum": 10
+        },
+        "cache_enabled": {
+          "type": "boolean",
+          "description": "Whether to cache predictions",
+          "default": false
+        },
+        "cache_ttl_seconds": {
+          "type": "integer",
+          "description": "Cache time-to-live in seconds",
+          "default": 3600,
+          "minimum": 60
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata for the ML node",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of the node"
+        },
+        "tags": {
+          "type": "array",
+          "description": "Tags for categorizing the node",
+          "items": {
+            "type": "string"
+          }
+        },
+        "industry": {
+          "type": "string",
+          "description": "Target industry for this node",
+          "enum": ["saas", "banking", "insurance", "ecommerce", "financial_services", "general"]
+        },
+        "created_by": {
+          "type": "string",
+          "description": "User who created this node"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

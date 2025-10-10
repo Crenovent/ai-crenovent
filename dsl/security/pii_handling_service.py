@@ -655,7 +655,7 @@ class PIIHandlingManager:
         sla_tier: str = "bronze"
     ) -> Dict[str, Any]:
         """
-        Comprehensive PII protection processing
+        Comprehensive PII protection processing with leak detection - Task 6.4.30
         """
         try:
             # Step 1: Detect and classify PII
@@ -663,6 +663,9 @@ class PIIHandlingManager:
             
             if not classifications:
                 return data
+            
+            # Check for PII/PHI leak risk
+            await self._check_pii_phi_leak_risk(classifications, tenant_id, data)
             
             # Step 2: Apply masking
             masked_data = await self.masking_service.apply_masking(
@@ -694,3 +697,69 @@ class PIIHandlingManager:
         except Exception as e:
             logger.error(f"❌ PII protection failed: {e}")
             return data
+    
+    async def _check_pii_phi_leak_risk(
+        self,
+        classifications: List,
+        tenant_id: int,
+        original_data: Dict[str, Any]
+    ):
+        """Check for PII/PHI leak risk and trigger fallback if detected"""
+        try:
+            # Define high-risk PII/PHI categories
+            HIGH_RISK_CATEGORIES = {
+                PIICategory.SSN, PIICategory.AADHAAR, PIICategory.PAN,
+                PIICategory.HEALTH_RECORD, PIICategory.MEDICAL_DATA,
+                PIICategory.ACCOUNT_NUMBER, PIICategory.CREDIT_SCORE
+            }
+            
+            # Check for high-risk PII/PHI
+            high_risk_fields = [
+                c for c in classifications 
+                if c.category in HIGH_RISK_CATEGORIES and c.confidence_score > 0.8
+            ]
+            
+            if high_risk_fields:
+                logger.warning(f"High-risk PII/PHI detected: {len(high_risk_fields)} fields")
+                
+                # Trigger PII/PHI leak fallback
+                await self._trigger_pii_phi_leak_fallback(
+                    tenant_id, high_risk_fields, original_data
+                )
+                
+        except Exception as e:
+            logger.error(f"Failed to check PII/PHI leak risk: {e}")
+    
+    async def _trigger_pii_phi_leak_fallback(
+        self,
+        tenant_id: int,
+        high_risk_fields: List,
+        original_data: Dict[str, Any]
+    ):
+        """Trigger fallback when PII/PHI leak is detected"""
+        try:
+            leak_details = [
+                {
+                    "field": field.field_name,
+                    "category": field.category.value,
+                    "sensitivity": field.sensitivity_level.value,
+                    "confidence": field.confidence_score
+                }
+                for field in high_risk_fields
+            ]
+            
+            fallback_data = {
+                "request_id": f"pii_phi_leak_{uuid.uuid4()}",
+                "tenant_id": str(tenant_id),
+                "workflow_id": "pii_protection",
+                "current_system": "rbia",
+                "error_type": "pii_phi_leak",
+                "error_message": f"High-risk PII/PHI leak detected: {len(high_risk_fields)} fields",
+                "leak_details": leak_details,
+                "data_size": len(original_data)
+            }
+            
+            logger.critical(f"Triggering PII/PHI leak fallback: {json.dumps(fallback_data)}")
+            
+        except Exception as fallback_error:
+            logger.error(f"Failed to trigger PII/PHI leak fallback: {fallback_error}")

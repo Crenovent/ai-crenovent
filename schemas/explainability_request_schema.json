@@ -1,0 +1,21 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Explainability Request Schema",
+    "type": "object",
+    "properties": {
+      "node_id": {
+        "type": "string",
+        "description": "Identifier of the ML node"
+      },
+      "input_data": {
+        "type": "object",
+        "description": "Input data for explanation"
+      },
+      "explanation_type": {
+        "type": "string",
+        "enum": ["shap", "lime", "reason_codes"],
+        "description": "Type of explanation requested"
+      }
+    },
+    "required": ["node_id", "input_data", "explanation_type"]
+  }
