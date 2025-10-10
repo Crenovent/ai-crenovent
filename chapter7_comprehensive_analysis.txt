@@ -1,0 +1,1490 @@
+CHAPTER 7 - COMPREHENSIVE TASK ANALYSIS
+==================================================
+
+Total Tasks: 210
+Implemented: 14
+Partial: 1
+Not Implemented: 195
+Implementation Rate: 6.9%
+
+SECTION 7.1 - DSL Grammar & Primitives
+----------------------------------------
+7.1.1: Define DSL taxonomy (workflow, policy, connector, agent).
+  Status: IMPLEMENTED
+  Purpose: Shared language across modules.
+  Tech: ADR docs.
+  Notes: Foundation for EPIC-1 Ch.7.1.
+  Evidence: dsl/compiler/parser.py - StepType enum with 6 core + 6 SaaS primitives
+
+7.1.2: Build DSL schema in YAML/JSON.
+  Status: PARTIAL
+  Purpose: Declarative and machine-readable.
+  Tech: JSON Schema, YAML specs.
+  Notes: Governance fields mandatory.
+  Evidence: dsl/compiler/parser.py - YAML/JSON parsing support
+  Missing: Formal JSON Schema definition files
+
+7.1.3: Configure mandatory metadata fields (tenant_id, region_id, SLA, policy_pack).
+  Status: IMPLEMENTED
+  Purpose: Governance-aware DSL.
+  Tech: JSON Schema validation.
+  Notes: Fail-closed if missing.
+  Evidence: dsl/compiler/parser.py - _validate_governance_fields method
+
+7.1.4: Implement DSL parser.
+  Status: IMPLEMENTED
+  Purpose: Translate DSL into executable plans.
+  Tech: Python parser, ANTLR.
+  Notes: Hooks into orchestrator.
+  Evidence: dsl/compiler/parser.py - DSLCompiler class with full parsing
+
+7.1.5: Build DSL compiler.
+  Status: IMPLEMENTED
+  Purpose: Convert DSL into workflow DAGs.
+  Tech: Python + Orchestrator DAG builder.
+  Notes: SLA/error budget annotated.
+  Evidence: dsl/compiler/runtime.py - WorkflowRuntime with DAG execution
+
+7.1.6: Create policy-as-tests integration for DSL.
+  Status: IMPLEMENTED
+  Purpose: Block non-compliant DSL.
+  Tech: OPA/Rego checks.
+  Notes: Logs stored in evidence packs.
+  Evidence: dsl/compiler/parser.py - _validate_policy_compliance method
+
+7.1.7: Build schema registry integration.
+  Status: NOT_IMPLEMENTED
+  Purpose: Enforce contracts in DSL.
+  Tech: JSON/Avro schema registry.
+  Notes: Tied to Ch.11.2.
+  Missing: Implementation needed
+
+7.1.8: Automate consent validation in DSL.
+  Status: IMPLEMENTED
+  Purpose: GDPR/DPDP compliance.
+  Tech: Consent schema hooks.
+  Notes: Consent_id required.
+  Evidence: dsl/compiler/parser.py - _validate_consent_compliance method (just added)
+
+7.1.9: Configure residency enforcement in DSL syntax.
+  Status: IMPLEMENTED
+  Purpose: Prevent cross-border leakage.
+  Tech: Region filters.
+  Notes: Fail-closed if breached.
+  Evidence: dsl/compiler/parser.py - _validate_residency_compliance method (just added)
+
+7.1.10: Add trust score annotations in DSL.
+  Status: NOT_IMPLEMENTED
+  Purpose: Reliability metadata included.
+  Tech: Trust engine.
+  Notes: Used in agent orchestration.
+  Missing: Implementation needed
+
+7.1.11: Build DSL library of primitives.
+  Status: NOT_IMPLEMENTED
+  Purpose: Standard reusable functions.
+  Tech: YAML/JSON templates.
+  Notes: Connectors, agents, workflows.
+  Missing: Implementation needed
+
+7.1.12: Automate DSL linting.
+  Status: IMPLEMENTED
+  Purpose: Catch syntax/policy issues early.
+  Tech: DSL linter.
+  Notes: CI/CD enforcement.
+  Evidence: dsl/compiler/parser.py - _lint_workflow method with comprehensive rules
+
+7.1.13: Create DSL unit testing framework.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate workflows locally.
+  Tech: pytest + DSL mocks.
+  Notes: Test harness integrated.
+  Missing: Implementation needed
+
+7.1.14: Build DSL evidence pack generator.
+  Status: IMPLEMENTED
+  Purpose: Immutable compliance logs.
+  Tech: Evidence DB, JSON packs.
+  Notes: Linked to override ledger.
+  Evidence: dsl/intelligence/evidence_pack_generator.py - EvidencePackGenerator
+
+7.1.15: Add override ledger hooks for DSL exceptions.
+  Status: IMPLEMENTED
+  Purpose: Track human interventions.
+  Tech: Override ledger DB.
+  Notes: Immutable + auditable.
+  Evidence: dsl/database/multi_tenant_schema.sql - dsl_override_ledger table with RLS
+
+7.1.16: Configure DSL reconciliation checks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate DSL ↔ execution trace.
+  Tech: dbt reconciliation tests.
+  Notes: Fail CI/CD if mismatch.
+  Missing: Implementation needed
+
+7.1.17: Build FinOps attribution for DSL jobs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Tenant-level cost visibility.
+  Tech: FinOps pipeline.
+  Notes: Linked to SLA tiers.
+  Missing: Implementation needed
+
+7.1.18: Create persona-specific DSL libraries.
+  Status: NOT_IMPLEMENTED
+  Purpose: CRO, Ops, Compliance tailored workflows.
+  Tech: Prebuilt DSL templates.
+  Notes: Linked to industry overlays.
+  Missing: Implementation needed
+
+7.1.19: Build DSL visualization tool.
+  Status: NOT_IMPLEMENTED
+  Purpose: Human-readable diagrams.
+  Tech: Graphviz, React UI.
+  Notes: Exportable PNG/SVG.
+  Missing: Implementation needed
+
+7.1.20: Automate DSL versioning (SemVer).
+  Status: NOT_IMPLEMENTED
+  Purpose: Safe evolution.
+  Tech: GitOps, registry metadata.
+  Notes: N-2 compatibility enforced.
+  Missing: Implementation needed
+
+7.1.21: Configure drift detection for DSL specs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Catch syntax/contract rot.
+  Tech: Drift jobs.
+  Notes: Auto-open remediation tickets.
+  Missing: Implementation needed
+
+7.1.22: Build chaos tests for DSL execution.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate resilience.
+  Tech: Chaos Mesh, mocks.
+  Notes: Must recover within SLA.
+  Missing: Implementation needed
+
+7.1.23: Publish DSL developer handbook.
+  Status: NOT_IMPLEMENTED
+  Purpose: Standard onboarding.
+  Tech: Docs site.
+  Notes: Linked to governance packs.
+  Missing: Implementation needed
+
+7.1.24: Create regulator dashboards on DSL usage.
+  Status: NOT_IMPLEMENTED
+  Purpose: Compliance transparency.
+  Tech: Grafana dashboards.
+  Notes: Exportable CSV/PDF.
+  Missing: Implementation needed
+
+7.1.25: Build SLA dashboards for DSL execution.
+  Status: NOT_IMPLEMENTED
+  Purpose: SLA/error budget visibility.
+  Tech: Grafana dashboards.
+  Notes: Persona-scoped.
+  Missing: Implementation needed
+
+7.1.26: Configure consent dashboards for DSL queries.
+  Status: NOT_IMPLEMENTED
+  Purpose: Transparency into privacy usage.
+  Tech: Compliance dashboards.
+  Notes: Must show masking/redactions.
+  Missing: Implementation needed
+
+7.1.27: Automate anomaly detection in DSL workflows.
+  Status: NOT_IMPLEMENTED
+  Purpose: Detect rogue patterns.
+  Tech: ML anomaly detection.
+  Notes: Alerts escalated SEV-1.
+  Missing: Implementation needed
+
+7.1.28: Build predictive analytics on DSL trust.
+  Status: NOT_IMPLEMENTED
+  Purpose: Anticipate failures.
+  Tech: ML pipelines.
+  Notes: ARR/churn signals.
+  Missing: Implementation needed
+
+7.1.29: Create DSL sandbox environment.
+  Status: NOT_IMPLEMENTED
+  Purpose: Safe tenant experimentation.
+  Tech: Mock connectors, datasets.
+  Notes: Linked to policy packs.
+  Missing: Implementation needed
+
+7.1.30: Build replay/reprocessing support for DSL.
+  Status: NOT_IMPLEMENTED
+  Purpose: Controlled recovery.
+  Tech: Replay workers.
+  Notes: Ledger approvals logged.
+  Missing: Implementation needed
+
+7.1.31: Automate archival of DSL specs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Compliance retention.
+  Tech: Cold storage.
+  Notes: ≥7 years if regulated.
+  Missing: Implementation needed
+
+7.1.32: Configure tamper-evident DSL logs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Immutable audit history.
+  Tech: Hash chaining, blockchain anchoring.
+  Notes: For Banking/Insurance.
+  Missing: Implementation needed
+
+7.1.33: Build DSL runbooks for Ops.
+  Status: NOT_IMPLEMENTED
+  Purpose: Standard troubleshooting.
+  Tech: Docs site.
+  Notes: Linked to override ledger.
+  Missing: Implementation needed
+
+7.1.34: Automate SLA-aware retries for DSL jobs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Reliable recovery.
+  Tech: Retry engine + jitter.
+  Notes: SLA tier aware.
+  Missing: Implementation needed
+
+7.1.35: Configure FinOps dashboards for DSL usage.
+  Status: NOT_IMPLEMENTED
+  Purpose: Exec/Compliance visibility.
+  Tech: Grafana dashboards.
+  Notes: Supports showback/chargeback.
+  Missing: Implementation needed
+
+7.1.36: Provide regulator-ready DSL evidence viewer.
+  Status: NOT_IMPLEMENTED
+  Purpose: Self-serve compliance access.
+  Tech: React UI + Evidence DB.
+  Notes: Read-only mode.
+  Missing: Implementation needed
+
+7.1.37: Build multi-tenant DSL isolation checks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate tenant boundaries.
+  Tech: Synthetic workloads.
+  Notes: Fail-closed if leakage.
+  Missing: Implementation needed
+
+7.1.38: Automate regulator notifications tied to DSL changes.
+  Status: NOT_IMPLEMENTED
+  Purpose: Meet legal obligations.
+  Tech: Workflow automation.
+  Notes: Evidence attached.
+  Missing: Implementation needed
+
+7.1.39: Conduct quarterly DSL governance audits.
+  Status: NOT_IMPLEMENTED
+  Purpose: Compliance posture validated.
+  Tech: Audit scripts.
+  Notes: Reports exportable.
+  Missing: Implementation needed
+
+7.1.40: Publish “DSL Governance Checklist.”
+  Status: NOT_IMPLEMENTED
+  Purpose: Standard enforcement guardrails.
+  Tech: Docs site.
+  Notes: Reviewed quarterly.
+  Missing: Implementation needed
+
+7.1.41: Configure SoD enforcement for DSL approvals.
+  Status: NOT_IMPLEMENTED
+  Purpose: Prevent single-person overrides.
+  Tech: ABAC engine.
+  Notes: Logged in evidence packs.
+  Missing: Implementation needed
+
+7.1.42: Build resilience dashboards for DSL runs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Prove fallback handling.
+  Tech: Grafana dashboards.
+  Notes: Ops persona required.
+  Missing: Implementation needed
+
+SECTION 7.2 - Composable Blocks
+----------------------------------------
+7.2.1: Define composable block taxonomy (connectors, workflows, agents, dashboards, policies).
+  Status: NOT_IMPLEMENTED
+  Purpose: Shared baseline across teams.
+  Tech: ADR docs.
+  Notes: Align with EPIC-1 Ch.7.2.
+  Missing: Implementation needed
+
+7.2.2: Build schema for composable blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Standardized definition.
+  Tech: JSON/YAML schema.
+  Notes: Governance fields required.
+  Missing: Implementation needed
+
+7.2.3: Configure registry for composable blocks.
+  Status: IMPLEMENTED
+  Purpose: Central source of truth.
+  Tech: Capability Registry.
+  Notes: tenant_id, region_id, SLA logged.
+  Evidence: dsl/registry/enhanced_capability_registry.py - EnhancedCapabilityRegistry
+
+7.2.4: Implement connector blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Prebuilt integrations.
+  Tech: API templates (CRM, Billing, CLM).
+  Notes: Must pass policy-as-tests.
+  Missing: Implementation needed
+
+7.2.5: Implement workflow blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Declarative execution flows.
+  Tech: DSL templates.
+  Notes: Linked to orchestrator.
+  Missing: Implementation needed
+
+7.2.6: Implement agent blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Autonomous task execution.
+  Tech: AI agent runtime.
+  Notes: SLA + trust scoring included.
+  Missing: Implementation needed
+
+7.2.7: Implement dashboard blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Prebuilt persona dashboards.
+  Tech: Grafana/PowerBI templates.
+  Notes: Exec, Ops, Compliance overlays.
+  Missing: Implementation needed
+
+7.2.8: Implement policy blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Governance applied at design-time.
+  Tech: OPA/Rego templates.
+  Notes: Industry overlays (GDPR, HIPAA).
+  Missing: Implementation needed
+
+7.2.9: Automate evidence pack generation for blocks.
+  Status: IMPLEMENTED
+  Purpose: Immutable compliance artifacts.
+  Tech: JSON evidence DB.
+  Notes: Linked to override ledger.
+  Evidence: dsl/intelligence/evidence_pack_generator.py - block-level evidence generation
+
+7.2.10: Add override ledger hooks for block exceptions.
+  Status: IMPLEMENTED
+  Purpose: Track manual interventions.
+  Tech: Override ledger DB.
+  Notes: Immutable + auditable.
+  Evidence: dsl/database/multi_tenant_schema.sql - override ledger integration
+
+7.2.11: Configure SLA metadata in blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: SLA awareness by default.
+  Tech: Registry metadata.
+  Notes: T0/T1/T2 enforced.
+  Missing: Implementation needed
+
+7.2.12: Add consent enforcement to blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Privacy-preserving execution.
+  Tech: Consent schema.
+  Notes: Consent_id logged in evidence.
+  Missing: Implementation needed
+
+7.2.13: Build lineage tagging for blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Full traceability.
+  Tech: OpenLineage.
+  Notes: Block → workflow → dataset links.
+  Missing: Implementation needed
+
+7.2.14: Configure FinOps tagging in blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Tenant cost attribution.
+  Tech: FinOps pipeline.
+  Notes: Chargeback supported.
+  Missing: Implementation needed
+
+7.2.15: Build trust score calculation per block.
+  Status: IMPLEMENTED
+  Purpose: Quantify reliability.
+  Tech: Trust engine.
+  Notes: Scores stored in registry.
+  Evidence: api/trust_scoring_api.py - TrustScoringService with block-level calculations
+
+7.2.16: Automate block certification workflow.
+  Status: NOT_IMPLEMENTED
+  Purpose: Only validated blocks promoted.
+  Tech: CI/CD gates + policy checks.
+  Notes: Evidence attached.
+  Missing: Implementation needed
+
+7.2.17: Build block visualization portal.
+  Status: NOT_IMPLEMENTED
+  Purpose: Human-readable views.
+  Tech: React UI + Registry API.
+  Notes: Exportable PNG/SVG.
+  Missing: Implementation needed
+
+7.2.18: Automate block versioning (SemVer).
+  Status: NOT_IMPLEMENTED
+  Purpose: Safe evolution.
+  Tech: GitOps, registry.
+  Notes: Backward compatibility enforced.
+  Missing: Implementation needed
+
+7.2.19: Build anomaly detection for block usage.
+  Status: NOT_IMPLEMENTED
+  Purpose: Detect rogue or unusual behavior.
+  Tech: ML anomaly detection.
+  Notes: Alerts escalated SEV-1.
+  Missing: Implementation needed
+
+7.2.20: Configure DLQ/replay for failed block runs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Safe reprocessing.
+  Tech: Kafka DLQs.
+  Notes: Approvals logged in ledger.
+  Missing: Implementation needed
+
+7.2.21: Build replay runbooks for Ops.
+  Status: NOT_IMPLEMENTED
+  Purpose: Standardize remediation.
+  Tech: Docs site.
+  Notes: Linked to override ledger.
+  Missing: Implementation needed
+
+7.2.22: Automate chaos tests on composable blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate resilience.
+  Tech: Chaos Mesh.
+  Notes: Must recover within SLA.
+  Missing: Implementation needed
+
+7.2.23: Configure sandbox for block testing.
+  Status: NOT_IMPLEMENTED
+  Purpose: Safe experimentation.
+  Tech: Mock connectors, datasets.
+  Notes: Tenant-isolated.
+  Missing: Implementation needed
+
+7.2.24: Build regulator dashboards on block usage.
+  Status: NOT_IMPLEMENTED
+  Purpose: Compliance transparency.
+  Tech: Grafana dashboards.
+  Notes: Exportable CSV/PDF.
+  Missing: Implementation needed
+
+7.2.25: Configure consent dashboards per block.
+  Status: NOT_IMPLEMENTED
+  Purpose: Auditor visibility.
+  Tech: Compliance dashboards.
+  Notes: Must show masking/redactions.
+  Missing: Implementation needed
+
+7.2.26: Build SLA dashboards on block execution.
+  Status: NOT_IMPLEMENTED
+  Purpose: SLA/error budgets tracked.
+  Tech: Grafana dashboards.
+  Notes: Persona-specific views.
+  Missing: Implementation needed
+
+7.2.27: Automate drift detection in block definitions.
+  Status: NOT_IMPLEMENTED
+  Purpose: Prevent schema rot.
+  Tech: Drift detection jobs.
+  Notes: Auto-create remediation tasks.
+  Missing: Implementation needed
+
+7.2.28: Build predictive analytics on block reliability.
+  Status: NOT_IMPLEMENTED
+  Purpose: Anticipate failures.
+  Tech: ML pipelines.
+  Notes: ARR/churn signals.
+  Missing: Implementation needed
+
+7.2.29: Configure SoD enforcement on block usage.
+  Status: NOT_IMPLEMENTED
+  Purpose: Prevent conflicts of duty.
+  Tech: ABAC engine.
+  Notes: Logged in evidence packs.
+  Missing: Implementation needed
+
+7.2.30: Automate archival of deprecated blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Compliance lifecycle.
+  Tech: Cold storage.
+  Notes: Retain ≥7 years.
+  Missing: Implementation needed
+
+7.2.31: Build tamper-evident logs for block activity.
+  Status: NOT_IMPLEMENTED
+  Purpose: Immutable history.
+  Tech: Hash chains, blockchain anchoring.
+  Notes: Required for Banking/Insurance.
+  Missing: Implementation needed
+
+7.2.32: Provide regulator-ready replay of block runs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Prove compliance.
+  Tech: Replay engine.
+  Notes: Immutable + auditable.
+  Missing: Implementation needed
+
+7.2.33: Build FinOps dashboards scoped to blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Cost transparency.
+  Tech: Grafana + FinOps pipeline.
+  Notes: Supports chargeback.
+  Missing: Implementation needed
+
+7.2.34: Configure tenant isolation tests for blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate safety under multi-tenancy.
+  Tech: Synthetic workloads.
+  Notes: Fail closed on leakage.
+  Missing: Implementation needed
+
+7.2.35: Build trust dashboards scoped to blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Exec/Compliance visibility.
+  Tech: Grafana dashboards.
+  Notes: Linked to trust scoring engine.
+  Missing: Implementation needed
+
+7.2.36: Automate regulator notifications for block changes.
+  Status: NOT_IMPLEMENTED
+  Purpose: Meet legal obligations.
+  Tech: Workflow automation.
+  Notes: Logged in evidence packs.
+  Missing: Implementation needed
+
+7.2.37: Publish “Composable Blocks Handbook.”
+  Status: NOT_IMPLEMENTED
+  Purpose: Developer guide.
+  Tech: Docs site.
+  Notes: Updated quarterly.
+  Missing: Implementation needed
+
+7.2.38: Automate quarterly block governance audits.
+  Status: NOT_IMPLEMENTED
+  Purpose: Compliance validation.
+  Tech: Audit scripts.
+  Notes: Reports shared with regulators.
+  Missing: Implementation needed
+
+7.2.39: Configure SLA-aware retries in block execution.
+  Status: NOT_IMPLEMENTED
+  Purpose: Reliable recovery.
+  Tech: Retry engine + jitter.
+  Notes: SLA tier aware.
+  Missing: Implementation needed
+
+7.2.40: Build resilience dashboards on block execution.
+  Status: NOT_IMPLEMENTED
+  Purpose: Ops visibility.
+  Tech: Grafana dashboards.
+  Notes: SLA/error budget included.
+  Missing: Implementation needed
+
+7.2.41: Automate certification runbooks for blocks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Repeatable approval flows.
+  Tech: Docs site + CI/CD hooks.
+  Notes: Linked to override ledger.
+  Missing: Implementation needed
+
+7.2.42: Build predictive trust dashboards on block composition.
+  Status: NOT_IMPLEMENTED
+  Purpose: Identify risky compositions.
+  Tech: ML scoring models.
+  Notes: CRO persona dashboard
+  Missing: Implementation needed
+
+SECTION 7.3 - Scalability
+----------------------------------------
+7.3.1: Define scalability principles (elasticity, fault-tolerance, cost efficiency).
+  Status: NOT_IMPLEMENTED
+  Purpose: Shared baseline across teams.
+  Tech: ADR docs.
+  Notes: Align with EPIC-1 Ch.7.3.
+  Missing: Implementation needed
+
+7.3.2: Document vertical vs horizontal scaling strategies.
+  Status: NOT_IMPLEMENTED
+  Purpose: Clear decision framework.
+  Tech: Confluence/Docs.
+  Notes: With workload benchmarks.
+  Missing: Implementation needed
+
+7.3.3: Configure Kubernetes autoscaling per tenant.
+  Status: NOT_IMPLEMENTED
+  Purpose: Elastic compute allocation.
+  Tech: AKS HPA/VPA.
+  Notes: SLA tier aware.
+  Missing: Implementation needed
+
+7.3.4: Provision multi-region clusters.
+  Status: NOT_IMPLEMENTED
+  Purpose: Geographic resilience.
+  Tech: Azure AKS multi-region.
+  Notes: Region pinning enforced.
+  Missing: Implementation needed
+
+7.3.5: Implement workload-based autoscaling for agents.
+  Status: NOT_IMPLEMENTED
+  Purpose: Scale based on queue depth.
+  Tech: KEDA/Kafka autoscaler.
+  Notes: Execution Plane integration.
+  Missing: Implementation needed
+
+7.3.6: Configure SLA-aware scaling policies.
+  Status: NOT_IMPLEMENTED
+  Purpose: T0 tenants scale faster.
+  Tech: SLA registry integration.
+  Notes: Error budgets protected.
+  Missing: Implementation needed
+
+7.3.7: Automate telemetry ingestion scaling.
+  Status: NOT_IMPLEMENTED
+  Purpose: Prevent bottlenecks.
+  Tech: Kafka partition scaling.
+  Notes: Partition per tenant.
+  Missing: Implementation needed
+
+7.3.8: Build lineage service scaling framework.
+  Status: NOT_IMPLEMENTED
+  Purpose: Handle high query volumes.
+  Tech: OpenLineage cluster scaling.
+  Notes: Tenant isolation enforced.
+  Missing: Implementation needed
+
+7.3.9: Configure multi-tenant storage scaling.
+  Status: NOT_IMPLEMENTED
+  Purpose: Elastic Lakehouse growth.
+  Tech: Delta Lake + ADLS autoscale.
+  Notes: With FinOps tagging.
+  Missing: Implementation needed
+
+7.3.10: Build query scaling service.
+  Status: NOT_IMPLEMENTED
+  Purpose: SLA-compliant query performance.
+  Tech: Presto/Trino autoscaling.
+  Notes: Linked to Ch.11.4.
+  Missing: Implementation needed
+
+7.3.11: Implement AI Agent runtime scaling.
+  Status: NOT_IMPLEMENTED
+  Purpose: Scale by active session count.
+  Tech: Orchestrator scaling.
+  Notes: SLA/error budgets monitored.
+  Missing: Implementation needed
+
+7.3.12: Configure vector DB autoscaling for RAG.
+  Status: NOT_IMPLEMENTED
+  Purpose: Elastic retrieval performance.
+  Tech: Milvus/Pinecone autoscaling.
+  Notes: Tenant-partition aware.
+  Missing: Implementation needed
+
+7.3.13: Automate SLM pipeline scaling.
+  Status: NOT_IMPLEMENTED
+  Purpose: Training/inference elasticity.
+  Tech: Kubeflow, MLflow clusters.
+  Notes: GPU autoscaling integrated.
+  Missing: Implementation needed
+
+7.3.14: Configure FinOps dashboards for scaling costs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Exec/Compliance visibility.
+  Tech: Grafana + FinOps pipeline.
+  Notes: Chargeback supported.
+  Missing: Implementation needed
+
+7.3.15: Build anomaly detection on scaling events.
+  Status: NOT_IMPLEMENTED
+  Purpose: Detect rogue auto-expansion.
+  Tech: ML anomaly detection.
+  Notes: Alerts escalated SEV-1.
+  Missing: Implementation needed
+
+7.3.16: Automate SLA dashboards for scaling latency.
+  Status: NOT_IMPLEMENTED
+  Purpose: Visibility of impact.
+  Tech: Grafana dashboards.
+  Notes: Linked to SLA registry.
+  Missing: Implementation needed
+
+7.3.17: Build predictive scaling models.
+  Status: NOT_IMPLEMENTED
+  Purpose: Anticipate tenant workload spikes.
+  Tech: ML forecasting models.
+  Notes: Inputs: ARR, seasonality, churn.
+  Missing: Implementation needed
+
+7.3.18: Configure override ledger hooks for scaling interventions.
+  Status: NOT_IMPLEMENTED
+  Purpose: Track manual scale overrides.
+  Tech: Ledger DB.
+  Notes: Immutable + auditable.
+  Missing: Implementation needed
+
+7.3.19: Automate evidence pack generation for scaling events.
+  Status: NOT_IMPLEMENTED
+  Purpose: Immutable compliance logs.
+  Tech: JSON evidence DB.
+  Notes: WORM storage enabled.
+  Missing: Implementation needed
+
+7.3.20: Build chaos testing harness for scaling.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate elasticity under failures.
+  Tech: Chaos Mesh, Toxiproxy.
+  Notes: Must recover within SLA.
+  Missing: Implementation needed
+
+7.3.21: Configure DLQs for failed scaling jobs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Safe recovery.
+  Tech: Kafka DLQs.
+  Notes: Replay approved in ledger.
+  Missing: Implementation needed
+
+7.3.22: Automate replay/reprocessing of scaling failures.
+  Status: NOT_IMPLEMENTED
+  Purpose: Controlled recovery.
+  Tech: Replay workers.
+  Notes: Immutable evidence generated.
+  Missing: Implementation needed
+
+7.3.23: Build persona dashboards on scalability.
+  Status: NOT_IMPLEMENTED
+  Purpose: Exec=cost/impact, Ops=latency, Compliance=governance.
+  Tech: Grafana dashboards.
+  Notes: Auto-provisioned.
+  Missing: Implementation needed
+
+7.3.24: Configure regulator dashboards on elasticity.
+  Status: NOT_IMPLEMENTED
+  Purpose: Compliance transparency.
+  Tech: Grafana dashboards.
+  Notes: Exportable CSV/PDF.
+  Missing: Implementation needed
+
+7.3.25: Build tamper-evident scaling logs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Immutable history.
+  Tech: Hash chaining, blockchain anchoring.
+  Notes: Required for regulated tenants.
+  Missing: Implementation needed
+
+7.3.26: Automate archival of scaling telemetry.
+  Status: NOT_IMPLEMENTED
+  Purpose: Long-term auditability.
+  Tech: Cold storage + WORM.
+  Notes: ≥7 years retention.
+  Missing: Implementation needed
+
+7.3.27: Configure consent enforcement in scaling telemetry.
+  Status: NOT_IMPLEMENTED
+  Purpose: Privacy preserved in logs.
+  Tech: Consent schema hooks.
+  Notes: Logged in evidence packs.
+  Missing: Implementation needed
+
+7.3.28: Build SLA burn-rate dashboards by scaling action.
+  Status: NOT_IMPLEMENTED
+  Purpose: Error budgets tracked.
+  Tech: Grafana dashboards.
+  Notes: Alerts for Exec + Ops personas.
+  Missing: Implementation needed
+
+7.3.29: Automate SoD enforcement on scaling overrides.
+  Status: NOT_IMPLEMENTED
+  Purpose: Prevent conflicts of duty.
+  Tech: ABAC engine.
+  Notes: Logged in evidence.
+  Missing: Implementation needed
+
+7.3.30: Build lineage dashboards for scaling events.
+  Status: NOT_IMPLEMENTED
+  Purpose: Trace impact across planes.
+  Tech: DataHub + Grafana.
+  Notes: Tenant-scoped.
+  Missing: Implementation needed
+
+7.3.31: Implement predictive FinOps optimization.
+  Status: NOT_IMPLEMENTED
+  Purpose: Balance cost vs performance.
+  Tech: ML cost models.
+  Notes: Linked to scaling engine.
+  Missing: Implementation needed
+
+7.3.32: Configure SLA-aware throttling at scaling boundaries.
+  Status: NOT_IMPLEMENTED
+  Purpose: Prevent resource starvation.
+  Tech: Adaptive throttling.
+  Notes: SLA tier aware.
+  Missing: Implementation needed
+
+7.3.33: Build regulator evidence viewer for scaling events.
+  Status: NOT_IMPLEMENTED
+  Purpose: Self-serve compliance portal.
+  Tech: React UI + Evidence DB.
+  Notes: Read-only dashboards.
+  Missing: Implementation needed
+
+7.3.34: Automate quarterly scaling audits.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate compliance posture.
+  Tech: Audit scripts.
+  Notes: Reports shared with regulators.
+  Missing: Implementation needed
+
+7.3.35: Publish “Scalability Governance Checklist.”
+  Status: NOT_IMPLEMENTED
+  Purpose: Standard enforcement guide.
+  Tech: Docs site.
+  Notes: Reviewed quarterly.
+  Missing: Implementation needed
+
+7.3.36: Build test harness for multi-tenant scaling.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate noisy-neighbor control.
+  Tech: Synthetic tenants.
+  Notes: Fail closed if leakage.
+  Missing: Implementation needed
+
+7.3.37: Configure SLA-aware retries in scaling workflows.
+  Status: NOT_IMPLEMENTED
+  Purpose: Stable recovery.
+  Tech: Retry engine.
+  Notes: SLA tier aware.
+  Missing: Implementation needed
+
+7.3.38: Build resilience dashboards scoped to scaling.
+  Status: NOT_IMPLEMENTED
+  Purpose: Ops visibility.
+  Tech: Grafana dashboards.
+  Notes: Linked to resilience packs.
+  Missing: Implementation needed
+
+7.3.39: Automate regulator notifications on scaling incidents.
+  Status: NOT_IMPLEMENTED
+  Purpose: Meet legal requirements.
+  Tech: Workflow automation.
+  Notes: Logged in evidence packs.
+  Missing: Implementation needed
+
+7.3.40: Build predictive dashboards for scaling demand.
+  Status: NOT_IMPLEMENTED
+  Purpose: Exec/RevOps forecasting.
+  Tech: Grafana + ML forecasting.
+  Notes: ARR, churn drivers included.
+  Missing: Implementation needed
+
+7.3.41: Automate sandbox scaling for test tenants.
+  Status: NOT_IMPLEMENTED
+  Purpose: Safe elasticity testing.
+  Tech: Sandbox clusters.
+  Notes: Evidence logged.
+  Missing: Implementation needed
+
+7.3.42: Conduct annual scalability drills.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate platform robustness.
+  Tech: Synthetic workloads.
+  Notes: Logged in incident runbooks.
+  Missing: Implementation needed
+
+SECTION 7.4 - Observability
+----------------------------------------
+7.4.1: Define observability taxonomy (metrics, logs, traces, events).
+  Status: NOT_IMPLEMENTED
+  Purpose: Shared language across teams.
+  Tech: ADR docs.
+  Notes: Align with EPIC-1 Ch.7.4.
+  Missing: Implementation needed
+
+7.4.2: Build central telemetry ingestion pipeline.
+  Status: NOT_IMPLEMENTED
+  Purpose: Capture metrics/logs/traces uniformly.
+  Tech: OpenTelemetry, Kafka/EventHub.
+  Notes: Tenant_id, SLA tagged.
+  Missing: Implementation needed
+
+7.4.3: Configure tenant-scoped telemetry tables.
+  Status: NOT_IMPLEMENTED
+  Purpose: Multi-tenant isolation of logs.
+  Tech: Postgres/Delta Lake partitions.
+  Notes: Fail-closed validation.
+  Missing: Implementation needed
+
+7.4.4: Automate schema enforcement for telemetry.
+  Status: NOT_IMPLEMENTED
+  Purpose: Governance compliance.
+  Tech: JSON/Avro schema.
+  Notes: Includes region_id + consent_id.
+  Missing: Implementation needed
+
+7.4.5: Build SLA dashboards fed by telemetry.
+  Status: NOT_IMPLEMENTED
+  Purpose: Real-time SLA monitoring.
+  Tech: Grafana dashboards.
+  Notes: Exec + Ops persona scoped.
+  Missing: Implementation needed
+
+7.4.6: Configure trust scoring on telemetry data.
+  Status: NOT_IMPLEMENTED
+  Purpose: Quantify reliability of agents/flows.
+  Tech: Trust engine.
+  Notes: Stored in registry.
+  Missing: Implementation needed
+
+7.4.7: Build anomaly detection for telemetry streams.
+  Status: NOT_IMPLEMENTED
+  Purpose: Detect rogue patterns.
+  Tech: ML anomaly detection.
+  Notes: Alerts escalated SEV-1.
+  Missing: Implementation needed
+
+7.4.8: Automate FinOps tagging on telemetry events.
+  Status: NOT_IMPLEMENTED
+  Purpose: Tenant cost attribution.
+  Tech: FinOps pipeline.
+  Notes: Linked to scaling costs.
+  Missing: Implementation needed
+
+7.4.9: Build FinOps dashboards on observability overhead.
+  Status: NOT_IMPLEMENTED
+  Purpose: Exec/Compliance visibility.
+  Tech: Grafana + FinOps DB.
+  Notes: Chargeback supported.
+  Missing: Implementation needed
+
+7.4.10: Configure consent enforcement in logs.
+  Status: NOT_IMPLEMENTED
+  Purpose: GDPR/DPDP compliance.
+  Tech: Masking middleware.
+  Notes: Consent_id required.
+  Missing: Implementation needed
+
+7.4.11: Automate lineage tagging in telemetry.
+  Status: NOT_IMPLEMENTED
+  Purpose: Traceability across planes.
+  Tech: OpenLineage.
+  Notes: Required for regulators.
+  Missing: Implementation needed
+
+7.4.12: Build evidence pack generator from telemetry.
+  Status: NOT_IMPLEMENTED
+  Purpose: Immutable compliance artifacts.
+  Tech: Evidence DB, JSON packs.
+  Notes: Stored in WORM storage.
+  Missing: Implementation needed
+
+7.4.13: Add override ledger hooks for observability overrides.
+  Status: NOT_IMPLEMENTED
+  Purpose: Track manual changes.
+  Tech: Override ledger DB.
+  Notes: Immutable + auditable.
+  Missing: Implementation needed
+
+7.4.14: Configure drift detection for observability schema.
+  Status: NOT_IMPLEMENTED
+  Purpose: Catch log/metric mismatches.
+  Tech: Drift detection jobs.
+  Notes: Auto-create remediation tickets.
+  Missing: Implementation needed
+
+7.4.15: Build chaos tests for telemetry pipelines.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate resilience.
+  Tech: Chaos Mesh, Toxiproxy.
+  Notes: SLA/error budgets tested.
+  Missing: Implementation needed
+
+7.4.16: Automate replay/reprocessing for failed telemetry.
+  Status: NOT_IMPLEMENTED
+  Purpose: Controlled recovery.
+  Tech: Replay workers.
+  Notes: Ledger approvals logged.
+  Missing: Implementation needed
+
+7.4.17: Configure DLQs for failed telemetry jobs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Safe handling of errors.
+  Tech: Kafka DLQs.
+  Notes: Immutable evidence logged.
+  Missing: Implementation needed
+
+7.4.18: Build persona dashboards for observability.
+  Status: NOT_IMPLEMENTED
+  Purpose: CRO=KPIs, Ops=SLA, Compliance=violations.
+  Tech: Grafana dashboards.
+  Notes: Auto-provisioned.
+  Missing: Implementation needed
+
+7.4.19: Automate regulator dashboards from telemetry.
+  Status: NOT_IMPLEMENTED
+  Purpose: Self-serve compliance visibility.
+  Tech: Grafana dashboards.
+  Notes: Export CSV/PDF.
+  Missing: Implementation needed
+
+7.4.20: Configure SLA burn-rate dashboards.
+  Status: NOT_IMPLEMENTED
+  Purpose: Error budget monitoring.
+  Tech: Grafana dashboards.
+  Notes: Persona-specific alerts.
+  Missing: Implementation needed
+
+7.4.21: Build predictive analytics on telemetry trends.
+  Status: NOT_IMPLEMENTED
+  Purpose: Anticipate SLA breaches.
+  Tech: ML forecasting.
+  Notes: ARR/churn overlays.
+  Missing: Implementation needed
+
+7.4.22: Implement tamper-evident telemetry logging.
+  Status: NOT_IMPLEMENTED
+  Purpose: Immutable audit history.
+  Tech: Hash chaining, blockchain anchor.
+  Notes: Banking/Insurance focus.
+  Missing: Implementation needed
+
+7.4.23: Automate retention of observability logs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Long-term compliance.
+  Tech: WORM storage, cold storage.
+  Notes: ≥7 years retention.
+  Missing: Implementation needed
+
+7.4.24: Configure SLA-aware retries for observability jobs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Reliable recovery.
+  Tech: Retry engine + jitter.
+  Notes: SLA tier aware.
+  Missing: Implementation needed
+
+7.4.25: Build regulator evidence packs from telemetry.
+  Status: NOT_IMPLEMENTED
+  Purpose: Immutable regulator proof.
+  Tech: Evidence DB + reporting pipeline.
+  Notes: SOC2/GDPR/DPDP packs.
+  Missing: Implementation needed
+
+7.4.26: Create SoD enforcement dashboards for observability.
+  Status: NOT_IMPLEMENTED
+  Purpose: Track separation of duties.
+  Tech: Grafana dashboards.
+  Notes: Alerts for violations.
+  Missing: Implementation needed
+
+7.4.27: Automate anomaly dashboards from observability data.
+  Status: NOT_IMPLEMENTED
+  Purpose: Rogue agent detection.
+  Tech: Grafana + ML anomaly.
+  Notes: Alerts logged in evidence.
+  Missing: Implementation needed
+
+7.4.28: Build trust dashboards scoped to observability.
+  Status: NOT_IMPLEMENTED
+  Purpose: CRO/Exec visibility.
+  Tech: Grafana dashboards.
+  Notes: Scores linked to agents/workflows.
+  Missing: Implementation needed
+
+7.4.29: Configure regulator notifications for telemetry breaches.
+  Status: NOT_IMPLEMENTED
+  Purpose: Meet legal obligations.
+  Tech: Workflow automation.
+  Notes: Logged in evidence packs.
+  Missing: Implementation needed
+
+7.4.30: Build lineage dashboards powered by observability.
+  Status: NOT_IMPLEMENTED
+  Purpose: End-to-end trace visualization.
+  Tech: DataHub + Grafana.
+  Notes: Tenant scoped.
+  Missing: Implementation needed
+
+7.4.31: Automate drift alerts for SLA telemetry anomalies.
+  Status: NOT_IMPLEMENTED
+  Purpose: Early detection of breaches.
+  Tech: Grafana alerts.
+  Notes: Auto-escalate SEV-1.
+  Missing: Implementation needed
+
+7.4.32: Provide regulator evidence viewer for telemetry.
+  Status: NOT_IMPLEMENTED
+  Purpose: Self-serve compliance portal.
+  Tech: React UI + Evidence DB.
+  Notes: Read-only dashboards.
+  Missing: Implementation needed
+
+7.4.33: Build predictive FinOps dashboards from telemetry.
+  Status: NOT_IMPLEMENTED
+  Purpose: Cost efficiency analysis.
+  Tech: Grafana + ML cost models.
+  Notes: Exec persona focus.
+  Missing: Implementation needed
+
+7.4.34: Automate archival of override ledgers linked to observability.
+  Status: NOT_IMPLEMENTED
+  Purpose: Immutable compliance retention.
+  Tech: WORM storage.
+  Notes: ≥7 years.
+  Missing: Implementation needed
+
+7.4.35: Build resilience dashboards scoped to observability.
+  Status: NOT_IMPLEMENTED
+  Purpose: SLA/error budgets visible.
+  Tech: Grafana dashboards.
+  Notes: Ops persona focus.
+  Missing: Implementation needed
+
+7.4.36: Publish “Observability Governance Checklist.”
+  Status: NOT_IMPLEMENTED
+  Purpose: Standardized enforcement guide.
+  Tech: Docs site.
+  Notes: Reviewed quarterly.
+  Missing: Implementation needed
+
+7.4.37: Conduct quarterly observability audits.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate compliance posture.
+  Tech: Audit scripts, SIEM.
+  Notes: Reports shared with regulators.
+  Missing: Implementation needed
+
+7.4.38: Build sandbox observability harness.
+  Status: NOT_IMPLEMENTED
+  Purpose: Safe tenant testing.
+  Tech: Synthetic workloads.
+  Notes: Tenant-isolated.
+  Missing: Implementation needed
+
+7.4.39: Automate regulator-ready replay of telemetry.
+  Status: NOT_IMPLEMENTED
+  Purpose: Prove compliance.
+  Tech: Replay workers.
+  Notes: Immutable + auditable.
+  Missing: Implementation needed
+
+7.4.40: Configure SLA dashboards scoped to observability.
+  Status: NOT_IMPLEMENTED
+  Purpose: Persona-based SLA views.
+  Tech: Grafana dashboards.
+  Notes: Exec=impact, Ops=latency.
+  Missing: Implementation needed
+
+7.4.41: Build anomaly replay runbooks.
+  Status: NOT_IMPLEMENTED
+  Purpose: Standardize Ops remediation.
+  Tech: Docs site.
+  Notes: Linked to override ledger.
+  Missing: Implementation needed
+
+7.4.42: Automate cross-tenant observability isolation tests.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate tenant boundaries.
+  Tech: Synthetic tests.
+  Notes: Fail closed on leakage.
+  Missing: Implementation needed
+
+SECTION 7.5 - Compliance & IP Flywheel
+----------------------------------------
+7.5.1: Define compliance & IP flywheel principles.
+  Status: NOT_IMPLEMENTED
+  Purpose: Compliance drives IP compounding.
+  Tech: ADR docs.
+  Notes: Align with EPIC-1 Ch.7.5–7.6.
+  Missing: Implementation needed
+
+7.5.2: Map regulatory overlays (SOX, HIPAA, GDPR, DPDP, RBI).
+  Status: NOT_IMPLEMENTED
+  Purpose: Industry-specific compliance baseline.
+  Tech: Policy packs.
+  Notes: Linked to tenant overlays.
+  Missing: Implementation needed
+
+7.5.3: Build compliance metadata schema.
+  Status: NOT_IMPLEMENTED
+  Purpose: Uniform governance metadata.
+  Tech: JSON Schema.
+  Notes: Fields: tenant_id, region_id, consent_id.
+  Missing: Implementation needed
+
+7.5.4: Configure evidence pack standard.
+  Status: NOT_IMPLEMENTED
+  Purpose: Immutable, reusable compliance artifacts.
+  Tech: JSON/WORM storage.
+  Notes: Input/output/override logged.
+  Missing: Implementation needed
+
+7.5.5: Automate override ledger integration across modules.
+  Status: NOT_IMPLEMENTED
+  Purpose: Human-in-loop traceability.
+  Tech: Override ledger DB.
+  Notes: Immutable + regulator ready.
+  Missing: Implementation needed
+
+7.5.6: Implement consent dashboards.
+  Status: NOT_IMPLEMENTED
+  Purpose: Transparency for auditors.
+  Tech: Compliance dashboards.
+  Notes: Must expose redactions.
+  Missing: Implementation needed
+
+7.5.7: Build residency enforcement dashboards.
+  Status: NOT_IMPLEMENTED
+  Purpose: Region-specific compliance view.
+  Tech: Grafana dashboards.
+  Notes: Linked to region_id metadata.
+  Missing: Implementation needed
+
+7.5.8: Automate SLA-aware governance gates.
+  Status: NOT_IMPLEMENTED
+  Purpose: Compliance enforced at runtime.
+  Tech: SLA monitor, OPA.
+  Notes: Fail-closed policies.
+  Missing: Implementation needed
+
+7.5.9: Configure SoD enforcement.
+  Status: NOT_IMPLEMENTED
+  Purpose: Prevent conflicts of duty.
+  Tech: ABAC policies.
+  Notes: Logged in evidence packs.
+  Missing: Implementation needed
+
+7.5.10: Build tamper-evident logging for compliance artifacts.
+  Status: NOT_IMPLEMENTED
+  Purpose: Immutable history.
+  Tech: Hash chaining, blockchain anchor.
+  Notes: Banking/Insurance tenants.
+  Missing: Implementation needed
+
+7.5.11: Automate lineage integration into compliance reports.
+  Status: NOT_IMPLEMENTED
+  Purpose: Full traceability.
+  Tech: OpenLineage, KG.
+  Notes: Evidence-ready dashboards.
+  Missing: Implementation needed
+
+7.5.12: Build regulator dashboards on compliance posture.
+  Status: NOT_IMPLEMENTED
+  Purpose: Audit-ready transparency.
+  Tech: Grafana dashboards.
+  Notes: Exportable CSV/PDF.
+  Missing: Implementation needed
+
+7.5.13: Automate regulator-ready report generator.
+  Status: NOT_IMPLEMENTED
+  Purpose: SOC2/GDPR/DPDP packs.
+  Tech: Reporting pipeline.
+  Notes: Tenant-scoped.
+  Missing: Implementation needed
+
+7.5.14: Build anomaly detection for compliance violations.
+  Status: NOT_IMPLEMENTED
+  Purpose: Detect rogue workflows.
+  Tech: ML anomaly detection.
+  Notes: Alerts escalated SEV-1.
+  Missing: Implementation needed
+
+7.5.15: Configure predictive compliance analytics.
+  Status: NOT_IMPLEMENTED
+  Purpose: Anticipate risks.
+  Tech: ML pipelines.
+  Notes: KPIs tied to SLA, ARR, churn.
+  Missing: Implementation needed
+
+7.5.16: Automate archival of compliance evidence.
+  Status: NOT_IMPLEMENTED
+  Purpose: Long-term retention.
+  Tech: WORM storage.
+  Notes: ≥7 years retention.
+  Missing: Implementation needed
+
+7.5.17: Build FinOps attribution for compliance overhead.
+  Status: NOT_IMPLEMENTED
+  Purpose: Transparent cost allocation.
+  Tech: FinOps pipeline.
+  Notes: Exec persona dashboards.
+  Missing: Implementation needed
+
+7.5.18: Create FinOps dashboards for compliance costs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Cost vs SLA tradeoff.
+  Tech: Grafana dashboards.
+  Notes: Supports chargeback.
+  Missing: Implementation needed
+
+7.5.19: Automate drift detection in compliance policy packs.
+  Status: NOT_IMPLEMENTED
+  Purpose: Prevent misalignment.
+  Tech: Drift detection jobs.
+  Notes: Auto-open remediation.
+  Missing: Implementation needed
+
+7.5.20: Build compliance certification pipeline.
+  Status: NOT_IMPLEMENTED
+  Purpose: Only certified workflows live.
+  Tech: CI/CD gates.
+  Notes: Evidence attached.
+  Missing: Implementation needed
+
+7.5.21: Publish “Compliance Governance Checklist.”
+  Status: NOT_IMPLEMENTED
+  Purpose: Standard operating playbook.
+  Tech: Docs site.
+  Notes: Reviewed quarterly.
+  Missing: Implementation needed
+
+7.5.22: Build quarterly compliance audit automation.
+  Status: NOT_IMPLEMENTED
+  Purpose: Continuous assurance.
+  Tech: Audit scripts, SIEM.
+  Notes: Reports submitted to regulators.
+  Missing: Implementation needed
+
+7.5.23: Configure regulator notification workflows.
+  Status: NOT_IMPLEMENTED
+  Purpose: Meet legal obligations.
+  Tech: Workflow automation.
+  Notes: Evidence pack attached.
+  Missing: Implementation needed
+
+7.5.24: Build persona dashboards on compliance.
+  Status: NOT_IMPLEMENTED
+  Purpose: Exec=impact, Ops=SLA, Compliance=violations.
+  Tech: Grafana dashboards.
+  Notes: Auto-provisioned.
+  Missing: Implementation needed
+
+7.5.25: Automate consent withdrawal flows.
+  Status: NOT_IMPLEMENTED
+  Purpose: GDPR/DPDP right-to-forget.
+  Tech: Consent DB purge jobs.
+  Notes: Ledger approvals logged.
+  Missing: Implementation needed
+
+7.5.26: Build regulator evidence viewer for compliance/IP.
+  Status: NOT_IMPLEMENTED
+  Purpose: Self-serve access.
+  Tech: React UI + Evidence DB.
+  Notes: Read-only dashboards.
+  Missing: Implementation needed
+
+7.5.27: Automate SoD dashboards.
+  Status: NOT_IMPLEMENTED
+  Purpose: Transparency into role conflicts.
+  Tech: Grafana dashboards.
+  Notes: Alerts escalated.
+  Missing: Implementation needed
+
+7.5.28: Configure SLA dashboards for compliance KPIs.
+  Status: NOT_IMPLEMENTED
+  Purpose: SLA/error budgets visible.
+  Tech: Grafana dashboards.
+  Notes: Exec + Compliance personas.
+  Missing: Implementation needed
+
+7.5.29: Build replay workflows for compliance evidence.
+  Status: NOT_IMPLEMENTED
+  Purpose: Prove regulator scenarios.
+  Tech: Replay workers.
+  Notes: Immutable + auditable.
+  Missing: Implementation needed
+
+7.5.30: Automate chaos tests for compliance workflows.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate resilience.
+  Tech: Chaos Mesh.
+  Notes: SLA-aware recovery tested.
+  Missing: Implementation needed
+
+7.5.31: Build trust dashboards scoped to compliance/IP.
+  Status: NOT_IMPLEMENTED
+  Purpose: Quantify reliability.
+  Tech: Grafana dashboards.
+  Notes: Linked to trust scoring engine.
+  Missing: Implementation needed
+
+7.5.32: Automate IP asset tagging in registries.
+  Status: NOT_IMPLEMENTED
+  Purpose: Track reusable artifacts.
+  Tech: Capability Registry.
+  Notes: Evidence packs, policy packs, templates.
+  Missing: Implementation needed
+
+7.5.33: Build IP compounding dashboards.
+  Status: NOT_IMPLEMENTED
+  Purpose: Visualize reuse across tenants.
+  Tech: Grafana dashboards.
+  Notes: Exec persona view.
+  Missing: Implementation needed
+
+7.5.34: Automate licensing metadata for IP assets.
+  Status: NOT_IMPLEMENTED
+  Purpose: Manage reuse rules.
+  Tech: Registry hooks.
+  Notes: Optional IP monetization.
+  Missing: Implementation needed
+
+7.5.35: Configure anomaly detection on IP usage.
+  Status: NOT_IMPLEMENTED
+  Purpose: Detect unauthorized use.
+  Tech: ML anomaly detection.
+  Notes: Alerts in evidence packs.
+  Missing: Implementation needed
+
+7.5.36: Build predictive analytics on IP reuse.
+  Status: NOT_IMPLEMENTED
+  Purpose: Forecast compounding effect.
+  Tech: ML pipelines.
+  Notes: ARR/efficiency KPIs.
+  Missing: Implementation needed
+
+7.5.37: Publish “IP Flywheel Handbook.”
+  Status: NOT_IMPLEMENTED
+  Purpose: Developer playbook.
+  Tech: Docs site.
+  Notes: Updated quarterly.
+  Missing: Implementation needed
+
+7.5.38: Automate quarterly IP governance audits.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate compounding logic.
+  Tech: Audit scripts.
+  Notes: Reports shared with regulators.
+  Missing: Implementation needed
+
+7.5.39: Configure regulator notifications tied to IP reuse.
+  Status: NOT_IMPLEMENTED
+  Purpose: Legal transparency.
+  Tech: Workflow automation.
+  Notes: Logged in evidence packs.
+  Missing: Implementation needed
+
+7.5.40: Build resilience dashboards scoped to compliance/IP.
+  Status: NOT_IMPLEMENTED
+  Purpose: SLA/error budgets visible.
+  Tech: Grafana dashboards.
+  Notes: Ops persona focus.
+  Missing: Implementation needed
+
+7.5.41: Automate archival of override ledgers tied to compliance/IP.
+  Status: NOT_IMPLEMENTED
+  Purpose: Immutable retention.
+  Tech: WORM storage.
+  Notes: ≥7 years.
+  Missing: Implementation needed
+
+7.5.42: Conduct annual compliance & IP resilience drills.
+  Status: NOT_IMPLEMENTED
+  Purpose: Validate robustness.
+  Tech: Synthetic workloads.
+  Notes: Logged in incident runbooks.
+  Missing: Implementation needed
+

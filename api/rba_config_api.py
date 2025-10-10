@@ -18,12 +18,13 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/rba-config", tags=["RBA Configuration"])
 
 # Dynamic agent registry - automatically discovers all agents
-def get_agent_registry():
+async def get_agent_registry():
     """Get all available RBA agents dynamically"""
     try:
         # Try the existing RBA registry first
-        from dsl.registry.rba_agent_registry import rba_registry
-        rba_registry.initialize()
+        from dsl.registry.enhanced_capability_registry import EnhancedCapabilityRegistry
+        rba_registry = EnhancedCapabilityRegistry()
+        await rba_registry.initialize()
         
         agents = {}
         for agent_name, agent_info in rba_registry.get_all_agents().items():
@@ -40,8 +41,18 @@ def get_agent_registry():
             'pipeline_summary': PipelineSummaryRBAAgent,
         }
 
-# Get dynamic agent registry
-AGENT_REGISTRY = get_agent_registry()
+# Get dynamic agent registry - will be initialized at startup
+AGENT_REGISTRY = {}
+
+async def initialize_agent_registry():
+    """Initialize the agent registry at startup"""
+    global AGENT_REGISTRY
+    try:
+        AGENT_REGISTRY = await get_agent_registry()
+        logger.info(f"✅ RBA Agent Registry initialized with {len(AGENT_REGISTRY)} agents")
+    except Exception as e:
+        logger.warning(f"⚠️ RBA registry failed: {e}, falling back to manual registry")
+        AGENT_REGISTRY = get_fallback_registry()
 
 # Configuration schemas for each agent
 CONFIG_SCHEMAS = {

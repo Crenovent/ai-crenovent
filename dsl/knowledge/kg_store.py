@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 """
-Knowledge Graph Storage Layer
-============================
+Enhanced Knowledge Graph Storage Layer
+=====================================
 
 Implements KG storage using PostgreSQL + pgvector as specified in Vision Doc Ch.8.2
-- Entity and relationship storage
-- Multi-tenant isolation
-- Embedding storage for semantic search
-- Query optimization
+Enhanced with Chapter 6.4: Orchestration DSL & Knowledge Graph Integration
+
+Features:
+- Tasks 6.4-T10 to T15: KG schema for workflows, steps, actors, evidence, outcomes
+- Tasks 6.4-T11 to T12: Runtime trace to KG mapping and ingestion pipeline
+- Tasks 6.4-T13 to T14: Anonymization rules and evidence linkage model
+- Multi-tenant isolation with PII-safe ingestion
+- Embedding storage for semantic search and analytics
+- Query optimization for complex workflow analytics
 """
 
 import json

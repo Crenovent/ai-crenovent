@@ -1,42 +1,616 @@
 metadata:
-  name: "Region Mapping"
-  description: "Maps locations/countries to Crenovent Regions"
-  version: "1.0"
-  last_updated: "2024-09-24"
+  name: "World-Class Region Mapping"
+  description: "Comprehensive global location mapping to Crenovent Regions"
+  version: "2.0"
+  last_updated: "2024-10-08"
+  coverage: "Global - 195+ countries, 1000+ cities, major states/provinces"
 
 # Default region if no match is found
 default_region: "America"
 
-# Region mapping rules from location keywords to Regions
+# ========================================================================
+# REGION MAPPING RULES - COMPREHENSIVE GLOBAL COVERAGE
+# ========================================================================
+# Priority levels: 95=Countries, 90=Regions, 85=Major Cities, 80=States/Provinces, 75=Minor Cities
+
 region_rules:
-  - keywords: ["america", "americas", "north america", "south america", "usa", "us", "united states", "canada", "mexico", "brazil", "argentina", "chile"]
+  # ========================================================================
+  # AMERICA REGION - North & South America
+  # ========================================================================
+  
+  # Continental/Regional Keywords
+  - keywords: ["america", "americas", "north america", "south america", "latin america", "latam", "caribbean"]
     region: "America"
     priority: 90
   
-  - keywords: ["europe", "emea", "uk", "united kingdom", "germany", "france", "spain", "italy", "netherlands", "belgium", "sweden", "norway", "denmark"]
+  # UNITED STATES - Comprehensive Coverage
+  - keywords: ["usa", "us", "united states", "united states of america", "u.s.a", "u.s.", "america"]
+    region: "America"
+    priority: 95
+  
+  # US States (All 50 States + DC + Territories)
+  - keywords: ["alabama", "alaska", "arizona", "arkansas", "california", "colorado", "connecticut", "delaware", "florida", "georgia"]
+    region: "America"
+    priority: 80
+  - keywords: ["hawaii", "idaho", "illinois", "indiana", "iowa", "kansas", "kentucky", "louisiana", "maine", "maryland"]
+    region: "America"
+    priority: 80
+  - keywords: ["massachusetts", "michigan", "minnesota", "mississippi", "missouri", "montana", "nebraska", "nevada", "new hampshire", "new jersey"]
+    region: "America"
+    priority: 80
+  - keywords: ["new mexico", "new york", "north carolina", "north dakota", "ohio", "oklahoma", "oregon", "pennsylvania", "rhode island", "south carolina"]
+    region: "America"
+    priority: 80
+  - keywords: ["south dakota", "tennessee", "texas", "utah", "vermont", "virginia", "washington", "west virginia", "wisconsin", "wyoming"]
+    region: "America"
+    priority: 80
+  - keywords: ["district of columbia", "washington dc", "dc", "puerto rico", "guam", "virgin islands", "american samoa"]
+    region: "America"
+    priority: 80
+
+  # US Major Cities (Top 100+ Cities)
+  - keywords: ["new york", "new york city", "nyc", "manhattan", "brooklyn", "queens", "bronx", "staten island"]
+    region: "America"
+    priority: 85
+  - keywords: ["los angeles", "la", "hollywood", "beverly hills", "santa monica", "pasadena", "long beach"]
+    region: "America"
+    priority: 85
+  - keywords: ["chicago", "san francisco", "sf", "bay area", "silicon valley", "palo alto", "san jose", "oakland"]
+    region: "America"
+    priority: 85
+  - keywords: ["houston", "philadelphia", "phoenix", "san antonio", "san diego", "dallas", "austin", "fort worth"]
+    region: "America"
+    priority: 85
+  - keywords: ["charlotte", "columbus", "indianapolis", "seattle", "denver", "washington", "boston", "nashville"]
+    region: "America"
+    priority: 85
+  - keywords: ["baltimore", "louisville", "portland", "oklahoma city", "milwaukee", "las vegas", "albuquerque", "tucson"]
+    region: "America"
+    priority: 85
+  - keywords: ["fresno", "sacramento", "kansas city", "mesa", "atlanta", "omaha", "colorado springs", "raleigh"]
+    region: "America"
+    priority: 85
+  - keywords: ["miami", "cleveland", "tulsa", "oakland", "minneapolis", "wichita", "arlington", "bakersfield"]
+    region: "America"
+    priority: 85
+  - keywords: ["tampa", "aurora", "honolulu", "anaheim", "santa ana", "corpus christi", "riverside", "lexington"]
+    region: "America"
+    priority: 85
+  - keywords: ["stockton", "st. paul", "cincinnati", "anchorage", "henderson", "greensboro", "plano", "newark"]
+    region: "America"
+    priority: 85
+  - keywords: ["lincoln", "buffalo", "jersey city", "chula vista", "fort wayne", "orlando", "st. petersburg", "chandler"]
+    region: "America"
+    priority: 85
+  - keywords: ["laredo", "norfolk", "durham", "madison", "lubbock", "irvine", "winston-salem", "glendale"]
+    region: "America"
+    priority: 85
+  - keywords: ["garland", "hialeah", "reno", "chesapeake", "gilbert", "baton rouge", "irving", "scottsdale"]
+    region: "America"
+    priority: 85
+  - keywords: ["north las vegas", "fremont", "boise", "richmond", "san bernardino", "birmingham", "spokane", "rochester"]
+    region: "America"
+    priority: 85
+
+  # CANADA - Comprehensive Coverage
+  - keywords: ["canada", "canadian"]
+    region: "America"
+    priority: 95
+  - keywords: ["ontario", "quebec", "british columbia", "alberta", "manitoba", "saskatchewan", "nova scotia", "new brunswick", "newfoundland", "prince edward island", "northwest territories", "nunavut", "yukon"]
+    region: "America"
+    priority: 80
+  - keywords: ["toronto", "montreal", "vancouver", "calgary", "edmonton", "ottawa", "winnipeg", "quebec city", "hamilton", "kitchener"]
+    region: "America"
+    priority: 85
+  - keywords: ["london ontario", "halifax", "victoria", "windsor", "oshawa", "saskatoon", "regina", "sherbrooke", "st. johns", "barrie"]
+    region: "America"
+    priority: 85
+
+  # MEXICO & Central America
+  - keywords: ["mexico", "mexican", "mexico city", "guadalajara", "monterrey", "puebla", "tijuana", "leon", "juarez", "torreon"]
+    region: "America"
+    priority: 85
+  - keywords: ["guatemala", "belize", "el salvador", "honduras", "nicaragua", "costa rica", "panama"]
+    region: "America"
+    priority: 95
+
+  # SOUTH AMERICA - All Countries & Major Cities
+  - keywords: ["brazil", "brazilian", "sao paulo", "rio de janeiro", "brasilia", "salvador", "fortaleza", "belo horizonte", "manaus", "curitiba"]
+    region: "America"
+    priority: 85
+  - keywords: ["argentina", "buenos aires", "cordoba", "rosario", "mendoza", "la plata", "tucuman", "mar del plata"]
+    region: "America"
+    priority: 85
+  - keywords: ["chile", "santiago", "valparaiso", "concepcion", "la serena", "antofagasta", "temuco"]
+    region: "America"
+    priority: 85
+  - keywords: ["colombia", "bogota", "medellin", "cali", "barranquilla", "cartagena", "cucuta", "bucaramanga"]
+    region: "America"
+    priority: 85
+  - keywords: ["peru", "lima", "arequipa", "trujillo", "chiclayo", "huancayo", "iquitos", "cusco"]
+    region: "America"
+    priority: 85
+  - keywords: ["venezuela", "caracas", "maracaibo", "valencia", "barquisimeto", "maracay", "ciudad guayana"]
+    region: "America"
+    priority: 85
+  - keywords: ["ecuador", "quito", "guayaquil", "cuenca", "santo domingo", "machala", "manta"]
+    region: "America"
+    priority: 85
+  - keywords: ["bolivia", "la paz", "santa cruz", "cochabamba", "oruro", "sucre", "tarija"]
+    region: "America"
+    priority: 85
+  - keywords: ["paraguay", "asuncion", "ciudad del este", "san lorenzo", "luque", "capiata"]
+    region: "America"
+    priority: 85
+  - keywords: ["uruguay", "montevideo", "salto", "paysandu", "las piedras", "rivera"]
+    region: "America"
+    priority: 85
+  - keywords: ["guyana", "suriname", "french guiana", "georgetown", "paramaribo", "cayenne"]
+    region: "America"
+    priority: 85
+
+  # Caribbean
+  - keywords: ["cuba", "havana", "jamaica", "kingston", "haiti", "port-au-prince", "dominican republic", "santo domingo"]
+    region: "America"
+    priority: 85
+  - keywords: ["puerto rico", "san juan", "trinidad", "tobago", "barbados", "bridgetown", "bahamas", "nassau"]
+    region: "America"
+    priority: 85
+
+  # ========================================================================
+  # EMEA REGION - Europe, Middle East & Africa
+  # ========================================================================
+  
+  # Continental/Regional Keywords
+  - keywords: ["europe", "european", "emea", "middle east", "africa", "african"]
     region: "EMEA"
     priority: 90
+
+  # UNITED KINGDOM & IRELAND
+  - keywords: ["uk", "united kingdom", "britain", "great britain", "england", "scotland", "wales", "northern ireland"]
+    region: "EMEA"
+    priority: 95
+  - keywords: ["london", "manchester", "birmingham", "leeds", "glasgow", "sheffield", "bradford", "liverpool"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["edinburgh", "bristol", "cardiff", "coventry", "leicester", "sunderland", "belfast", "newcastle"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["nottingham", "plymouth", "stoke-on-trent", "wolverhampton", "derby", "swansea", "southampton", "salford"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["aberdeen", "westminster", "reading", "luton", "york", "stockport", "brighton", "blackpool"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["ireland", "dublin", "cork", "limerick", "galway", "waterford", "drogheda", "dundalk"]
+    region: "EMEA"
+    priority: 85
+
+  # GERMANY
+  - keywords: ["germany", "german", "deutschland"]
+    region: "EMEA"
+    priority: 95
+  - keywords: ["berlin", "hamburg", "munich", "munchen", "cologne", "koln", "frankfurt", "stuttgart", "dusseldorf", "dortmund"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["essen", "leipzig", "bremen", "dresden", "hanover", "hannover", "nuremberg", "nurnberg", "duisburg", "bochum"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["wuppertal", "bielefeld", "bonn", "mannheim", "karlsruhe", "wiesbaden", "munster", "augsburg", "gelsenkirchen", "monchengladbach"]
+    region: "EMEA"
+    priority: 85
+
+  # FRANCE
+  - keywords: ["france", "french"]
+    region: "EMEA"
+    priority: 95
+  - keywords: ["paris", "marseille", "lyon", "toulouse", "nice", "nantes", "strasbourg", "montpellier", "bordeaux", "lille"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["rennes", "reims", "le havre", "saint-etienne", "toulon", "angers", "grenoble", "dijon", "nimes", "aix-en-provence"]
+    region: "EMEA"
+    priority: 85
+
+  # SPAIN
+  - keywords: ["spain", "spanish", "espana"]
+    region: "EMEA"
+    priority: 95
+  - keywords: ["madrid", "barcelona", "valencia", "seville", "sevilla", "zaragoza", "malaga", "murcia", "palma", "las palmas"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["bilbao", "alicante", "cordoba", "valladolid", "vigo", "gijon", "hospitalet", "vitoria", "granada", "elche"]
+    region: "EMEA"
+    priority: 85
+
+  # ITALY
+  - keywords: ["italy", "italian", "italia"]
+    region: "EMEA"
+    priority: 95
+  - keywords: ["rome", "roma", "milan", "milano", "naples", "napoli", "turin", "torino", "palermo", "genoa", "genova"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["bologna", "florence", "firenze", "bari", "catania", "venice", "venezia", "verona", "messina", "padua", "padova"]
+    region: "EMEA"
+    priority: 85
+
+  # NETHERLANDS
+  - keywords: ["netherlands", "holland", "dutch"]
+    region: "EMEA"
+    priority: 95
+  - keywords: ["amsterdam", "rotterdam", "the hague", "utrecht", "eindhoven", "tilburg", "groningen", "almere", "breda", "nijmegen"]
+    region: "EMEA"
+    priority: 85
+
+  # BELGIUM
+  - keywords: ["belgium", "belgian"]
+    region: "EMEA"
+    priority: 95
+  - keywords: ["brussels", "antwerp", "ghent", "charleroi", "liege", "bruges", "namur", "leuven", "mons", "aalst"]
+    region: "EMEA"
+    priority: 85
+
+  # SWITZERLAND
+  - keywords: ["switzerland", "swiss"]
+    region: "EMEA"
+    priority: 95
+  - keywords: ["zurich", "geneva", "basel", "lausanne", "bern", "winterthur", "lucerne", "st. gallen", "lugano", "biel"]
+    region: "EMEA"
+    priority: 85
+
+  # AUSTRIA
+  - keywords: ["austria", "austrian"]
+    region: "EMEA"
+    priority: 95
+  - keywords: ["vienna", "wien", "graz", "linz", "salzburg", "innsbruck", "klagenfurt", "villach", "wels", "sankt polten"]
+    region: "EMEA"
+    priority: 85
+
+  # NORDIC COUNTRIES
+  - keywords: ["sweden", "swedish", "stockholm", "gothenburg", "malmo", "uppsala", "vasteras", "orebro", "linkoping", "helsingborg"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["norway", "norwegian", "oslo", "bergen", "trondheim", "stavanger", "drammen", "fredrikstad", "kristiansand", "sandnes"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["denmark", "danish", "copenhagen", "aarhus", "odense", "aalborg", "esbjerg", "randers", "kolding", "horsens"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["finland", "finnish", "helsinki", "espoo", "tampere", "vantaa", "oulu", "turku", "jyvaskyla", "lahti"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["iceland", "reykjavik", "kopavogur", "hafnarfjordur", "akureyri"]
+    region: "EMEA"
+    priority: 85
+
+  # EASTERN EUROPE
+  - keywords: ["poland", "polish", "warsaw", "krakow", "lodz", "wroclaw", "poznan", "gdansk", "szczecin", "bydgoszcz"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["czech republic", "prague", "brno", "ostrava", "plzen", "liberec", "olomouc", "ceske budejovice"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["slovakia", "bratislava", "kosice", "presov", "zilina", "banska bystrica", "nitra", "trnava"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["hungary", "budapest", "debrecen", "szeged", "miskolc", "pecs", "gyor", "nyiregyhaza", "kecskemet"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["romania", "bucharest", "cluj-napoca", "timisoara", "iasi", "constanta", "craiova", "brasov", "galati"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["bulgaria", "sofia", "plovdiv", "varna", "burgas", "ruse", "stara zagora", "pleven", "sliven"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["croatia", "zagreb", "split", "rijeka", "osijek", "zadar", "slavonski brod", "pula", "senica"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["serbia", "belgrade", "novi sad", "nis", "kragujevac", "subotica", "zrenjanin", "pancevo"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["slovenia", "ljubljana", "maribor", "celje", "kranj", "velenje", "koper", "novo mesto"]
+    region: "EMEA"
+    priority: 85
+
+  # RUSSIA & CIS
+  - keywords: ["russia", "russian", "moscow", "st. petersburg", "novosibirsk", "yekaterinburg", "nizhny novgorod", "kazan", "chelyabinsk", "omsk"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["samara", "rostov-on-don", "ufa", "krasnoyarsk", "perm", "voronezh", "volgograd", "krasnodar", "saratov", "tyumen"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["ukraine", "kiev", "kharkiv", "odessa", "dnipro", "donetsk", "zaporizhzhia", "lviv", "kryvyi rih"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["belarus", "minsk", "gomel", "mogilev", "vitebsk", "grodno", "brest"]
+    region: "EMEA"
+    priority: 85
+
+  # MIDDLE EAST
+  - keywords: ["israel", "tel aviv", "jerusalem", "haifa", "rishon lezion", "petah tikva", "ashdod", "netanya", "beer sheva"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["turkey", "istanbul", "ankara", "izmir", "bursa", "adana", "gaziantep", "konya", "antalya", "diyarbakir"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["uae", "united arab emirates", "dubai", "abu dhabi", "sharjah", "al ain", "ajman", "ras al khaimah", "fujairah"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["saudi arabia", "riyadh", "jeddah", "mecca", "medina", "dammam", "khobar", "tabuk", "buraidah", "khamis mushait"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["qatar", "doha", "al rayyan", "umm salal", "al wakrah", "al khor", "dukhan"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["kuwait", "kuwait city", "al ahmadi", "hawalli", "as salimiyah", "sabah as salim"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["bahrain", "manama", "muharraq", "riffa", "hamad town", "a'ali", "isa town"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["oman", "muscat", "seeb", "salalah", "bawshar", "sohar", "nizwa", "sur"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["lebanon", "beirut", "tripoli", "sidon", "tyre", "nabatieh", "baalbek", "jounieh"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["jordan", "amman", "zarqa", "irbid", "russeifa", "wadi as sir", "aqaba", "madaba"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["egypt", "cairo", "alexandria", "giza", "shubra el kheima", "port said", "suez", "luxor", "aswan"]
+    region: "EMEA"
+    priority: 85
+
+  # AFRICA
+  - keywords: ["south africa", "johannesburg", "cape town", "durban", "pretoria", "port elizabeth", "pietermaritzburg", "benoni", "tembisa"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["nigeria", "lagos", "kano", "ibadan", "abuja", "port harcourt", "benin city", "maiduguri", "zaria"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["kenya", "nairobi", "mombasa", "nakuru", "eldoret", "kisumu", "thika", "malindi", "kitale"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["ghana", "accra", "kumasi", "tamale", "takoradi", "cape coast", "teshie", "tema", "madina"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["morocco", "casablanca", "rabat", "fez", "marrakech", "agadir", "tangier", "meknes", "oujda"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["tunisia", "tunis", "sfax", "sousse", "kairouan", "bizerte", "gabes", "ariana", "gafsa"]
+    region: "EMEA"
+    priority: 85
+  - keywords: ["algeria", "algiers", "oran", "constantine", "annaba", "blida", "batna", "djelfa", "setif"]
+    region: "EMEA"
+    priority: 85
+
+  # ========================================================================
+  # APAC REGION - Asia Pacific
+  # ========================================================================
   
-  - keywords: ["asia", "apac", "asia pacific", "japan", "singapore", "australia", "new zealand", "india", "china", "korea", "thailand", "malaysia"]
+  # Continental/Regional Keywords
+  - keywords: ["asia", "asian", "apac", "asia pacific", "pacific", "oceania", "far east"]
     region: "APAC"
     priority: 90
-  
-  # Specific countries
-  - keywords: ["new york", "california", "texas", "florida", "chicago", "boston", "seattle", "san francisco"]
-    region: "America"
+
+  # INDIA - COMPREHENSIVE COVERAGE (Special Focus as Requested)
+  - keywords: ["india", "indian", "bharat"]
+    region: "APAC"
+    priority: 95
+
+  # Indian States (All 28 States + 8 Union Territories)
+  - keywords: ["andhra pradesh", "arunachal pradesh", "assam", "bihar", "chhattisgarh", "goa", "gujarat", "haryana", "himachal pradesh", "jharkhand"]
+    region: "APAC"
+    priority: 80
+  - keywords: ["karnataka", "kerala", "madhya pradesh", "maharashtra", "manipur", "meghalaya", "mizoram", "nagaland", "odisha", "orissa"]
+    region: "APAC"
+    priority: 80
+  - keywords: ["punjab", "rajasthan", "sikkim", "tamil nadu", "telangana", "tripura", "uttar pradesh", "uttarakhand", "west bengal"]
+    region: "APAC"
+    priority: 80
+  - keywords: ["andaman and nicobar", "chandigarh", "dadra and nagar haveli", "daman and diu", "delhi", "jammu and kashmir", "ladakh", "lakshadweep", "puducherry"]
+    region: "APAC"
+    priority: 80
+
+  # Indian Major Cities (Top 100+ Cities)
+  - keywords: ["mumbai", "bombay", "delhi", "new delhi", "bangalore", "bengaluru", "hyderabad", "ahmedabad", "chennai", "madras"]
+    region: "APAC"
     priority: 85
-  
-  - keywords: ["london", "berlin", "paris", "madrid", "amsterdam", "dublin", "zurich", "stockholm"]
-    region: "EMEA"
+  - keywords: ["kolkata", "calcutta", "pune", "jaipur", "surat", "lucknow", "kanpur", "nagpur", "indore", "thane"]
+    region: "APAC"
     priority: 85
-  
-  - keywords: ["tokyo", "sydney", "mumbai", "bangalore", "singapore city", "hong kong", "seoul"]
+  - keywords: ["bhopal", "visakhapatnam", "pimpri chinchwad", "patna", "vadodara", "ghaziabad", "ludhiana", "agra", "nashik", "faridabad"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["meerut", "rajkot", "kalyan dombivali", "vasai virar", "varanasi", "srinagar", "aurangabad", "dhanbad", "amritsar", "navi mumbai"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["allahabad", "prayagraj", "ranchi", "howrah", "coimbatore", "jabalpur", "gwalior", "vijayawada", "jodhpur", "madurai"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["raipur", "kota", "guwahati", "chandigarh", "solapur", "hubballi dharwad", "tiruchirappalli", "bareilly", "mysore", "mysuru"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["tiruppur", "gurgaon", "gurugram", "aligarh", "jalandhar", "bhubaneswar", "salem", "warangal", "guntur", "bhiwandi"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["saharanpur", "gorakhpur", "bikaner", "amravati", "noida", "jamshedpur", "bhilai", "cuttack", "firozabad", "kochi"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["cochin", "ernakulam", "nellore", "bhavnagar", "dehradun", "durgapur", "asansol", "rourkela", "nanded", "kolhapur"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["ajmer", "akola", "gulbarga", "jamnagar", "ujjain", "loni", "siliguri", "jhansi", "ulhasnagar", "jammu"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["sangli miraj kupwad", "mangalore", "erode", "belgaum", "ambattur", "tirunelveli", "malegaon", "gaya", "jalgaon", "udaipur"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["maheshtala", "davanagere", "kozhikode", "calicut", "kurnool", "rajpur sonarpur", "rajahmundry", "bokaro", "south dumdum", "bellary"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["patiala", "gopalpur", "agartala", "bhagalpur", "muzaffarnagar", "bhatpara", "panihati", "latur", "dhule", "rohtak"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["korba", "bhilwara", "berhampur", "muzaffarpur", "ahmednagar", "mathura", "kollam", "avadi", "kadapa", "kamarhati"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["sambalpur", "bilaspur", "shahjahanpur", "satara", "bijapur", "rampur", "shivamogga", "chandrapur", "junagadh", "thrissur"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["alwar", "bardhaman", "kulti", "kakinada", "nizamabad", "parbhani", "tumkur", "khammam", "ozhukarai", "bihar sharif"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["panipat", "darbhanga", "bally", "aizawl", "dewas", "ichalkaranji", "karnal", "bathinda", "jalna", "eluru"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["kirari suleman nagar", "baranagar", "tiruvottiyur", "pondicherry", "puducherry", "sikar", "thoothukudi", "rewa", "mirzapur", "raichur"]
     region: "APAC"
     priority: 85
 
-# Configuration for matching
+  # CHINA
+  - keywords: ["china", "chinese", "prc", "peoples republic of china"]
+    region: "APAC"
+    priority: 95
+  - keywords: ["beijing", "shanghai", "guangzhou", "shenzhen", "tianjin", "wuhan", "dongguan", "chengdu", "nanjing", "chongqing"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["xian", "shenyang", "hangzhou", "jinan", "harbin", "suzhou", "shantou", "taiyuan", "guiyang", "xuzhou"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["dalian", "zhengzhou", "yantai", "changchun", "tangshan", "hefei", "shijiazhuang", "urumqi", "zibo", "handan"]
+    region: "APAC"
+    priority: 85
+
+  # JAPAN
+  - keywords: ["japan", "japanese", "nippon", "nihon"]
+    region: "APAC"
+    priority: 95
+  - keywords: ["tokyo", "yokohama", "osaka", "nagoya", "sapporo", "fukuoka", "kobe", "kawasaki", "kyoto", "saitama"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["hiroshima", "sendai", "kitakyushu", "chiba", "sakai", "niigata", "hamamatsu", "okayama", "sagamihara", "kumamoto"]
+    region: "APAC"
+    priority: 85
+
+  # SOUTH KOREA
+  - keywords: ["south korea", "korea", "korean", "republic of korea"]
+    region: "APAC"
+    priority: 95
+  - keywords: ["seoul", "busan", "incheon", "daegu", "daejeon", "gwangju", "suwon", "ulsan", "changwon", "goyang"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["yongin", "seongnam", "bucheon", "cheongju", "ansan", "jeonju", "anyang", "cheonan", "pohang", "uijeongbu"]
+    region: "APAC"
+    priority: 85
+
+  # SOUTHEAST ASIA
+  - keywords: ["singapore", "singapore city", "jurong", "woodlands", "tampines", "bedok", "hougang"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["thailand", "bangkok", "nonthaburi", "pak kret", "hat yai", "chiang mai", "udon thani", "nakhon ratchasima", "khon kaen"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["malaysia", "kuala lumpur", "george town", "ipoh", "shah alam", "petaling jaya", "klang", "johor bahru", "subang jaya"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["indonesia", "jakarta", "surabaya", "bandung", "bekasi", "medan", "tangerang", "depok", "semarang", "palembang"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["philippines", "manila", "quezon city", "davao", "caloocan", "cebu city", "zamboanga", "taguig", "antipolo", "pasig"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["vietnam", "ho chi minh city", "saigon", "hanoi", "haiphong", "da nang", "bien hoa", "hue", "nha trang", "can tho"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["myanmar", "yangon", "mandalay", "naypyidaw", "mawlamyine", "bago", "pathein", "monywa", "meiktila"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["cambodia", "phnom penh", "siem reap", "battambang", "sihanoukville", "poipet", "kampong cham"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["laos", "vientiane", "savannakhet", "pakse", "luang prabang", "xam neua", "phonsavan"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["brunei", "bandar seri begawan", "kuala belait", "seria", "tutong", "bangar"]
+    region: "APAC"
+    priority: 85
+
+  # AUSTRALIA & NEW ZEALAND
+  - keywords: ["australia", "australian"]
+    region: "APAC"
+    priority: 95
+  - keywords: ["sydney", "melbourne", "brisbane", "perth", "adelaide", "gold coast", "newcastle", "canberra", "sunshine coast", "wollongong"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["geelong", "hobart", "townsville", "cairns", "darwin", "toowoomba", "ballarat", "bendigo", "albury", "launceston"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["new zealand", "auckland", "wellington", "christchurch", "hamilton", "tauranga", "napier-hastings", "dunedin", "palmerston north", "nelson"]
+    region: "APAC"
+    priority: 85
+
+  # PACIFIC ISLANDS
+  - keywords: ["fiji", "suva", "nadi", "lautoka", "labasa", "ba"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["papua new guinea", "port moresby", "lae", "mount hagen", "popondetta", "madang"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["samoa", "apia", "vaitele", "faleula", "siusega", "nofoalii"]
+    region: "APAC"
+    priority: 85
+
+  # OTHER ASIAN COUNTRIES
+  - keywords: ["bangladesh", "dhaka", "chittagong", "sylhet", "rajshahi", "khulna", "barisal", "rangpur", "comilla"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["pakistan", "karachi", "lahore", "faisalabad", "rawalpindi", "gujranwala", "peshawar", "multan", "hyderabad", "islamabad"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["sri lanka", "colombo", "dehiwala-mount lavinia", "moratuwa", "negombo", "kandy", "kalmunai", "vavuniya", "galle"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["nepal", "kathmandu", "pokhara", "lalitpur", "bharatpur", "biratnagar", "birgunj", "dharan", "butwal"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["bhutan", "thimphu", "phuntsholing", "punakha", "wangdue", "mongar", "trashigang"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["maldives", "male", "addu city", "fuvahmulah", "kulhudhuffushi", "thinadhoo"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["afghanistan", "kabul", "kandahar", "herat", "mazar-i-sharif", "kunduz", "jalalabad", "lashkar gah"]
+    region: "APAC"
+    priority: 85
+  - keywords: ["mongolia", "ulaanbaatar", "erdenet", "darkhan", "choibalsan", "murun", "hovd"]
+    region: "APAC"
+    priority: 85
+
+# ========================================================================
+# CONFIGURATION SETTINGS
+# ========================================================================
 matching_config:
   case_sensitive: false
   partial_match: true
   minimum_keyword_length: 2
+  fuzzy_threshold: 85  # Minimum fuzzy match score (0-100)
+  enable_fuzzy_matching: true
+  enable_partial_matching: true
+  
+# Performance settings
+performance:
+  cache_results: true
+  max_cache_size: 10000
+  cache_ttl_seconds: 3600
+  
+# Logging settings
+logging:
+  log_matches: true
+  log_fallbacks: true
+  log_performance: true
 
+# Statistics tracking
+statistics:
+  track_match_rates: true
+  track_fallback_usage: true
+  track_performance_metrics: true

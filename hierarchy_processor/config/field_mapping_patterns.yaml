@@ -1,0 +1,481 @@
+metadata:
+  name: "Field Mapping Patterns"
+  description: "Configurable patterns for intelligent field detection and mapping"
+  version: "1.0"
+  last_updated: "2024-10-08"
+  coverage: "Comprehensive field patterns for global CSV formats"
+
+# Field mapping patterns - each field has multiple detection methods
+field_patterns:
+  
+  # ========================================================================
+  # CORE IDENTITY FIELDS
+  # ========================================================================
+  
+  name:
+    exact: 
+      - 'name'
+      - 'full name'
+      - 'employee name'
+      - 'person name'
+      - 'user name'
+      - 'contact name'
+      - 'individual name'
+      - 'worker name'
+    fuzzy:
+      - 'first name'
+      - 'last name'
+      - 'given name'
+      - 'family name'
+      - 'surname'
+      - 'display name'
+      - 'preferred name'
+      - 'legal name'
+    semantic:
+      - 'employee'
+      - 'person'
+      - 'individual'
+      - 'user'
+      - 'contact'
+      - 'worker'
+      - 'associate'
+      - 'member'
+    context:
+      - 'who'
+      - 'identity'
+      - 'individual'
+      - 'personnel'
+    weight: 1.0
+    priority: 100
+    
+  email:
+    exact:
+      - 'email'
+      - 'email address'
+      - 'e-mail'
+      - 'mail'
+      - 'email id'
+      - 'work email'
+      - 'business email'
+      - 'corporate email'
+    fuzzy:
+      - 'electronic mail'
+      - 'contact email'
+      - 'primary email'
+      - 'office email'
+      - 'company email'
+    semantic:
+      - '@'
+      - 'contact'
+      - 'communication'
+      - 'correspondence'
+    context:
+      - 'contact'
+      - 'reach'
+      - 'communication'
+      - 'digital'
+    weight: 1.0
+    priority: 100
+    validation: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    
+  # ========================================================================
+  # HIERARCHY FIELDS
+  # ========================================================================
+  
+  manager_email:
+    exact:
+      - 'manager email'
+      - 'supervisor email'
+      - 'reports to email'
+      - 'boss email'
+      - 'reporting manager email'
+      - 'direct manager email'
+      - 'line manager email'
+      - 'manager e-mail'
+    fuzzy:
+      - 'reporting to email'
+      - 'immediate supervisor email'
+      - 'team lead email'
+      - 'department head email'
+      - 'superior email'
+    semantic:
+      - 'manager'
+      - 'supervisor'
+      - 'boss'
+      - 'reports to'
+      - 'reporting'
+      - 'superior'
+      - 'head'
+      - 'lead'
+    context:
+      - 'hierarchy'
+      - 'reporting'
+      - 'management'
+      - 'supervision'
+    weight: 0.9
+    priority: 95
+    validation: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    
+  manager_name:
+    exact:
+      - 'manager'
+      - 'supervisor'
+      - 'reports to'
+      - 'boss'
+      - 'manager name'
+      - 'reporting manager'
+      - 'direct manager'
+      - 'line manager'
+    fuzzy:
+      - 'team lead'
+      - 'team leader'
+      - 'department head'
+      - 'immediate supervisor'
+      - 'reporting to'
+    semantic:
+      - 'superior'
+      - 'head'
+      - 'lead'
+      - 'chief'
+      - 'director'
+      - 'overseer'
+    context:
+      - 'hierarchy'
+      - 'reporting'
+      - 'management'
+      - 'leadership'
+    weight: 0.9
+    priority: 90
+    
+  # ========================================================================
+  # JOB INFORMATION FIELDS
+  # ========================================================================
+  
+  role_title:
+    exact:
+      - 'title'
+      - 'job title'
+      - 'position'
+      - 'role'
+      - 'designation'
+      - 'job position'
+      - 'work title'
+      - 'employment title'
+    fuzzy:
+      - 'role title'
+      - 'position title'
+      - 'job role'
+      - 'work role'
+      - 'professional title'
+      - 'occupation'
+    semantic:
+      - 'function'
+      - 'responsibility'
+      - 'occupation'
+      - 'profession'
+      - 'career'
+    context:
+      - 'job'
+      - 'work'
+      - 'career'
+      - 'profession'
+      - 'employment'
+    weight: 0.8
+    priority: 85
+    
+  department:
+    exact:
+      - 'department'
+      - 'dept'
+      - 'division'
+      - 'team'
+      - 'group'
+      - 'business unit'
+      - 'organizational unit'
+      - 'work group'
+    fuzzy:
+      - 'unit'
+      - 'section'
+      - 'branch'
+      - 'area'
+      - 'function'
+      - 'vertical'
+    semantic:
+      - 'organization'
+      - 'structure'
+      - 'business'
+      - 'functional'
+      - 'operational'
+    context:
+      - 'organization'
+      - 'structure'
+      - 'business'
+      - 'corporate'
+    weight: 0.7
+    priority: 80
+    
+  # ========================================================================
+  # LOCATION FIELDS
+  # ========================================================================
+  
+  location:
+    exact:
+      - 'location'
+      - 'office'
+      - 'site'
+      - 'city'
+      - 'country'
+      - 'region'
+      - 'work location'
+      - 'office location'
+    fuzzy:
+      - 'geographic location'
+      - 'workplace'
+      - 'work site'
+      - 'base location'
+      - 'home office'
+    semantic:
+      - 'place'
+      - 'geography'
+      - 'address'
+      - 'where'
+      - 'locale'
+    context:
+      - 'geographic'
+      - 'physical'
+      - 'spatial'
+      - 'territorial'
+    weight: 0.6
+    priority: 75
+    
+  # ========================================================================
+  # EMPLOYMENT DETAILS
+  # ========================================================================
+  
+  employee_id:
+    exact:
+      - 'employee id'
+      - 'emp id'
+      - 'employee number'
+      - 'emp no'
+      - 'staff id'
+      - 'personnel number'
+      - 'worker id'
+      - 'associate id'
+    fuzzy:
+      - 'employee identifier'
+      - 'staff number'
+      - 'personnel id'
+      - 'worker number'
+      - 'badge number'
+    semantic:
+      - 'identifier'
+      - 'number'
+      - 'code'
+      - 'reference'
+      - 'unique'
+    context:
+      - 'identification'
+      - 'reference'
+      - 'tracking'
+      - 'system'
+    weight: 0.5
+    priority: 70
+    
+  hire_date:
+    exact:
+      - 'hire date'
+      - 'start date'
+      - 'join date'
+      - 'employment start'
+      - 'date of joining'
+      - 'commencement date'
+    fuzzy:
+      - 'joining date'
+      - 'employment date'
+      - 'onboard date'
+      - 'begin date'
+    semantic:
+      - 'start'
+      - 'begin'
+      - 'commence'
+      - 'join'
+      - 'hire'
+    context:
+      - 'employment'
+      - 'career'
+      - 'timeline'
+      - 'history'
+    weight: 0.4
+    priority: 65
+    
+  employment_status:
+    exact:
+      - 'employment status'
+      - 'status'
+      - 'employee status'
+      - 'work status'
+      - 'employment type'
+      - 'employee type'
+    fuzzy:
+      - 'job status'
+      - 'working status'
+      - 'employment state'
+      - 'worker status'
+    semantic:
+      - 'active'
+      - 'inactive'
+      - 'terminated'
+      - 'full time'
+      - 'part time'
+      - 'contract'
+    context:
+      - 'employment'
+      - 'status'
+      - 'state'
+      - 'condition'
+    weight: 0.4
+    priority: 60
+    
+  # ========================================================================
+  # CRM-SPECIFIC FIELDS
+  # ========================================================================
+  
+  account:
+    exact:
+      - 'account'
+      - 'account name'
+      - 'customer'
+      - 'client'
+      - 'company'
+      - 'organization'
+    fuzzy:
+      - 'customer name'
+      - 'client name'
+      - 'company name'
+      - 'business name'
+    semantic:
+      - 'business'
+      - 'enterprise'
+      - 'corporation'
+      - 'firm'
+    context:
+      - 'business'
+      - 'commercial'
+      - 'customer'
+      - 'client'
+    weight: 0.7
+    priority: 70
+    
+  opportunity:
+    exact:
+      - 'opportunity'
+      - 'deal'
+      - 'sale'
+      - 'prospect'
+      - 'lead'
+    fuzzy:
+      - 'sales opportunity'
+      - 'business opportunity'
+      - 'potential deal'
+      - 'sales lead'
+    semantic:
+      - 'revenue'
+      - 'income'
+      - 'business'
+      - 'potential'
+    context:
+      - 'sales'
+      - 'revenue'
+      - 'business'
+      - 'commercial'
+    weight: 0.6
+    priority: 65
+    
+  territory:
+    exact:
+      - 'territory'
+      - 'sales territory'
+      - 'region'
+      - 'area'
+      - 'zone'
+    fuzzy:
+      - 'sales region'
+      - 'sales area'
+      - 'geographic territory'
+      - 'market area'
+    semantic:
+      - 'geographic'
+      - 'market'
+      - 'coverage'
+      - 'assignment'
+    context:
+      - 'sales'
+      - 'geographic'
+      - 'market'
+      - 'coverage'
+    weight: 0.6
+    priority: 65
+
+# ========================================================================
+# DETECTION CONFIGURATION
+# ========================================================================
+
+detection_config:
+  # Confidence thresholds for different matching methods
+  exact_match_confidence: 1.0
+  fuzzy_match_threshold: 75  # Minimum fuzzy score (0-100)
+  semantic_match_threshold: 0.7
+  contextual_match_threshold: 0.6
+  
+  # Field priority and weighting
+  enable_priority_weighting: true
+  enable_context_boosting: true
+  context_boost_factor: 1.1  # 10% boost for context matches
+  
+  # Performance settings
+  max_fuzzy_candidates: 10
+  enable_caching: true
+  cache_size: 1000
+  
+# System-specific field mappings (overrides for specific systems)
+system_overrides:
+  salesforce:
+    # Salesforce-specific field mappings
+    'email id': 'email'
+    'contact name': 'name'
+    'account name': 'account'
+    'opportunity name': 'opportunity'
+    
+  bamboohr:
+    # BambooHR-specific field mappings
+    'full name': 'name'
+    'manager email': 'manager_email'
+    'job title': 'role_title'
+    'work location': 'location'
+    
+  workday:
+    # Workday-specific field mappings
+    'worker': 'name'
+    'position': 'role_title'
+    'supervisory organization': 'department'
+    'location': 'location'
+    
+  hubspot:
+    # HubSpot-specific field mappings
+    'contact owner': 'manager_name'
+    'company name': 'account'
+    'deal stage': 'opportunity'
+    
+  zoho:
+    # Zoho-specific field mappings
+    'lead owner': 'manager_name'
+    'account name': 'account'
+    'deal name': 'opportunity'
+
+# Learning and adaptation settings
+learning_config:
+  enable_adaptive_learning: true
+  success_threshold: 0.8  # Confidence threshold to learn from
+  max_learned_patterns: 100
+  pattern_decay_factor: 0.95  # Reduce weight of old patterns over time

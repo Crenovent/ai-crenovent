@@ -1,0 +1,407 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://revai.pro/schemas/dsl/steps/v1.0.0",
+  "title": "DSL Step Schemas",
+  "description": "Individual schemas for each DSL step type (Task 7.1.2)",
+  "definitions": {
+    "query_step": {
+      "$id": "#/definitions/query_step",
+      "type": "object",
+      "title": "Query Step Schema",
+      "description": "Schema for query step type - data fetching with filters and projections",
+      "required": ["id", "name", "type", "params"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-zA-Z0-9_-]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "type": {"const": "query"},
+        "params": {
+          "type": "object",
+          "required": ["source", "resource"],
+          "properties": {
+            "source": {
+              "type": "string",
+              "enum": ["salesforce", "postgres", "api", "external", "fabric"],
+              "description": "Data source type"
+            },
+            "resource": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Resource identifier (table, object, endpoint)"
+            },
+            "filters": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["field", "op", "value"],
+                "properties": {
+                  "field": {"type": "string", "minLength": 1},
+                  "op": {"type": "string", "enum": ["=", "!=", ">", "<", ">=", "<=", "IN", "NOT IN", "LIKE", "NOT LIKE", "IS NULL", "IS NOT NULL"]},
+                  "value": {"description": "Filter value (any type)"}
+                }
+              }
+            },
+            "select": {
+              "type": "array",
+              "items": {"type": "string", "minLength": 1},
+              "description": "Fields to select"
+            },
+            "limit": {"type": "integer", "minimum": 1, "maximum": 10000},
+            "offset": {"type": "integer", "minimum": 0},
+            "order_by": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["field"],
+                "properties": {
+                  "field": {"type": "string", "minLength": 1},
+                  "direction": {"type": "string", "enum": ["ASC", "DESC"], "default": "ASC"}
+                }
+              }
+            },
+            "cache_ttl": {"type": "integer", "minimum": 0, "description": "Cache TTL in seconds"},
+            "timeout": {"type": "integer", "minimum": 1, "maximum": 300, "description": "Query timeout in seconds"}
+          },
+          "additionalProperties": false
+        },
+        "governance": {
+          "type": "object",
+          "properties": {
+            "evidence_capture": {"type": "boolean", "default": true},
+            "consent_id": {"type": "string"},
+            "region_id": {"type": "string", "enum": ["US", "EU", "APAC", "GLOBAL"]},
+            "pii_handling": {"type": "string", "enum": ["none", "pseudonymized", "encrypted", "masked"]},
+            "cross_border_approved": {"type": "boolean"},
+            "trust_metadata": {"type": "object"}
+          }
+        }
+      }
+    },
+    "decision_step": {
+      "$id": "#/definitions/decision_step",
+      "type": "object",
+      "title": "Decision Step Schema",
+      "description": "Schema for decision step type - deterministic rule evaluation",
+      "required": ["id", "name", "type", "params"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-zA-Z0-9_-]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "type": {"const": "decision"},
+        "params": {
+          "type": "object",
+          "required": ["expression"],
+          "properties": {
+            "expression": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Boolean expression using Jinja2 syntax"
+            },
+            "on_true": {"type": "string", "description": "Next step if true"},
+            "on_false": {"type": "string", "description": "Next step if false"},
+            "on_else": {"type": "string", "description": "Default next step"},
+            "variables": {
+              "type": "object",
+              "description": "Variables available in expression"
+            },
+            "explanation": {
+              "type": "string",
+              "description": "Human-readable explanation of the decision logic"
+            }
+          },
+          "additionalProperties": false
+        },
+        "conditions": {
+          "type": "object",
+          "properties": {
+            "if_true": {"type": "array", "items": {"type": "string"}},
+            "if_false": {"type": "array", "items": {"type": "string"}},
+            "if_else": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      }
+    },
+    "agent_call_step": {
+      "$id": "#/definitions/agent_call_step",
+      "type": "object",
+      "title": "Agent Call Step Schema",
+      "description": "Schema for agent_call step type - AI agent execution",
+      "required": ["id", "name", "type", "params", "governance"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-zA-Z0-9_-]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "type": {"const": "agent_call"},
+        "params": {
+          "type": "object",
+          "required": ["agent_id", "task"],
+          "properties": {
+            "agent_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "description": "Agent identifier from registry"
+            },
+            "task": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000,
+              "description": "Task description for the agent"
+            },
+            "context": {
+              "type": "object",
+              "description": "Context data for agent execution"
+            },
+            "tools": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Available tools for the agent"
+            },
+            "max_iterations": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            },
+            "timeout": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3600,
+              "default": 300
+            },
+            "temperature": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 2.0,
+              "default": 0.7,
+              "description": "Agent creativity/randomness"
+            },
+            "model": {
+              "type": "string",
+              "enum": ["gpt-4", "gpt-4-turbo", "claude-3-sonnet", "claude-3-opus"],
+              "description": "LLM model to use"
+            }
+          },
+          "additionalProperties": false
+        },
+        "governance": {
+          "type": "object",
+          "required": ["trust_threshold", "agent_data_consent"],
+          "properties": {
+            "trust_threshold": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "agent_data_consent": {"type": "string", "minLength": 1},
+            "agent_region": {"type": "string", "enum": ["US", "EU", "APAC", "GLOBAL"]},
+            "evidence_capture": {"type": "boolean", "default": true},
+            "trust_metadata": {
+              "type": "object",
+              "properties": {
+                "required_trust_score": {"type": "number"},
+                "trust_policy": {"type": "string"},
+                "fallback_on_low_trust": {"type": "boolean"},
+                "trust_validation_required": {"type": "boolean"},
+                "agent_id": {"type": "string"},
+                "trust_calculation_method": {"type": "string"},
+                "trust_factors": {"type": "array", "items": {"type": "string"}}
+              }
+            }
+          }
+        }
+      }
+    },
+    "ml_decision_step": {
+      "$id": "#/definitions/ml_decision_step",
+      "type": "object",
+      "title": "ML Decision Step Schema",
+      "description": "Schema for ml_decision step type - ML model invocation with thresholds",
+      "required": ["id", "name", "type", "params", "governance"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-zA-Z0-9_-]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "type": {"const": "ml_decision"},
+        "params": {
+          "type": "object",
+          "required": ["model_id", "input_features", "thresholds"],
+          "properties": {
+            "model_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "description": "ML model identifier from registry"
+            },
+            "input_features": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "Input features for the model"
+            },
+            "thresholds": {
+              "type": "object",
+              "required": ["accept", "reject"],
+              "properties": {
+                "accept": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                "reject": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+              },
+              "additionalProperties": false
+            },
+            "model_version": {
+              "type": "string",
+              "description": "Specific model version to use"
+            },
+            "feature_preprocessing": {
+              "type": "object",
+              "description": "Feature preprocessing configuration"
+            },
+            "batch_size": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 1
+            },
+            "timeout": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 300,
+              "default": 30
+            }
+          },
+          "additionalProperties": false
+        },
+        "governance": {
+          "type": "object",
+          "required": ["model_consent", "trust_threshold"],
+          "properties": {
+            "model_consent": {"type": "string", "minLength": 1},
+            "trust_threshold": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "evidence_capture": {"type": "boolean", "default": true},
+            "trust_metadata": {
+              "type": "object",
+              "properties": {
+                "required_model_trust_score": {"type": "number"},
+                "model_confidence_threshold": {"type": "number"},
+                "trust_policy": {"type": "string"},
+                "fallback_on_low_trust": {"type": "boolean"},
+                "model_validation_required": {"type": "boolean"},
+                "model_id": {"type": "string"},
+                "trust_calculation_method": {"type": "string"},
+                "trust_factors": {"type": "array", "items": {"type": "string"}}
+              }
+            }
+          }
+        }
+      }
+    },
+    "notify_step": {
+      "$id": "#/definitions/notify_step",
+      "type": "object",
+      "title": "Notify Step Schema",
+      "description": "Schema for notify step type - alerts and notifications",
+      "required": ["id", "name", "type", "params"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-zA-Z0-9_-]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "type": {"const": "notify"},
+        "params": {
+          "type": "object",
+          "required": ["channels", "message"],
+          "properties": {
+            "channels": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["slack", "email", "webhook", "sms", "teams", "pagerduty"]
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "message": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4000,
+              "description": "Notification message (supports Jinja2 templates)"
+            },
+            "recipients": {
+              "type": "array",
+              "items": {"type": "string", "minLength": 1},
+              "description": "Notification recipients"
+            },
+            "priority": {
+              "type": "string",
+              "enum": ["low", "medium", "high", "critical"],
+              "default": "medium"
+            },
+            "template": {
+              "type": "string",
+              "description": "Message template identifier"
+            },
+            "attachments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["type", "content"],
+                "properties": {
+                  "type": {"type": "string", "enum": ["file", "image", "data"]},
+                  "content": {"type": "string"},
+                  "filename": {"type": "string"}
+                }
+              }
+            },
+            "retry_on_failure": {"type": "boolean", "default": true},
+            "delivery_timeout": {"type": "integer", "minimum": 1, "maximum": 300, "default": 30}
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "governance_step": {
+      "$id": "#/definitions/governance_step",
+      "type": "object",
+      "title": "Governance Step Schema",
+      "description": "Schema for governance step type - compliance and audit actions",
+      "required": ["id", "name", "type", "params"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-zA-Z0-9_-]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "type": {"const": "governance"},
+        "params": {
+          "type": "object",
+          "required": ["action"],
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": ["record", "create_evidence_pack", "trigger_approval", "log_override", "compliance_check"],
+              "description": "Governance action type"
+            },
+            "evidence_type": {
+              "type": "string",
+              "enum": ["workflow_execution", "data_access", "approval_decision", "override_action", "compliance_validation"],
+              "description": "Type of evidence to generate"
+            },
+            "retention_days": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3650,
+              "description": "Evidence retention period in days"
+            },
+            "approval_type": {
+              "type": "string",
+              "enum": ["manager", "director", "compliance", "auto", "quorum"],
+              "description": "Required approval type"
+            },
+            "timeout_hours": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 168,
+              "description": "Approval timeout in hours"
+            },
+            "compliance_frameworks": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["SOX", "GDPR", "HIPAA", "RBI", "IRDAI", "PCI-DSS", "DPDP", "SOC2", "ISO27001"]
+              },
+              "description": "Applicable compliance frameworks"
+            },
+            "digital_signature": {"type": "boolean", "default": false},
+            "blockchain_anchor": {"type": "boolean", "default": false},
+            "worm_storage": {"type": "boolean", "default": false}
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  }
+}

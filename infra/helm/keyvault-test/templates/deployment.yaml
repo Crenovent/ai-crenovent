@@ -1,0 +1,167 @@
+# ================================================================================
+# Key Vault Test Service - Verification Application
+# ================================================================================
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kv-test-config
+  namespace: {{ .Values.namespace }}
+data:
+  keyvault-name: "{{ .Values.keyvault.name }}"
+  secret-name: "{{ .Values.keyvault.secretName }}"
+  key-name: "{{ .Values.keyvault.keyName }}"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kv-test-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: kv-test-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kv-test-service
+  template:
+    metadata:
+      labels:
+        app: kv-test-service
+    spec:
+      serviceAccountName: kv-test-sa
+      containers:
+      - name: kv-test
+        image: mcr.microsoft.com/azure-cli:latest
+        command: ["/bin/bash"]
+        args:
+        - -c
+        - |
+          echo "Starting Key Vault Test Service..."
+          echo "Key Vault Name: $(KEYVAULT_NAME)"
+          echo "Testing secret retrieval..."
+          
+          # Install Azure CLI extensions
+          az extension add --name keyvault-preview
+          
+          # Test secret retrieval
+          echo "Retrieving secret: $(SECRET_NAME)"
+          SECRET_VALUE=$(az keyvault secret show --vault-name $(KEYVAULT_NAME) --name $(SECRET_NAME) --query value -o tsv)
+          if [ $? -eq 0 ]; then
+            echo "✅ Secret retrieval successful"
+            echo "Secret length: ${#SECRET_VALUE} characters"
+          else
+            echo "❌ Secret retrieval failed"
+            exit 1
+          fi
+          
+          # Test key retrieval
+          echo "Retrieving key: $(KEY_NAME)"
+          KEY_INFO=$(az keyvault key show --vault-name $(KEYVAULT_NAME) --name $(KEY_NAME) --query '{"keyId": key.kid, "keyType": key.kty}' -o json)
+          if [ $? -eq 0 ]; then
+            echo "✅ Key retrieval successful"
+            echo "Key info: $KEY_INFO"
+          else
+            echo "❌ Key retrieval failed"
+            exit 1
+          fi
+          
+          echo "🎉 All Key Vault tests passed!"
+          sleep 3600
+        env:
+        - name: KEYVAULT_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: kv-test-config
+              key: keyvault-name
+        - name: SECRET_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: kv-test-config
+              key: secret-name
+        - name: KEY_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: kv-test-config
+              key: key-name
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kv-test-sa
+  namespace: {{ .Values.namespace }}
+  annotations:
+    azure.workload.identity/client-id: "{{ .Values.managedIdentity.clientId }}"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kv-test-service
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: kv-test-service
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kv-test-job
+  namespace: {{ .Values.namespace }}
+spec:
+  template:
+    spec:
+      serviceAccountName: kv-test-sa
+      restartPolicy: Never
+      containers:
+      - name: kv-test-job
+        image: mcr.microsoft.com/azure-cli:latest
+        command: ["/bin/bash"]
+        args:
+        - -c
+        - |
+          echo "Running Key Vault verification job..."
+          
+          # Install Azure CLI extensions
+          az extension add --name keyvault-preview
+          
+          # Test secret retrieval
+          echo "Testing secret retrieval..."
+          SECRET_VALUE=$(az keyvault secret show --vault-name {{ .Values.keyvault.name }} --name {{ .Values.keyvault.secretName }} --query value -o tsv)
+          if [ $? -eq 0 ]; then
+            echo "✅ Secret retrieval successful"
+            echo "Secret retrieved: ${SECRET_VALUE:0:10}..."
+          else
+            echo "❌ Secret retrieval failed"
+            exit 1
+          fi
+          
+          # Test key retrieval
+          echo "Testing key retrieval..."
+          KEY_INFO=$(az keyvault key show --vault-name {{ .Values.keyvault.name }} --name {{ .Values.keyvault.keyName }} --query '{"keyId": key.kid, "keyType": key.kty}' -o json)
+          if [ $? -eq 0 ]; then
+            echo "✅ Key retrieval successful"
+            echo "Key info: $KEY_INFO"
+          else
+            echo "❌ Key retrieval failed"
+            exit 1
+          fi
+          
+          echo "🎉 Key Vault verification completed successfully!"
+        env:
+        - name: KEYVAULT_NAME
+          value: "{{ .Values.keyvault.name }}"
+        - name: SECRET_NAME
+          value: "{{ .Values.keyvault.secretName }}"
+        - name: KEY_NAME
+          value: "{{ .Values.keyvault.keyName }}"

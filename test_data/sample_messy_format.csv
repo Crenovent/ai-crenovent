@@ -1,0 +1,16 @@
+employee_full_name,work_email_address,current_job_title,direct_supervisor_email,dept_name,office_loc
+CEO John,ceo.john@messycompany.com,Chief Executive Officer,,EXEC,NYC
+VP_Sales_Jane,jane_vp@messycompany.com,VP of Sales,ceo.john@messycompany.com,SALES_DEPT,SF
+VP-Engineering-Bob,bob.vp@messycompany.com,Vice President - Engineering,ceo.john@messycompany.com,ENG_DEPT,AUSTIN
+VP Marketing Lisa,lisa.vp@messycompany.com,VP Marketing,ceo.john@messycompany.com,MKT_DEPT,BOS
+Director Sales Tom,tom.sales@messycompany.com,Sales Director,jane_vp@messycompany.com,SALES_DEPT,SF
+Director_Eng_Amy,amy_eng@messycompany.com,Engineering Director,bob.vp@messycompany.com,ENG_DEPT,AUSTIN
+Director-Marketing-Carol,carol.mkt@messycompany.com,Marketing Director,lisa.vp@messycompany.com,MKT_DEPT,BOS
+Manager Sales Dave,dave.sales@messycompany.com,Sales Manager,tom.sales@messycompany.com,SALES_DEPT,SF
+Manager_Eng_Eve,eve_eng@messycompany.com,Engineering Manager,amy_eng@messycompany.com,ENG_DEPT,AUSTIN
+Manager-Marketing-Frank,frank.mkt@messycompany.com,Marketing Manager,carol.mkt@messycompany.com,MKT_DEPT,BOS
+Rep Sales Grace,grace.sales@messycompany.com,Sales Rep,dave.sales@messycompany.com,SALES_DEPT,SF
+Engineer_Henry,henry_eng@messycompany.com,Software Engineer,eve_eng@messycompany.com,ENG_DEPT,AUSTIN
+Specialist-Marketing-Iris,iris.mkt@messycompany.com,Marketing Specialist,frank.mkt@messycompany.com,MKT_DEPT,BOS
+Rep_Sales_Jack,jack_sales@messycompany.com,Account Executive,dave.sales@messycompany.com,SALES_DEPT,SF
+Engineer-Kate,kate.eng@messycompany.com,Senior Engineer,eve_eng@messycompany.com,ENG_DEPT,AUSTIN

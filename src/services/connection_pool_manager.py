@@ -533,3 +533,7 @@ class ConnectionPoolManager:
 
 # Global instance
 pool_manager = ConnectionPoolManager()
+
+def get_pool_manager() -> ConnectionPoolManager:
+    """Get the global pool manager instance"""
+    return pool_manager

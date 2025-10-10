@@ -1276,3 +1276,101 @@ CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com',
 RBA Agent created successfully
 About to call agent._execute_rba_logic
 RBA logic completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'validation_errors', 'confidence_scores', 'confidence_statistics', 'company_profile', 'geographic_hierarchy', 'location_intelligence', 'execution_summary']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+Using OPTIMIZED hierarchy processing system
+Optimized processing completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'confidence_statistics', 'execution_summary', 'hierarchy_metadata']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+Using OPTIMIZED hierarchy processing system
+Optimized processing completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'confidence_statistics', 'execution_summary', 'hierarchy_metadata']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+Using OPTIMIZED hierarchy processing system
+Optimized processing completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'confidence_statistics', 'execution_summary', 'hierarchy_metadata']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+Using OPTIMIZED hierarchy processing system
+Optimized processing completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'confidence_statistics', 'execution_summary', 'hierarchy_metadata']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+Using OPTIMIZED hierarchy processing system
+Optimized processing completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'confidence_statistics', 'execution_summary', 'hierarchy_metadata']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+Using OPTIMIZED hierarchy processing system
+Optimized processing completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'confidence_statistics', 'execution_summary', 'hierarchy_metadata']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+Using OPTIMIZED hierarchy processing system
+Optimized processing completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'confidence_statistics', 'execution_summary', 'hierarchy_metadata']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+Using OPTIMIZED hierarchy processing system
+Optimized processing completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'confidence_statistics', 'execution_summary', 'hierarchy_metadata']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+Using OPTIMIZED hierarchy processing system
+Optimized processing completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'confidence_statistics', 'execution_summary', 'hierarchy_metadata']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+Using OPTIMIZED hierarchy processing system
+Optimized processing completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'confidence_statistics', 'execution_summary', 'hierarchy_metadata']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+Using OPTIMIZED hierarchy processing system
+Optimized processing completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'confidence_statistics', 'execution_summary', 'hierarchy_metadata']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+Using OPTIMIZED hierarchy processing system
+Optimized processing completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'confidence_statistics', 'execution_summary', 'hierarchy_metadata']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+Using OPTIMIZED hierarchy processing system
+Optimized processing completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'confidence_statistics', 'execution_summary', 'hierarchy_metadata']
+=== FASTAPI EXECUTE_WORKFLOW_SYNC CALLED ===
+CSV data length: 31
+Config: {}
+CSV data sample: {'Full Name': 'Sarah Chen', 'Email': 'sarah.chen@acmecorp.com', 'Manager Email': '', 'Department': 'Executive', 'Job Title': 'Chief Revenue Officer', 'Location': 'San Francisco', 'Employee ID': 'SF001', 'Start Date': '2020-01-15', 'Role': 'CRO Role', 'User Type': 'Standard User', 'Profile': 'Sales Executive'}
+==================================================
+Using OPTIMIZED hierarchy processing system
+Optimized processing completed, result keys: ['success', 'processed_users', 'assignment_statistics', 'confidence_statistics', 'execution_summary', 'hierarchy_metadata']

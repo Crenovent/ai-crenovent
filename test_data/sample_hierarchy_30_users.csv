@@ -1,0 +1,31 @@
+Name,Email,Job Title,Manager Email,Department,Location
+John Smith,john.smith@company.com,Chief Executive Officer,,Executive,New York NY
+VP Sales,vp.sales@company.com,Vice President,john.smith@company.com,Sales,San Francisco CA
+VP Engineering,vp.engineering@company.com,Vice President,john.smith@company.com,Engineering,Austin TX
+VP Marketing,vp.marketing@company.com,Vice President,john.smith@company.com,Marketing,Boston MA
+Sales Director 1,sales.dir1@company.com,Director,vp.sales@company.com,Sales,San Francisco CA
+Sales Director 2,sales.dir2@company.com,Director,vp.sales@company.com,Sales,Los Angeles CA
+Eng Director 1,eng.dir1@company.com,Director,vp.engineering@company.com,Engineering,Austin TX
+Eng Director 2,eng.dir2@company.com,Director,vp.engineering@company.com,Engineering,Seattle WA
+Marketing Director 1,mkt.dir1@company.com,Director,vp.marketing@company.com,Marketing,Boston MA
+Marketing Director 2,mkt.dir2@company.com,Director,vp.marketing@company.com,Marketing,Chicago IL
+Sales Manager 1,sales.mgr1@company.com,Manager,sales.dir1@company.com,Sales,San Francisco CA
+Sales Manager 2,sales.mgr2@company.com,Manager,sales.dir1@company.com,Sales,San Francisco CA
+Sales Manager 3,sales.mgr3@company.com,Manager,sales.dir2@company.com,Sales,Los Angeles CA
+Eng Manager 1,eng.mgr1@company.com,Manager,eng.dir1@company.com,Engineering,Austin TX
+Eng Manager 2,eng.mgr2@company.com,Manager,eng.dir1@company.com,Engineering,Austin TX
+Eng Manager 3,eng.mgr3@company.com,Manager,eng.dir2@company.com,Engineering,Seattle WA
+Marketing Manager 1,mkt.mgr1@company.com,Manager,mkt.dir1@company.com,Marketing,Boston MA
+Marketing Manager 2,mkt.mgr2@company.com,Manager,mkt.dir2@company.com,Marketing,Chicago IL
+Sales Rep 1,sales.rep1@company.com,Sales Representative,sales.mgr1@company.com,Sales,San Francisco CA
+Sales Rep 2,sales.rep2@company.com,Sales Representative,sales.mgr1@company.com,Sales,San Francisco CA
+Sales Rep 3,sales.rep3@company.com,Sales Representative,sales.mgr2@company.com,Sales,San Francisco CA
+Sales Rep 4,sales.rep4@company.com,Sales Representative,sales.mgr3@company.com,Sales,Los Angeles CA
+Software Engineer 1,eng1@company.com,Software Engineer,eng.mgr1@company.com,Engineering,Austin TX
+Software Engineer 2,eng2@company.com,Software Engineer,eng.mgr1@company.com,Engineering,Austin TX
+Software Engineer 3,eng3@company.com,Software Engineer,eng.mgr2@company.com,Engineering,Austin TX
+Software Engineer 4,eng4@company.com,Software Engineer,eng.mgr3@company.com,Engineering,Seattle WA
+Marketing Specialist 1,mkt.spec1@company.com,Marketing Specialist,mkt.mgr1@company.com,Marketing,Boston MA
+Marketing Specialist 2,mkt.spec2@company.com,Marketing Specialist,mkt.mgr1@company.com,Marketing,Boston MA
+Marketing Specialist 3,mkt.spec3@company.com,Marketing Specialist,mkt.mgr2@company.com,Marketing,Chicago IL
+Marketing Analyst,mkt.analyst@company.com,Marketing Analyst,mkt.mgr2@company.com,Marketing,Chicago IL

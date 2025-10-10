@@ -1,0 +1,67 @@
+# Policy Evaluation Harness
+# This file contains test scenarios for policy evaluation
+
+scenarios:
+  - name: "Valid User Read Access"
+    input:
+      user: "alice"
+      action: "read"
+      resource: "data"
+      environment: "production"
+    expected: true
+    
+  - name: "Admin Full Access"
+    input:
+      user: "admin"
+      action: "write"
+      resource: "sensitive-data"
+      environment: "production"
+    expected: true
+    
+  - name: "Invalid User Access"
+    input:
+      user: "eve"
+      action: "read"
+      resource: "data"
+      environment: "production"
+    expected: false
+    
+  - name: "Sensitive Resource Denied"
+    input:
+      user: "alice"
+      action: "read"
+      resource: "sensitive-data"
+      environment: "production"
+    expected: false
+    
+  - name: "Development Environment Access"
+    input:
+      user: "alice"
+      action: "read"
+      resource: "data"
+      environment: "development"
+    expected: true
+    
+  - name: "Write Permission Granted"
+    input:
+      user: "alice"
+      action: "write"
+      resource: "data"
+      environment: "production"
+    expected: true
+    
+  - name: "Write Permission Denied"
+    input:
+      user: "bob"
+      action: "write"
+      resource: "data"
+      environment: "production"
+    expected: false
+    
+  - name: "Invalid Resource Access"
+    input:
+      user: "alice"
+      action: "read"
+      resource: "unknown-resource"
+      environment: "production"
+    expected: false
