@@ -1,90 +1,127 @@
-# Core web framework
+# =============================================================================
+# AI CRENOVENT BACKEND REQUIREMENTS
+# =============================================================================
+# This file contains all Python dependencies for the AI backend service
+# Organized by functionality to match Dockerfile structure and usage patterns
+
+# =============================================================================
+# CORE WEB FRAMEWORK & SERVER
+# =============================================================================
+# FastAPI and ASGI server (matches DSL requirements for consistency)
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Flask for legacy compatibility
 flask==2.3.3
 flask-cors==4.0.0
-fastapi==0.117.1
-uvicorn==0.37.0
+flask-socketio==5.3.6
 
-# Environment and utilities
-python-dotenv==1.0.0
-requests==2.31.0
+# =============================================================================
+# DATABASE & DATA PROCESSING
+# =============================================================================
+# Database drivers and ORM
 sqlalchemy==2.0.20
-# Fixed: Use asyncpg instead of psycopg2-binary for better Windows compatibility
 asyncpg==0.29.0
-typing_extensions==4.15.0
+pyodbc==4.0.39
 
-# LangChain and LangGraph for advanced AI workflows
+# Data processing and analytics
+pandas==2.1.4
+numpy==1.24.4
+scikit-learn>=1.4.0
+scipy>=1.12.0
+
+# =============================================================================
+# AI & MACHINE LEARNING
+# =============================================================================
+# LangChain ecosystem for AI workflows
 langchain>=0.2.0
 langchain-community>=0.2.0
 langchain-openai>=0.1.0
+langchain-experimental>=0.0.60
+langchain-postgres==0.0.9
 langgraph>=0.2.0
 langsmith>=0.1.0
 
-# Memory and conversation management (optional)
-# redis==4.6.0
-# chromadb==0.4.15
-
-# Real-time communication
-websockets==11.0.3
-python-socketio==5.9.0
-flask-socketio==5.3.6
-
-# Agent tools and utilities
+# AI utilities
 pydantic==2.11.9
 pydantic_core==2.33.2
 tenacity==8.2.3
 tiktoken>=0.7,<1
 
-# RPA and automation dependencies
-selenium==4.15.0
-beautifulsoup4==4.12.2
-pandas>=2.2.0
-numpy>=1.26.0
+# =============================================================================
+# DSL (DOMAIN SPECIFIC LANGUAGE) DEPENDENCIES
+# =============================================================================
+# Core DSL parsing and validation
+jsonschema==4.20.0
+PyYAML==6.0.1
+semver==3.0.2
 
-# Email automation
-# smtplib-async==1.1.3
+# DSL workflow and orchestration
+networkx==3.2.1
+structlog==23.2.0
 
-# Data processing
-pyodbc==4.0.39
+# DSL HTTP and async operations
+httpx==0.25.2
+aiohttp==3.9.1
 
-# Data processing
-pyodbc==4.0.39
+# DSL templating and security
+jinja2==3.1.2
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
 
-# Azure dependencies for database configuration
+# =============================================================================
+# AZURE CLOUD SERVICES
+# =============================================================================
+# Azure SDK for cloud integration
 azure-identity==1.15.0
 azure-keyvault-secrets==4.7.0
 azure-storage-blob==12.19.0
 
-# Enterprise LangChain Tools for Revolutionary AI
-langchain-experimental>=0.0.60
-tavily-python==0.3.3
-# pgvector==0.2.4  # May not be needed with asyncpg
+# =============================================================================
+# AUTOMATION & RPA
+# =============================================================================
+# Web automation and scraping
+selenium==4.15.0
+beautifulsoup4==4.12.2
 
-# Advanced Analytics & Business Intelligence
-scikit-learn>=1.4.0
-scipy>=1.12.0
+# Real-time communication
+websockets==11.0.3
+python-socketio==5.9.0
+
+# =============================================================================
+# EXTERNAL API INTEGRATIONS
+# =============================================================================
+# Market intelligence and data sources
 yfinance==0.2.28
-
-# Market Intelligence Tools
 newsapi-python==0.2.7
 alpha-vantage==2.3.1
+tavily-python==0.3.3
 
-# Enhanced PostgreSQL Vector Support
-langchain-postgres==0.0.9
-
-# Ultra-Dynamic Geolocation Services
+# =============================================================================
+# GEOLOCATION & MAPPING
+# =============================================================================
+# Geographic services
 geopy==2.4.1
 pycountry==24.6.1
 pycountry-convert==0.7.2
 reverse-geocoder==1.5.1
 
-# Additional dependencies
+# =============================================================================
+# UTILITIES & ENVIRONMENT
+# =============================================================================
+# Environment and configuration
+python-dotenv==1.0.0
+requests==2.31.0
+typing_extensions==4.15.0
+
+# Core Python utilities
 annotated-types==0.7.0
 anyio==4.11.0
 click==8.3.0
 colorama==0.4.6
 h11==0.16.0
 idna==3.10
-Jinja2==3.1.6
 MarkupSafe==3.0.2
 pyproject==1.3.1
 python-dateutil==2.9.0.post0
@@ -95,12 +132,15 @@ starlette==0.48.0
 typing-inspection==0.4.1
 tzdata==2025.2
 
-# JSON schema validation (required by DSL parser)
-jsonschema==4.20.0
+# =============================================================================
+# OPTIONAL DEPENDENCIES (COMMENTED OUT)
+# =============================================================================
+# Memory and conversation management
+# redis==4.6.0
+# chromadb==0.4.15
 
-# Additional DSL dependencies
-PyYAML==6.0.1
-httpx==0.25.2
-semver==3.0.2
-structlog==23.2.0
-python-multipart==0.0.6
+# Email automation
+# smtplib-async==1.1.3
+
+# Vector database support
+# pgvector==0.2.4  # May not be needed with asyncpg
