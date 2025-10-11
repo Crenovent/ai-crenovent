@@ -44,6 +44,8 @@ except ImportError:
     class RBAWorkflowEngine:
         async def execute_workflow(self, **kwargs):
             return WorkflowExecutionResult()
+logger = logging.getLogger(__name__)
+
 try:
     from hierarchy_processor.core.super_smart_rba_mapper import SuperSmartRBAMapper
     from hierarchy_processor.core.optimized_universal_mapper import OptimizedUniversalMapper
@@ -52,13 +54,20 @@ try:
         HierarchyValidationResult
     )
     # LLM processor removed - using smart RBA agents only
-except ImportError:
+    logger.info("✅ Successfully imported hierarchy processor components")
+except ImportError as e:
+    logger.warning(f"⚠️ Failed to import hierarchy processor components: {e}")
+    logger.warning("⚠️ Using mock classes - this may indicate missing dependencies")
     # Create mock classes if hierarchy processor is not available
     class SuperSmartRBAMapper:
         def map_csv_intelligently(self, df, tenant_id=None):
             return df, 0.8, "MOCK_SYSTEM"
     
     class OptimizedUniversalMapper:
+        def __init__(self, enable_caching=True, chunk_size=1000):
+            self.enable_caching = enable_caching
+            self.chunk_size = chunk_size
+        
         def map_any_hrms_to_crenovent_vectorized(self, df):
             return df
     
@@ -74,8 +83,6 @@ except ImportError:
             self.circular_references = []
             self.missing_managers = []
             self.max_depth = 0
-
-logger = logging.getLogger(__name__)
 
 class HierarchyProcessingWorkflowExecutor:
     """

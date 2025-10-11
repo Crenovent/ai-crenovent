@@ -1121,3 +1121,9 @@ execution_mode: sync
 workflow_config: None
 file.filename: salesforce_user_hierarchy.csv
 ==================================================
+=== ENDPOINT CALLED ===
+tenant_id: 1813446747
+execution_mode: sync
+workflow_config: None
+file.filename: salesforce_user_hierarchy.csv
+==================================================
